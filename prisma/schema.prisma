@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model EdgeBoost {
+  id          String      @id @unique @default(cuid())
+  name        String
+  cost        Int
+  description String
+  source      source_book
+  page        Int
+  updated_at  DateTime    @default(now()) @updatedAt
+}
+
+model EdgeAction {
+  id          String                  @id @unique @default(cuid())
+  name        String
+  cost        Int
+  restriction edge_action_restriction
+  description String
+  source      source_book
+  page        Int
+  updated_at  DateTime                @default(now()) @updatedAt
+}
+
+model Rule {
+  id          String        @id @unique @default(cuid())
+  category    rule_category
+  name        String
+  description String?
+  updated_at  DateTime      @default(now()) @updatedAt
+  homebrew    Boolean       @default(false)
+  source      source_book?
+  page        Int?
+}
+
+model Homebrew {
+  id          String        @id @unique @default(cuid())
+  category    rule_category
+  name        String
+  description String
+  updated_at  DateTime      @default(now()) @updatedAt
+}
+
+enum source_book {
+  core
+  wyrd
+  wild_life
+  firing_squad
+  companion
+  body_shop
+  shifter
+  homebrew
+}
+
+enum edge_action_restriction {
+  melee_attack
+  ranged_attack
+  any_attack
+  any
+  specific
+  block
+  ranged_attack_from_cover
+  use_skill
+  multi_attack
+}
+
+enum rule_category {
+  edge
+  magic
+  combat
+  decking
+  rigging
+  regeneration
+  critter
+  spirits
+  other
+}
