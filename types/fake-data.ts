@@ -50,7 +50,7 @@ export function fakeRule() {
   return {
     category: faker.helpers.arrayElement([rule_category.edge, rule_category.magic, rule_category.combat, rule_category.decking, rule_category.rigging, rule_category.regeneration, rule_category.critter, rule_category.spirits, rule_category.other] as const),
     name: faker.person.fullName(),
-    description: undefined,
+    description: faker.lorem.words(5),
     source: undefined,
     page: undefined,
   };
@@ -60,11 +60,11 @@ export function fakeRuleComplete() {
     id: faker.string.uuid(),
     category: faker.helpers.arrayElement([rule_category.edge, rule_category.magic, rule_category.combat, rule_category.decking, rule_category.rigging, rule_category.regeneration, rule_category.critter, rule_category.spirits, rule_category.other] as const),
     name: faker.person.fullName(),
-    description: undefined,
+    description: faker.lorem.words(5),
     updated_at: new Date(),
     homebrew: false,
-    source: undefined,
-    page: undefined,
+    source: faker.helpers.arrayElement([source_book.core, source_book.wyrd, source_book.wild_life, source_book.firing_squad, source_book.companion, source_book.body_shop, source_book.shifter, source_book.homebrew] as const),
+    page: faker.number.int(),
   };
 }
 export function fakeHomebrew() {
