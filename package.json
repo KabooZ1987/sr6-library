@@ -16,6 +16,7 @@
     "vue-router": "^4.3.0"
   },
   "devDependencies": {
-    "prisma": "^5.11.0"
+    "prisma": "^5.11.0",
+    "prisma-generator-fake-data": "^0.14.1"
   }
 }
