@@ -10,6 +10,12 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.5.1",
+    "@fortawesome/free-brands-svg-icons": "^6.5.1",
+    "@fortawesome/free-regular-svg-icons": "^6.5.1",
+    "@fortawesome/free-solid-svg-icons": "^6.5.1",
+    "@fortawesome/vue-fontawesome": "^3.0.6",
+    "@nuxt/ui": "^2.14.2",
     "@prisma/client": "5.11.0",
     "nuxt": "^3.10.3",
     "vue": "^3.4.21",
@@ -17,6 +23,7 @@
   },
   "devDependencies": {
     "prisma": "^5.11.0",
-    "prisma-generator-fake-data": "^0.14.1"
+    "prisma-generator-fake-data": "^0.14.1",
+    "sass": "^1.72.0"
   }
 }
