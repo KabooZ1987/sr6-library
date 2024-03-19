@@ -31,6 +31,14 @@
       text-justify: inter-word;
       margin-top: 30px;
     }
+
+    h1{
+      font-size: 32px;
+    }
+
+    .data-table{
+      margin-top: 50px;
+    }
   }
 
 </style>
