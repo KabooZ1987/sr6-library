@@ -18,10 +18,12 @@
     "@nuxt/ui": "^2.14.2",
     "@prisma/client": "5.11.0",
     "nuxt": "^3.10.3",
+    "primevue": "^3.50.0",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },
   "devDependencies": {
+    "nuxt-primevue": "^0.3.1",
     "prisma": "^5.11.0",
     "prisma-generator-fake-data": "^0.14.1",
     "sass": "^1.72.0"
