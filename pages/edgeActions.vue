@@ -24,6 +24,7 @@
 
 
 <script setup>
+import { rule_category, edge_action_restriction, source_book } from '@prisma/client';
     const columns = [{
         key: 'id',
         label: 'ID',

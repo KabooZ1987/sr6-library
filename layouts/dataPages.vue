@@ -7,7 +7,9 @@
             <form  action="">
                 <input placeholder="Google Suche..." type="text">
                 <label for="" class="icon">
-                    <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
+                    <client-only>
+                        <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
+                    </client-only>
                 </label>
             </form>
         </div>
@@ -31,7 +33,9 @@
             </ul>
             <div class="berger-Menu">
                 <span @click="toggleMobileNav" v-show="Tablet" :class="{ 'icon-active': mobileNavOpen }">
-                    <font-awesome-icon :icon="['fas', 'bars']" />
+                    <client-only>
+                        <font-awesome-icon :icon="['fas', 'bars']" />
+                    </client-only>
                 </span>
                 <!-- <span @click="toggleMobileNav" v-show="mobile"  :class="{'icon-active' : mobileNavOpen}">menu</span> -->
             </div>
