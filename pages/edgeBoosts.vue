@@ -5,57 +5,120 @@
             <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
                 <template #header>
                     <div class="flex items-center justify-between">
-                        <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+                        <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white" v-show="formSwitch">
                             Edit
+                        </h3>
+                        <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
+                            v-show="!formSwitch">
+                            Add New Item
+                        </h3>
+                        <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                            @click="xButton()" />
+                    </div>
+                </template>
+
+                <section v-show="formSwitch" v-if="formSwitch">
+                    <div class="Form">
+                        <div>
+                            <p>Name</p>
+                            <input type="text" :placeholder="dataOfEachRow.name" v-model="Name">
+                        </div>
+
+                        <div>
+                            <p>Cost</p>
+                            <input type="text" :placeholder="dataOfEachRow.cost" v-model="Cost">
+                        </div>
+                    </div>
+
+                    <div class="Form">
+                        <div>
+                            <p>Page</p>
+                            <input type="text" :placeholder="dataOfEachRow.page" v-model="Page">
+
+                        </div>
+                        <div>
+                            <p>Source</p>
+                            <input type="text" :placeholder="dataOfEachRow.source" v-model="Source">
+                        </div>
+
+                    </div>
+
+                    <div class="field">
+                        <div>
+                            <p>Description</p>
+                            <textarea type="text" :placeholder="dataOfEachRow.description" v-model="Description" />
+                        </div>
+                    </div>
+                    <div class="save-button">
+                        <UButton size="sm" color="blue" variant="solid" :trailing="false" @click="saveData()">
+                            Save
+                        </UButton>
+                    </div>
+                </section>
+                <section v-show="!formSwitch" v-else>
+
+                    <div class="Form">
+                        <div>
+                            <p>New Name</p>
+                            <input type="text" v-model="Name">
+                        </div>
+
+                        <div>
+                            <p>New Cost</p>
+                            <input type="text" v-model="Cost">
+                        </div>
+                    </div>
+
+                    <div class="Form">
+                        <div>
+                            <p> New Page</p>
+                            <input type="text" v-model="Page">
+
+                        </div>
+                        <div>
+                            <p>New Source</p>
+                            <input type="text" v-model="Source">
+                        </div>
+
+                    </div>
+
+                    <div class="field">
+                        <div>
+                            <p>New Description</p>
+                            <textarea type="text" v-model="Description" />
+                        </div>
+                    </div>
+                    <div class="save-button">
+                        <UButton size="sm" color="blue" variant="solid" :trailing="false" @click="saveData()">
+                            Save
+                        </UButton>
+                    </div>
+                </section>
+
+            </UCard>
+            <!-- <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }" v-show="!formSwitch"
+                v-else>
+                <template #header>
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+                            Add New Item
                         </h3>
                         <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
                             @click="isOpen = false" />
                     </div>
                 </template>
-                
-                <div class="Form">
-                    <div>
-                        <p>Name</p>
-                        <input type="text" :placeholder="dataOfEachRow.name" v-model="Name">
-                    </div>
+                <p>make it real</p>
 
-                    <div>
-                        <p>Cost</p>
-                        <input type="text" :placeholder="dataOfEachRow.cost" v-model="Cost">
-                    </div>
-                </div>
 
-                <div class="Form">
-                    <div>
-                        <p>Page</p>
-                        <input type="text" :placeholder="dataOfEachRow.page" v-model="Page">
-
-                    </div>
-                    <div>
-                        <p>Source</p>
-                        <input type="text" :placeholder="dataOfEachRow.source" v-model="Source">
-                    </div>
-
-                </div>
-
-                <div class="field">
-                    <div>
-                        <p>Description</p>
-                        <textarea type="text" :placeholder="dataOfEachRow.description" v-model="Description" />
-                    </div>
-                </div>
-                <div class="save-button">
-                    <UButton size="sm" color="blue" variant="solid" :trailing="false" @click="saveData()">
-                        Save
-                    </UButton>
-                </div>
-
-            </UCard>
+            </UCard> -->
         </UModal>
+
+
+
 
         <h1>EDGE BOOSTS</h1>
         <div class="add-button">
-            <UButton size="sm" color="green" variant="solid" :trailing="false">
+            <UButton size="sm" color="green" variant="solid" :trailing="false" @click="addData()">
                 + New Data
             </UButton>
 
@@ -82,6 +145,7 @@
 import { ref, onMounted } from 'vue'
 
 
+const formSwitch = ref(true)
 const data = ref([])
 const isOpen = ref(false)
 const dataOfEachRow = ref()
@@ -147,9 +211,21 @@ definePageMeta({
 
 })
 
+function xButton() {
+    isOpen.value = false
+    Name.value = null 
+    Cost.value = null
+    Page.value = null
+    Source.value = null
+    Description.value = null
+}
+function addData() {
+    isOpen.value = true;
+    formSwitch.value = false;
 
-
+}
 function getData(rowData) {
+    formSwitch.value = true;
     dataOfEachRow.value = rowData;
     isOpen.value = true
 
@@ -165,8 +241,13 @@ function getData(rowData) {
 
 
 function saveData() {
-    element.value.id = dataOfEachRow.value.id
-    element.value.updated_at = dataOfEachRow.value.updated_at
+    if (!formSwitch.value) {
+        element.value.id = Math.ceil(Math.random() * 1000000).toString()
+        element.value.updated_at = new Date()
+    } else {
+        element.value.id = dataOfEachRow.value.id
+        element.value.updated_at = dataOfEachRow.value.updated_at
+    }
 
     if (Name.value !== null) {
         element.value.name = Name.value.toString();
