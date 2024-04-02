@@ -49,11 +49,6 @@
                             <textarea type="text" :placeholder="dataOfEachRow.description" v-model="Description" />
                         </div>
                     </div>
-                    <div class="save-button">
-                        <UButton size="sm" color="blue" variant="solid" :trailing="false" @click="saveData()">
-                            Save
-                        </UButton>
-                    </div>
                 </section>
                 <section v-show="!formSwitch" v-else>
 
@@ -88,13 +83,13 @@
                             <textarea type="text" v-model="Description" />
                         </div>
                     </div>
-                    <div class="save-button">
-                        <UButton size="sm" color="blue" variant="solid" :trailing="false" @click="saveData()">
-                            Save
-                        </UButton>
-                    </div>
                 </section>
-
+                <div class="save-button">
+                    <UButton size="sm" color="blue" variant="solid" :trailing="false" @click="saveData()">
+                        Save
+                    </UButton>
+                </div>
+                
             </UCard>
             <!-- <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }" v-show="!formSwitch"
                 v-else>
@@ -131,7 +126,7 @@
                         <UButton icon="i-heroicons-pencil-square" size="sm" color="orange" variant="solid"
                             :trailing="false" @click="getData(row)" />
                         <UButton icon="i-heroicons-trash-20-solid" size="sm" color="red" variant="solid"
-                            :trailing="false" />
+                            :trailing="false" @click="delData(row)"/>
                     </div>
                 </template>
             </UTable>
@@ -218,6 +213,14 @@ function xButton() {
     Page.value = null
     Source.value = null
     Description.value = null
+}
+
+function delData(rowData){
+    dataOfEachRow.value = rowData;
+    element.value.id = dataOfEachRow.value.id
+
+    useFetch("/api/edge_boost", { method: "Delete", body: JSON.stringify({ upsert: element.value }) });
+    location.reload()
 }
 function addData() {
     isOpen.value = true;
