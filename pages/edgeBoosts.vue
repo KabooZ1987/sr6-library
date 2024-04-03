@@ -1,5 +1,4 @@
 <template>
-
     <div>
         <UModal v-model="isOpen" prevent-close>
             <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
@@ -89,44 +88,34 @@
                         Save
                     </UButton>
                 </div>
-                
             </UCard>
-            <!-- <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }" v-show="!formSwitch"
-                v-else>
-                <template #header>
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-                            Add New Item
-                        </h3>
-                        <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
-                            @click="isOpen = false" />
-                    </div>
-                </template>
-                <p>make it real</p>
-
-
-            </UCard> -->
         </UModal>
 
 
 
 
         <h1>EDGE BOOSTS</h1>
+
+
         <div class="add-button">
             <UButton size="sm" color="green" variant="solid" :trailing="false" @click="addData()">
-                + New Data
+               + New Data
             </UButton>
 
         </div>
 
+
         <div class="data-table">
-            <UTable :columns="columns" :rows="data">
+            <div class="flex px-3 py-3.5 border border-gray-200 dark:border-gray-700">
+                <UInput v-model="serachWord" placeholder="Search here..." />
+            </div>
+            <UTable :columns="columns" :rows="filtering" class="border border-primary-200 dark:border-primary-700">
                 <template #actions-data="{ row }">
                     <div>
                         <UButton icon="i-heroicons-pencil-square" size="sm" color="orange" variant="solid"
                             :trailing="false" @click="getData(row)" />
                         <UButton icon="i-heroicons-trash-20-solid" size="sm" color="red" variant="solid"
-                            :trailing="false" @click="delData(row)"/>
+                            :trailing="false" @click="delData(row)" />
                     </div>
                 </template>
             </UTable>
@@ -144,13 +133,14 @@ const formSwitch = ref(true)
 const data = ref([])
 const isOpen = ref(false)
 const dataOfEachRow = ref()
-
+const serachWord = ref()
 
 const Name = ref(null)
 const Cost = ref(null)
 const Page = ref(null)
 const Source = ref(null)
 const Description = ref(null)
+
 
 const element = ref({
     "id": null,
@@ -199,7 +189,16 @@ const columns = [{
 useFetch('/api/edge_boost').then(response => data.value = response.data.value.data.complete)
 
 // Server push beispiel
-
+const filtering = computed(() => {
+    if(!serachWord.value){
+        return data.value
+    }
+    return data.value.filter((row) => {
+        return Object.values(row).some((value)=>{
+            return String(value).toLowerCase().includes(serachWord.value.trim().toLowerCase())
+        })
+    })
+})
 
 definePageMeta({
     layout: 'data-pages',
@@ -208,14 +207,14 @@ definePageMeta({
 
 function xButton() {
     isOpen.value = false
-    Name.value = null 
+    Name.value = null
     Cost.value = null
     Page.value = null
     Source.value = null
     Description.value = null
 }
 
-function delData(rowData){
+function delData(rowData) {
     dataOfEachRow.value = rowData;
     element.value.id = dataOfEachRow.value.id
 
@@ -316,6 +315,10 @@ function saveData() {
 
 .add-button {
     margin-top: 20px;
+    
+    .plus-icon{
+        font-size: 15px;
+    }
 }
 
 .Form {

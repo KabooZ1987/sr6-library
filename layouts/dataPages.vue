@@ -5,7 +5,7 @@
         </div>
         <div class="box">
             <form  action="">
-                <input placeholder="Google Suche..." type="text">
+                <input placeholder="Search Here.... " type="text">
                 <label for="" class="icon">
                     <client-only>
                         <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
@@ -84,8 +84,14 @@ if (typeof window !== 'undefined') {
 
 
     onMounted(() => {
+        
+            if(window.screenY > 50)
+                  scrollNav.value = true
+            
+            else
+                window.addEventListener("scroll", updateScroll)
 
-        window.addEventListener("scroll", updateScroll)
+    
 
     });
 }
@@ -95,9 +101,11 @@ function updateScroll() {
     const scrollPosition = window.scrollY;
     if (scrollPosition > 50) {
         scrollNav.value = true;
+        
     } else {
 
         scrollNav.value = false;
+        
     }
 }
 function toggleMobileNav() {
