@@ -97,16 +97,12 @@
         <h1>EDGE BOOSTS</h1>
 
 
-        <div class="add-button">
-            <UButton size="sm" color="green" variant="solid" :trailing="false" @click="addData()">
-               + New Data
-            </UButton>
-
-        </div>
-
-
+        
         <div class="data-table">
             <div class="flex px-3 py-3.5 border border-gray-200 dark:border-gray-700">
+                <UButton size="sm" color="green" variant="solid" :trailing="false" @click="addData()">
+                   + New Data
+                </UButton>
                 <UInput v-model="serachWord" placeholder="Search here..." />
             </div>
             <UTable :columns="columns" :rows="filtering" class="border border-primary-200 dark:border-primary-700">
