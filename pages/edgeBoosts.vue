@@ -97,16 +97,18 @@
         <h1>EDGE BOOSTS</h1>
 
 
-        
+
         <div class="data-table">
             <div class="table-tools">
-                
+
                 <form action="">
                     <input type="text" v-model="serachWord" placeholder="Search here...">
                 </form>
-                <button @click="addData()">
-                    <font-awesome-icon icon="fa-solid fa-square-plus" />
-                </button>
+                
+                    <button @click="addData()">
+                        + New Data
+                    </button>
+                
                 <!-- <UButton size="sm" color="green" variant="solid" :trailing="false" @click="addData()">
                    + New Data
                 </UButton>
@@ -114,12 +116,15 @@
             </div>
             <UTable :columns="columns" :rows="filtering" class="border border-primary-200 dark:border-primary-700">
                 <template #actions-data="{ row }">
-                    <div>
-                        <UButton icon="i-heroicons-pencil-square" size="sm" color="orange" variant="solid"
+                    <UDropdown :items="items(row)">
+                        <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
+                    </UDropdown>
+
+                    <!-- <UButton icon="i-heroicons-pencil-square" size="sm" color="orange" variant="solid"
                             :trailing="false" @click="getData(row)" />
                         <UButton icon="i-heroicons-trash-20-solid" size="sm" color="red" variant="solid"
-                            :trailing="false" @click="delData(row)" />
-                    </div>
+                            :trailing="false" @click="delData(row)" /> -->
+
                 </template>
             </UTable>
         </div>
@@ -156,7 +161,7 @@ const element = ref({
     "updated_at": null
 });
 
-const columns = [ {
+const columns = [{
     key: 'name',
     label: 'Name',
     sortable: true
@@ -184,17 +189,29 @@ const columns = [ {
     key: 'actions'
 }]
 
+const items = (row) => [
+    [{
+        label: 'Edit',
+        icon: 'i-heroicons-pencil-square-20-solid',
+        click: () => getData(row)
+    }, {
+        label: 'Delete',
+        icon: 'i-heroicons-trash-20-solid',
+        click: () => delData(row)
+    }]
+]
+
 // console.log(await useFetch('/api/edge_boost'));
 
 useFetch('/api/edge_boost').then(response => data.value = response.data.value.data.complete)
 
 // Server push beispiel
 const filtering = computed(() => {
-    if(!serachWord.value){
+    if (!serachWord.value) {
         return data.value
     }
     return data.value.filter((row) => {
-        return Object.values(row).some((value)=>{
+        return Object.values(row).some((value) => {
             return String(value).toLowerCase().includes(serachWord.value.trim().toLowerCase())
         })
     })
@@ -244,10 +261,10 @@ function getData(rowData) {
 
 function saveData() {
     if (!formSwitch.value) {
-        data.value.filter((row) =>{
-            do{
+        data.value.filter((row) => {
+            do {
                 UUID.value = uuidv4();
-            } while(UUID.value === row.id )
+            } while (UUID.value === row.id)
         })
         element.value.id = UUID.value
         element.value.updated_at = new Date()
@@ -303,26 +320,40 @@ function saveData() {
 
 
 
-<style lang="scss">
+<style lang="scss" scoped>
 .data-table {
-    .table-tools{
-       
-        padding: 0 10px;
+    .table-tools {
+
+        padding:  10px;
         display: flex;
         justify-content: space-between;
         margin-bottom: 15px;
         align-items: center;
-        button{
-            font-size: 35px;
-            color: rgb(10, 240, 10);
-        }
-        input{
-            border-radius: 20px;
-            padding: 0 20px ;
-            background-color: rgb(99, 96, 96);
-            
-        }
         
+        button{
+            display: inline-block;
+            box-sizing: border-box;
+            color: rgb(1, 179, 1);
+            border-radius: 20px;
+            padding:2px 8px;
+            font-size: 15px;
+            border: 2px solid  rgb(1, 179, 1);
+            &:hover{
+                color:  rgb(5, 235, 5);
+                border-color:  rgb(5, 235, 5);
+            }
+
+        }
+            
+
+
+        input {
+            border-radius: 20px;
+            padding: 0 20px;
+            background-color: rgb(99, 96, 96);
+
+        }
+
     }
 }
 
@@ -338,8 +369,8 @@ function saveData() {
 
 .add-button {
     margin-top: 20px;
-    
-    .plus-icon{
+
+    .plus-icon {
         font-size: 15px;
     }
 }
