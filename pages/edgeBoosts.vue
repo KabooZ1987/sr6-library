@@ -99,11 +99,18 @@
 
         
         <div class="data-table">
-            <div class="flex px-3 py-3.5 border border-gray-200 dark:border-gray-700">
-                <UButton size="sm" color="green" variant="solid" :trailing="false" @click="addData()">
+            <div class="table-tools">
+                
+                <form action="">
+                    <input type="text" v-model="serachWord" placeholder="Search here...">
+                </form>
+                <button @click="addData()">
+                    <font-awesome-icon icon="fa-solid fa-square-plus" />
+                </button>
+                <!-- <UButton size="sm" color="green" variant="solid" :trailing="false" @click="addData()">
                    + New Data
                 </UButton>
-                <UInput v-model="serachWord" placeholder="Search here..." />
+                <UInput v-model="serachWord" placeholder="Search here..." /> -->
             </div>
             <UTable :columns="columns" :rows="filtering" class="border border-primary-200 dark:border-primary-700">
                 <template #actions-data="{ row }">
@@ -123,7 +130,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-
+import { v4 as uuidv4 } from 'uuid';
+const UUID = ref()
 
 const formSwitch = ref(true)
 const data = ref([])
@@ -148,11 +156,7 @@ const element = ref({
     "updated_at": null
 });
 
-const columns = [{
-    key: 'id',
-    label: 'ID',
-    sortable: true
-}, {
+const columns = [ {
     key: 'name',
     label: 'Name',
     sortable: true
@@ -240,7 +244,12 @@ function getData(rowData) {
 
 function saveData() {
     if (!formSwitch.value) {
-        element.value.id = Math.ceil(Math.random() * 1000000).toString()
+        data.value.filter((row) =>{
+            do{
+                UUID.value = uuidv4();
+            } while(UUID.value === row.id )
+        })
+        element.value.id = UUID.value
         element.value.updated_at = new Date()
     } else {
         element.value.id = dataOfEachRow.value.id
@@ -295,8 +304,26 @@ function saveData() {
 
 
 <style lang="scss">
-.data-table button {
-    margin: 0 5px;
+.data-table {
+    .table-tools{
+       
+        padding: 0 10px;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        align-items: center;
+        button{
+            font-size: 35px;
+            color: rgb(10, 240, 10);
+        }
+        input{
+            border-radius: 20px;
+            padding: 0 20px ;
+            background-color: rgb(99, 96, 96);
+            
+        }
+        
+    }
 }
 
 .save-button {
