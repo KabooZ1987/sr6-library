@@ -6,16 +6,16 @@
         <nav>
             <ul v-show="!Tablet" class="navigation">
                 <li>
-                    <NuxtLink class="link" to="/edgeBoosts">edge boosts</NuxtLink >
+                    <NuxtLink class="link" to="/edgeBoosts">edge boosts</NuxtLink>
                 </li>
                 <li>
-                    <NuxtLink  class="link" to="/edgeActions">edge actions</NuxtLink>
+                    <NuxtLink class="link" to="/edgeActions">edge actions</NuxtLink>
                 </li>
                 <li>
-                    <NuxtLink  class="link" to="/rules">rules</NuxtLink >
+                    <NuxtLink class="link" to="/rules">rules</NuxtLink>
                 </li>
                 <li>
-                    <NuxtLink  class="link" to="/homeBrew">homebrew</NuxtLink >
+                    <NuxtLink class="link" to="/homeBrew">homebrew</NuxtLink>
                 </li>
             </ul>
             <div class="berger-Menu">
@@ -27,16 +27,16 @@
             <transition name="mobile-nav">
                 <ul v-show="mobileNavOpen" class="sideBar">
                     <li>
-                        <NuxtLink  class="link" to="/edgeBoosts">edge boosts</NuxtLink >
+                        <NuxtLink class="link" to="/edgeBoosts">edge boosts</NuxtLink>
                     </li>
                     <li>
-                        <NuxtLink  class="link" to="/edgeActions">edge actions</NuxtLink >
+                        <NuxtLink class="link" to="/edgeActions">edge actions</NuxtLink>
                     </li>
                     <li>
-                        <NuxtLink  class="link" to="/rules">rules</NuxtLink >
+                        <NuxtLink class="link" to="/rules">rules</NuxtLink>
                     </li>
                     <li>
-                        <NuxtLink  class="link" to="/homeBrew">homebrew</NuxtLink >
+                        <NuxtLink class="link" to="/homeBrew">homebrew</NuxtLink>
                     </li>
                 </ul>
             </transition>
@@ -109,7 +109,7 @@ header {
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
-    background-color: rgb(93, 93, 93);
+    background-color: rgba(4, 180, 19, 0.616);
     color: white;
     z-index: 99;
     width: 100%;
@@ -128,6 +128,8 @@ header {
             font-weight: 800;
             transition: .5s ease all;
             padding: 0 16px;
+
+
         }
     }
 
@@ -169,8 +171,9 @@ header {
                     border-bottom: 1px solid transparent;
 
                     &:hover {
-                        color: aqua;
-                        border-color: aqua;
+                        color: rgba(5, 12, 117, 0.548);
+                        border-color: rgba(5, 12, 117, 0.548);
+                        transition: .5s ease-out;
                     }
                 }
             }
@@ -205,7 +208,7 @@ header {
             width: 100%;
             max-width: 250px;
             height: 100%;
-            background-color: gray;
+            background-color: rgb(4, 180, 19);
             top: 0;
             left: 0;
 
@@ -221,8 +224,9 @@ header {
                     border-bottom: 1px solid transparent;
 
                     &:hover {
-                        color: aqua;
-                        border-color: aqua;
+                        color:  rgba(5, 12, 117, 0.548);
+                        border-color:  rgba(5, 12, 117, 0.548);
+                        transition: .5s ease-out;
                     }
                 }
             }
@@ -270,6 +274,11 @@ header {
 
                 .link {
                     font-size: 10px;
+                    &:hover {
+                        color: rgb(4, 180, 19);
+                        border-color:  rgb(4, 180, 19);
+                        transition: .5s ease-out;
+                    }
                 }
             }
         }

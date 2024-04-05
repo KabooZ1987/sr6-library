@@ -3,16 +3,7 @@
         <div class="logo">
             <span>uLogo</span>
         </div>
-        <div class="box">
-            <form  action="">
-                <input placeholder="Search Here.... " type="text">
-                <label for="" class="icon">
-                    <client-only>
-                        <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
-                    </client-only>
-                </label>
-            </form>
-        </div>
+        
         <nav>
             <ul v-show="!Tablet" class="navigation">
                 <li>
@@ -135,7 +126,7 @@ header {
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
-    background-color: rgb(255, 0, 0);
+    background-color: rgba(4, 180, 19, 0.616);
     color: white;
     z-index: 99;
     width: 100%;
@@ -143,55 +134,7 @@ header {
     position: fixed;
     top: 0;
     transition: .5s ease all;
-    .box{
-        max-width: 280px; 
-        width: 100%;
-
-        form {
-            background-color: #cccaca;
-            position: relative;
-            height: 30px;
-            max-width: 280px;
-            margin: auto;
-            border-radius: 25px;
-            border: 3px solid #494343 ;
-
-            input {
-                position: absolute;
-                height: 100%;
-                width: 85%;
-                border-radius: 23px 0 0 23px;
-                background-color: #cccaca;
-                outline: none;
-                border: none;
-                padding-left: 20px;
-            }
-
-            .icon {
-                cursor: pointer;
-                position: absolute;
-                right: -2px;
-                top: 0;
-                width: 50px;
-                height: 100%;
-                text-align: center;
-                line-height: 25px;
-                background-color:#494343;
-                border-radius: 0 23px 23px 0;
-                color: #fff;
-                font-size: 20px;
-            }
-        }
-
-        @media (max-width: 1094px) {
-            margin-right: 60px;
-            form{
-                max-width:200px;
-            }
-
-        }
-        
-    }
+   
 
     .logo {
         margin-right: auto;
@@ -244,8 +187,9 @@ header {
                     border-bottom: 1px solid transparent;
 
                     &:hover {
-                        color: aqua;
-                        border-color: aqua;
+                        color: rgba(5, 12, 117, 0.548);
+                        border-color: rgba(5, 12, 117, 0.548);
+                        transition: .5s ease-out;
                     }
                 }
             }
@@ -280,7 +224,7 @@ header {
             width: 100%;
             max-width: 250px;
             height: 100%;
-            background-color: gray;
+            background-color: rgb(4, 180, 19);
             top: 0;
             left: 0;
 
@@ -296,8 +240,9 @@ header {
                     border-bottom: 1px solid transparent;
 
                     &:hover {
-                        color: aqua;
-                        border-color: aqua;
+                        color:  rgba(5, 12, 117, 0.548);
+                        border-color:  rgba(5, 12, 117, 0.548);
+                        transition: .5s ease-out;
                     }
                 }
             }
@@ -324,10 +269,7 @@ header {
     background-color: black;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
-    .box{
-        max-width: 250px; 
-        width: 100%;
-    }
+
 
     .logo {
 
@@ -350,6 +292,11 @@ header {
 
                 .link {
                     font-size: 10px;
+                    &:hover {
+                        color: rgb(4, 180, 19);
+                        border-color:  rgb(4, 180, 19);
+                        transition: .5s ease-out;
+                    }
                 }
             }
         }
