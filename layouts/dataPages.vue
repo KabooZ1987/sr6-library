@@ -75,14 +75,8 @@ if (typeof window !== 'undefined') {
 
 
     onMounted(() => {
-        
-            if(window.screenY > 50)
-                  scrollNav.value = true
-            
-            else
-                window.addEventListener("scroll", updateScroll)
 
-    
+        window.addEventListener("scroll", updateScroll)
 
     });
 }
