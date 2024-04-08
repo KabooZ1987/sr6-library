@@ -170,7 +170,7 @@ header {
                     padding-bottom: 4px;
                     border-bottom: 1px solid transparent;
 
-                    &:hover {
+                    &:hover, &.router-link-exact-active {
                         color: rgba(5, 12, 117, 0.548);
                         border-color: rgba(5, 12, 117, 0.548);
                         transition: .5s ease-out;
@@ -223,7 +223,7 @@ header {
                     padding-bottom: 4px;
                     border-bottom: 1px solid transparent;
 
-                    &:hover {
+                    &:hover,  &.router-link-exact-active{
                         color:  rgba(5, 12, 117, 0.548);
                         border-color:  rgba(5, 12, 117, 0.548);
                         transition: .5s ease-out;

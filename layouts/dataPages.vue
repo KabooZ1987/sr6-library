@@ -180,7 +180,7 @@ header {
                     padding-bottom: 4px;
                     border-bottom: 1px solid transparent;
 
-                    &:hover {
+                    &:hover,  &.router-link-exact-active {
                         color: rgba(5, 12, 117, 0.548);
                         border-color: rgba(5, 12, 117, 0.548);
                         transition: .5s ease-out;
@@ -233,7 +233,7 @@ header {
                     padding-bottom: 4px;
                     border-bottom: 1px solid transparent;
 
-                    &:hover {
+                    &:hover,  &.router-link-exact-active {
                         color:  rgba(5, 12, 117, 0.548);
                         border-color:  rgba(5, 12, 117, 0.548);
                         transition: .5s ease-out;
@@ -286,7 +286,7 @@ header {
 
                 .link {
                     font-size: 10px;
-                    &:hover {
+                    &:hover, &.router-link-exact-active  {
                         color: rgb(4, 180, 19);
                         border-color:  rgb(4, 180, 19);
                         transition: .5s ease-out;
