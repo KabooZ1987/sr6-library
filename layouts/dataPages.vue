@@ -33,19 +33,29 @@
             <transition name="mobile-nav">
                 <ul v-show="mobileNavOpen" class="sideBar">
                     <li>
-                        <NuxtLink  class="link" to="/">Home</NuxtLink >
+                        <NuxtLink  class="link" to="/">
+                            <p>Home</p>
+                        </NuxtLink >
                     </li>
                     <li>
-                        <NuxtLink  class="link" to="/edgeBoosts">edge boosts</NuxtLink >
+                        <NuxtLink  class="link" to="/edgeBoosts">
+                            <p>edge boosts</p>
+                        </NuxtLink >
                     </li>
                     <li>
-                        <NuxtLink  class="link" to="/edgeActions">edge actions</NuxtLink >
+                        <NuxtLink  class="link" to="/edgeActions">
+                            <p>edge actions</p>
+                        </NuxtLink >
                     </li>
                     <li>
-                        <NuxtLink  class="link" to="/rules">rules</NuxtLink >
+                        <NuxtLink  class="link" to="/rules">
+                           <p>rules</p> 
+                        </NuxtLink >
                     </li>
                     <li>
-                        <NuxtLink  class="link" to="/homeBrew">homebrew</NuxtLink >
+                        <NuxtLink  class="link" to="/homeBrew">
+                            <p>homebrew</p>
+                        </NuxtLink >
                     </li>
                 </ul>
             </transition>
@@ -178,11 +188,10 @@ header {
                     font-size: 15px;
                     transition: .5s ease all;
                     padding-bottom: 4px;
-                    border-bottom: 1px solid transparent;
+                    
 
                     &:hover,  &.router-link-exact-active {
-                        color: rgba(5, 12, 117, 0.548);
-                        border-color: rgba(5, 12, 117, 0.548);
+                        color: rgb(19, 58, 15);
                         transition: .5s ease-out;
                     }
                 }
@@ -223,20 +232,28 @@ header {
             left: 0;
 
             li {
-                margin-left: 0;
-                padding: 15px;
-
+                
+                
+                
                 .link {
+                    padding: 0.5rem 1rem;
+                    display: flex;
                     font-size: 20px;
-                    transition: .5s ease all;
+                    
                     color: white;
                     padding-bottom: 4px;
-                    border-bottom: 1px solid transparent;
-
-                    &:hover,  &.router-link-exact-active {
-                        color:  rgba(5, 12, 117, 0.548);
-                        border-color:  rgba(5, 12, 117, 0.548);
+                    p{
                         transition: .5s ease-out;
+                    }
+                    
+                    &:hover,  &.router-link-exact-active {
+                        color:  rgb(18, 97, 8);
+                        background-color: rgba(104, 226, 114, 0.712);
+                    }
+
+                    &.router-link-exact-active{
+                        border-right: solid rgb(18, 97, 8) 5px;
+                        
                     }
                 }
             }
