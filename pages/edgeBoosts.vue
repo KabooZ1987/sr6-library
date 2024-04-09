@@ -104,29 +104,31 @@
                 <form action="">
                     <input type="text" v-model="serachWord" placeholder="Search here...">
                 </form>
-                
-                    <button @click="addData()">
-                        + New Data
-                    </button>
-                
+
+                <button @click="addData()">
+                    + New Data
+                </button>
+
                 <!-- <UButton size="sm" color="green" variant="solid" :trailing="false" @click="addData()">
                    + New Data
                 </UButton>
                 <UInput v-model="serachWord" placeholder="Search here..." /> -->
             </div>
-            <UTable :columns="columns" :rows="filtering" class="border border-primary-200 dark:border-primary-700">
-                <template #actions-data="{ row }">
-                    <UDropdown :items="items(row)">
-                        <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
-                    </UDropdown>
+            <div class="scrollable">
+                <UTable :columns="columns" :rows="filtering" class="border border-primary-200 dark:border-primary-700">
+                    <template #actions-data="{ row }">
+                        <UDropdown :items="items(row)">
+                            <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
+                        </UDropdown>
 
-                    <!-- <UButton icon="i-heroicons-pencil-square" size="sm" color="orange" variant="solid"
-                            :trailing="false" @click="getData(row)" />
-                        <UButton icon="i-heroicons-trash-20-solid" size="sm" color="red" variant="solid"
-                            :trailing="false" @click="delData(row)" /> -->
+                        <!-- <UButton icon="i-heroicons-pencil-square" size="sm" color="orange" variant="solid"
+                                :trailing="false" @click="getData(row)" />
+                            <UButton icon="i-heroicons-trash-20-solid" size="sm" color="red" variant="solid"
+                                :trailing="false" @click="delData(row)" /> -->
 
-                </template>
-            </UTable>
+                    </template>
+                </UTable>
+            </div>
         </div>
     </div>
 </template>
@@ -324,27 +326,29 @@ function saveData() {
 .data-table {
     .table-tools {
 
-        padding:  10px;
+        padding: 10px;
         display: flex;
         justify-content: space-between;
         margin-bottom: 15px;
         align-items: center;
-        
-        button{
+        border-bottom: solid 1px gray;
+
+        button {
             display: inline-block;
             box-sizing: border-box;
             color: rgb(1, 179, 1);
             border-radius: 20px;
-            padding:2px 8px;
+            padding: 2px 8px;
             font-size: 15px;
-            border: 2px solid  rgb(1, 179, 1);
-            &:hover{
-                color:  rgb(5, 235, 5);
-                border-color:  rgb(5, 235, 5);
+            border: 2px solid rgb(1, 179, 1);
+
+            &:hover {
+                color: rgb(5, 235, 5);
+                border-color: rgb(5, 235, 5);
             }
 
         }
-            
+
 
 
         input {
@@ -353,6 +357,25 @@ function saveData() {
             background-color: rgb(99, 96, 96);
 
         }
+    }
+
+
+    .scrollable {
+        overflow: scroll;
+        height: 65vh;
+        overflow-x: hidden;
+        &::-webkit-scrollbar{
+            width: 10px;
+        }
+        &::-webkit-scrollbar-thumb{
+            background: rgb(1, 179, 1);
+            border-radius: 10px;
+        }
+
+        &::-webkit-scrollbar-track{
+            background: rgb(54, 54, 54);
+        }
+
 
     }
 }
