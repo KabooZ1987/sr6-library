@@ -19,25 +19,36 @@
                 <section v-show="formSwitch" v-if="formSwitch">
                     <div class="Form">
                         <div>
-                            <p>Name</p>
+                            <p>Name<span>*</span></p>
                             <input type="text" :placeholder="dataOfEachRow.name" v-model="Name">
                         </div>
 
                         <div>
-                            <p>Cost</p>
+                            <p>Cost<span>*</span></p>
                             <input type="text" :placeholder="dataOfEachRow.cost" v-model="Cost">
                         </div>
                     </div>
 
                     <div class="Form">
                         <div>
-                            <p>Page</p>
+                            <p>Page<span>*</span></p>
                             <input type="text" :placeholder="dataOfEachRow.page" v-model="Page">
 
                         </div>
                         <div>
-                            <p>Source</p>
-                            <input type="text" :placeholder="dataOfEachRow.source" v-model="Source">
+                            <p>Source<span>*</span></p>
+                            <select v-model="Source" required>
+                                <option selected disabled value="">{{ dataOfEachRow.source }}</option>
+                                <option value="core">core</option>
+                                <option value="wyrd">wyrd</option>
+                                <option value="wild_life">wild_life</option>
+                                <option value="firing_squad">firing_squad</option>
+                                <option value="companion">companion</option>
+                                <option value="body_shop">body_shop</option>
+                                <option value="shifter">shifter</option>
+                                <option value="homebrew">homebrew</option>
+                            </select>
+                            <!-- <input type="text" :placeholder="dataOfEachRow.source" v-model="Source"> -->
                         </div>
 
                     </div>
@@ -53,25 +64,36 @@
 
                     <div class="Form">
                         <div>
-                            <p>New Name</p>
+                            <p>New Name<span>*</span></p>
                             <input type="text" v-model="Name">
                         </div>
 
                         <div>
-                            <p>New Cost</p>
+                            <p>New Cost<span>*</span></p>
                             <input type="text" v-model="Cost">
                         </div>
                     </div>
 
                     <div class="Form">
                         <div>
-                            <p> New Page</p>
+                            <p>New Page<span>*</span></p>
                             <input type="text" v-model="Page">
 
                         </div>
                         <div>
-                            <p>New Source</p>
-                            <input type="text" v-model="Source">
+                            <p>New Source<span>*</span></p>
+                            <select v-model="Source" required>
+                                <option selected disabled value=""></option>
+                                <option value="core">core</option>
+                                <option value="wyrd">wyrd</option>
+                                <option value="wild_life">wild_life</option>
+                                <option value="firing_squad">firing_squad</option>
+                                <option value="companion">companion</option>
+                                <option value="body_shop">body_shop</option>
+                                <option value="shifter">shifter</option>
+                                <option value="homebrew">homebrew</option>
+                            </select>
+                            <!-- <input type="text" v-model="Source"> -->
                         </div>
 
                     </div>
@@ -361,19 +383,22 @@ function saveData() {
 
 
     .scrollable {
+        scrollbar-gutter: stable;
         overflow: scroll;
         height: 65vh;
         overflow-x: hidden;
-        &::-webkit-scrollbar{
+
+        &::-webkit-scrollbar {
             width: 10px;
         }
-        &::-webkit-scrollbar-thumb{
+
+        &::-webkit-scrollbar-thumb {
             background: rgb(1, 179, 1);
             border-radius: 10px;
         }
 
-        &::-webkit-scrollbar-track{
-            background: rgb(54, 54, 54);
+        &::-webkit-scrollbar-track {
+            background: transparent
         }
 
 
@@ -412,9 +437,12 @@ function saveData() {
 
         p {
             margin-right: auto;
+            span{
+                color: red;
+            }
         }
 
-        input {
+        input, select {
             width: 100%;
             border-radius: 20px;
             padding: 5px 20px;
