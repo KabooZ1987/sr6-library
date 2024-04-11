@@ -55,6 +55,20 @@
 
                     </div>
 
+                    <div class="Form">
+
+                        <div>
+                            <p>New Restriction<span>*</span></p>
+                            <input type="text" v-model="Restriction">
+                        </div>
+
+                        <div>
+                            <p></p>
+                            <input class="disabled" disabled type="text">
+                        </div>
+
+                    </div>
+
                     <div class="field">
                         <div>
                             <p>Description</p>
@@ -100,6 +114,20 @@
 
                     </div>
 
+                    <div class="Form">
+
+                        <div>
+                            <p>New Restriction<span>*</span></p>
+                            <input type="text" v-model="Restriction">
+                        </div>
+
+                        <div>
+                            <p></p>
+                            <input class="disabled" disabled type="text">
+                        </div>
+
+                    </div>
+
                     <div class="field">
                         <div>
                             <p>New Description</p>
@@ -108,7 +136,7 @@
                     </div>
                 </section>
                 <div class="save-button">
-                    <UButton size="sm" color="blue" variant="solid" :trailing="false" @click="saveData()">
+                    <UButton size="sm" color="blue" variant="solid" :trailing="false" @click="Validation">
                         Save
                     </UButton>
                 </div>
@@ -127,7 +155,7 @@
 
 
         <div class="data-table">
-            <TableTools :columns="columns" :data="data" />
+            <TableTools :columns="columns" :data="data" @add-data="addData" @get-data="getData" @del-data="delData" />
         </div>
 
         <!-- <div class="data-table">
@@ -139,9 +167,32 @@
 
 
 <script setup>
+import { v4 as uuidv4 } from 'uuid';
+const UUID = ref()
+
+const formSwitch = ref(true)
+const data = ref([])
+const isOpen = ref(false)
+const dataOfEachRow = ref()
+
+const Name = ref(null)
+const Cost = ref(null)
+const Restriction = ref(null)
+const Page = ref(null)
+const Source = ref(null)
+const Description = ref(null)
 
 
-
+const element = ref({
+    "id": null,
+    "name": null,
+    "cost": null,
+    "restriction": null,
+    "description": null,
+    "source": null,
+    "page": null,
+    "updated_at": null
+});
 
 
 const columns = [{
@@ -172,9 +223,12 @@ const columns = [{
     key: 'updated_at',
     label: 'Date',
     sortable: true
-}, { 
-    key: 'actions' 
+}, {
+    key: 'actions'
 }]
+
+
+
 
 
 useFetch('/api/edge_action').then(response => data.value = response.data.value.data.complete)
@@ -183,4 +237,163 @@ definePageMeta({
     layout: 'data-pages',
 
 })
+
+
+
+function xButton() {
+    isOpen.value = false
+    Name.value = null
+    Cost.value = null
+    Restriction.value = null
+    Page.value = null
+    Source.value = null
+    Description.value = null
+}
+
+function delData(rowData) {
+    dataOfEachRow.value = rowData;
+    element.value.id = dataOfEachRow.value.id
+
+    useFetch("/api/edge_action", { method: "Delete", body: JSON.stringify({ upsert: element.value }) });
+    location.reload()
+}
+function addData() {
+    isOpen.value = true;
+    formSwitch.value = false;
+
+}
+function getData(rowData) {
+    formSwitch.value = true;
+    dataOfEachRow.value = rowData;
+    isOpen.value = true
+
+    Name.value = dataOfEachRow.value.name
+    Cost.value = dataOfEachRow.value.cost
+    Restriction.value = dataOfEachRow.value.restriction
+    Page.value = dataOfEachRow.value.page
+    Source.value = dataOfEachRow.value.source
+    Description.value = dataOfEachRow.value.description
+
+
+    return dataOfEachRow
+}
+
+
+
+const Validation = () => {
+    if (Name.value && Cost.value && Restriction.value && Page.value && Source.value && Description.value) {
+        saveData()
+    } else {
+        alert("you need to fill every field with *")
+    }
+}
+
+function saveData() {
+    if (!formSwitch.value) {
+        data.value.filter((row) => {
+            do {
+                UUID.value = uuidv4();
+            } while (UUID.value === row.id)
+        })
+        element.value.id = UUID.value
+        element.value.updated_at = new Date()
+    } else {
+        element.value.id = dataOfEachRow.value.id
+        element.value.updated_at = dataOfEachRow.value.updated_at
+    }
+
+    if (Name.value !== null) {
+        element.value.name = Name.value.toString();
+    } else {
+        element.value.name = dataOfEachRow.value.name
+    }
+
+    if (Cost.value !== null) {
+        element.value.cost = Cost.value.toString();
+    } else {
+        element.value.cost = dataOfEachRow.value.cost
+    }
+
+
+    if (Page.value !== null) {
+        element.value.page = Page.value.toString();
+    } else {
+        element.value.page = dataOfEachRow.value.page
+    }
+
+
+    if (Source.value !== null) {
+        element.value.source = Source.value.toString();
+    } else {
+
+        element.value.source = dataOfEachRow.value.source
+    }
+
+    if (Description.value !== null) {
+        element.value.description = Description.value.toString();
+    } else {
+        element.value.description = dataOfEachRow.value.description
+    }
+
+    useFetch("/api/edge_action", { method: "POST", body: JSON.stringify({ upsert: element.value }) });
+
+    isOpen.value = false;
+    location.reload()
+    // useFetch("/api/edge_boost",{method:"POST",body:{"upsert":element}})
+
+}
 </script>
+
+
+<style lang="scss">
+.Form {
+    display: flex;
+    width: 100%;
+
+
+    div {
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 20px;
+
+        p {
+            margin-right: auto;
+
+            span {
+                color: red;
+            }
+        }
+
+        input,
+        select {
+            width: 100%;
+            border-radius: 20px;
+            padding: 5px 20px;
+        }
+
+        .disabled {
+            margin-top: 24px;
+        }
+    }
+}
+
+
+
+.field {
+    width: 100%;
+
+    div {
+        margin: 20px;
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            border-radius: 20px;
+            padding: 5px 20px;
+            resize: none;
+        }
+    }
+}
+</style>

@@ -3,7 +3,7 @@
 import { PrismaClient } from '@prisma/client';
 import fakeData from '@/types/fake.json'
 const prisma = new PrismaClient();
-const resultType = "EdgeBoost"
+const resultType = "EdgeAction"
 export default defineEventHandler(async (event) => {
 
     
@@ -17,13 +17,12 @@ export default defineEventHandler(async (event) => {
     }
 
 
-    fakeData.EdgeBoost.complete.find((element, index) => {
+    fakeData.EdgeAction.complete.find((element, index) => {
         if (element.id == body.upsert.id){
-          fakeData.EdgeBoost.complete.splice(index,1)
+          fakeData.EdgeAction.complete.splice(index,1)
           return true
         }
     })
-
 
     const result = {}
 
@@ -34,5 +33,5 @@ export default defineEventHandler(async (event) => {
       });
     }
     
-  return {data: fakeData.EdgeBoost};
+  return {data: fakeData.EdgeAction};
 });

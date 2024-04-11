@@ -8,7 +8,7 @@
                 <input type="text" v-model="serachWord" placeholder="Search here...">
             </form>
 
-            <button @click="addData()">
+            <button @click="$emit('addData', payload)">
                 + New Data
             </button>
 
@@ -33,6 +33,7 @@
 <script setup>
 
 const props = defineProps(['columns', 'data'])
+const emit = defineEmits(['getData', 'delData'])
 const serachWord = ref()
 
 
@@ -49,16 +50,24 @@ const filtering = computed(() => {
     })
 })
 
+const getDataEmit = (rowData) =>{
+    emit('getData', rowData)
+}
+
+const delDataEmit = (rowData) =>{
+
+    emit('delData', rowData)
+}
 
 const items = (row) => [
     [{
         label: 'Edit',
         icon: 'i-heroicons-pencil-square-20-solid',
-        click: () => getData(row)
+        click: () => getDataEmit(row)
     }, {
         label: 'Delete',
         icon: 'i-heroicons-trash-20-solid',
-        click: () => delData(row)
+        click: () => delDataEmit(row)
     }]
 ]
 
