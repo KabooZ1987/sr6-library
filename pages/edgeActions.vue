@@ -58,7 +58,7 @@
                     <div class="Form">
 
                         <div>
-                            <p>New Restriction<span>*</span></p>
+                            <p>Restriction<span>*</span></p>
                             <input type="text" v-model="Restriction">
                         </div>
 
@@ -71,7 +71,7 @@
 
                     <div class="field">
                         <div>
-                            <p>Description</p>
+                            <p>Description<span>*</span></p>
                             <textarea type="text" :placeholder="dataOfEachRow.description" v-model="Description" />
                         </div>
                     </div>
@@ -130,7 +130,7 @@
 
                     <div class="field">
                         <div>
-                            <p>New Description</p>
+                            <p>New Description<span>*</span></p>
                             <textarea type="text" v-model="Description" />
                         </div>
                     </div>
@@ -231,7 +231,7 @@ const columns = [{
 
 
 
-useFetch('/api/edge_action').then(response => data.value = response.data.value.data.complete)
+useFetch('/api/edge_action/edge_action').then(response => data.value = response.data.value.data.complete)
 
 definePageMeta({
     layout: 'data-pages',
@@ -254,7 +254,7 @@ function delData(rowData) {
     dataOfEachRow.value = rowData;
     element.value.id = dataOfEachRow.value.id
 
-    useFetch("/api/edge_action", { method: "Delete", body: JSON.stringify({ upsert: element.value }) });
+    useFetch("/api/edge_action/edge_action", { method: "Delete", body: JSON.stringify({ upsert: element.value }) });
     location.reload()
 }
 function addData() {
@@ -284,7 +284,7 @@ const Validation = () => {
     if (Name.value && Cost.value && Restriction.value && Page.value && Source.value && Description.value) {
         saveData()
     } else {
-        alert("you need to fill every field with *")
+        alert("You need to fill every field with *")
     }
 }
 
@@ -313,7 +313,12 @@ function saveData() {
     } else {
         element.value.cost = dataOfEachRow.value.cost
     }
-
+    
+    if (Restriction.value !== null) {
+        element.value.restriction = Restriction.value.toString();
+    } else {
+        element.value.restriction = dataOfEachRow.value.restriction
+    }
 
     if (Page.value !== null) {
         element.value.page = Page.value.toString();
@@ -335,7 +340,7 @@ function saveData() {
         element.value.description = dataOfEachRow.value.description
     }
 
-    useFetch("/api/edge_action", { method: "POST", body: JSON.stringify({ upsert: element.value }) });
+    useFetch("/api/edge_action/edge_action", { method: "POST", body: JSON.stringify({ upsert: element.value }) });
 
     isOpen.value = false;
     location.reload()
@@ -379,14 +384,24 @@ function saveData() {
     }
 }
 
+.save-button {
+    margin: 0 20px;
 
+    button {
+        padding: 10px 20px;
+
+    }
+
+}
 
 .field {
     width: 100%;
 
     div {
         margin: 20px;
-
+        span{
+            color: red;
+        }
         textarea {
             width: 100%;
             height: 200px;
