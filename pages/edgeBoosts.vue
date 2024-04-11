@@ -229,7 +229,7 @@ const items = (row) => [
 
 useFetch('/api/edge_boost').then(response => data.value = response.data.value.data.complete)
 
-// Server push beispiel
+
 const filtering = computed(() => {
     if (!serachWord.value) {
         return data.value
