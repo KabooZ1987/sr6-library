@@ -3,7 +3,7 @@
 import { PrismaClient } from '@prisma/client';
 import fakeData from '@/types/fake.json'
 const prisma = new PrismaClient();
-const resultType = "homebrew"
+const resultType = "Rule"
 export default defineEventHandler(async (event) => {
 
     
@@ -17,9 +17,9 @@ export default defineEventHandler(async (event) => {
     }
 
 
-    fakeData.Homebrew.complete.find((element, index) => {
+    fakeData.Rule.complete.find((element, index) => {
         if (element.id == body.upsert.id){
-          fakeData.Homebrew.complete.splice(index,1)
+          fakeData.Rule.complete.splice(index,1)
           return true
         }
     })
@@ -33,5 +33,5 @@ export default defineEventHandler(async (event) => {
       });
     }
     
-  return {data: fakeData.Homebrew};
+  return {data: fakeData.Rule};
 });
