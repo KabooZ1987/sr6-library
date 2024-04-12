@@ -281,10 +281,20 @@ function getData(rowData) {
 
 
 const Validation = () => {
-    if (Name.value && Cost.value && Restriction.value && Page.value && Source.value && Description.value) {
+    if (Name.value && Cost.value && Page.value && Source.value  && Restriction.value && Description.value) {
         saveData()
-    } else {
-        alert("You need to fill every field with *")
+    }else if(!Name.value){
+        alert("You need to fill Name")
+    }else if (!Cost.value){
+        alert("You need to fill Cost")  
+    }else if (!Restriction.value){
+        alert("You need to fill  Restriction")     
+    } else if(!Page.value){
+        alert("You need to fill Page")
+    }else if (!Source.value){
+        alert("You need to fill Source")  
+    }else if (!Description.value){
+        alert("You need to fill  Description")     
     }
 }
 

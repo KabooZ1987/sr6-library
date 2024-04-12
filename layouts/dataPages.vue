@@ -22,7 +22,7 @@
                     <NuxtLink  class="link" to="/homeBrew">homebrew</NuxtLink >
                 </li>
             </ul>
-            <div class="berger-Menu">
+            <div class="burger-Menu">
                 <span @click="toggleMobileNav" v-show="Tablet" :class="{ 'icon-active': mobileNavOpen }">
                     <client-only>
                         <font-awesome-icon :icon="['fas', 'bars']" />
@@ -198,7 +198,7 @@ header {
             }
         }
 
-        .berger-Menu {
+        .burger-Menu {
             display: flex;
             align-items: center;
             position: absolute;

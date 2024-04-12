@@ -24,7 +24,7 @@
                         </div>
 
                         <div>
-                            <p>Source<span>*</span></p>
+                            <p>Category<span>*</span></p>
                             <select v-model="Category" required>
                                 <option selected disabled value="">{{ dataOfEachRow.category }}</option>
                                 <option value="edge">edge</option>
@@ -262,8 +262,12 @@ function getData(rowData) {
 const Validation = () => {
     if (Name.value && Category.value && Description.value) {
         saveData()
-    } else {
-        alert("You need to fill every field with *")
+    } else if(!Name.value){
+        alert("You need to fill Name")
+    }else if (!Category.value){
+        alert("You need to fill Category")  
+    }else if (!Description.value){
+        alert("You need to fill  Description")     
     }
 }
 

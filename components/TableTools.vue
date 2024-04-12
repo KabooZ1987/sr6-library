@@ -50,14 +50,11 @@ const filtering = computed(() => {
     })
 })
 
-const getDataEmit = (rowData) =>{
-    emit('getData', rowData)
-}
+const getDataEmit = (rowData) => emit('getData', rowData)
 
-const delDataEmit = (rowData) =>{
 
-    emit('delData', rowData)
-}
+const delDataEmit = (rowData) => emit('delData', rowData)
+
 
 const items = (row) => [
     [{
