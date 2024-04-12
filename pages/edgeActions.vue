@@ -360,7 +360,7 @@ function saveData() {
 </script>
 
 
-<style lang="scss">
+<style lang="scss" scoped>
 .Form {
     display: flex;
     width: 100%;
@@ -388,9 +388,6 @@ function saveData() {
             padding: 5px 20px;
         }
 
-        .disabled {
-            margin-top: 24px;
-        }
     }
 }
 

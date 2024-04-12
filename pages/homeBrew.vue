@@ -18,12 +18,12 @@
 
                 <section v-show="formSwitch" v-if="formSwitch">
                     <div class="Form">
-                        <div>
-                            <p>Name<span>*</span></p>
-                            <input type="text" :placeholder="dataOfEachRow.name" v-model="Name">
-                        </div>
 
-                        <div>
+                        <Input label="Name" v-model="Name" :placeholder="dataOfEachRow.name" @update="setName"
+                            options="" />
+                        <SelectField label="Category" v-model="Category" :selected="dataOfEachRow.category"
+                            :options="options"  @update="setCategory"/>
+                        <!-- <div>
                             <p>Category<span>*</span></p>
                             <select v-model="Category" required>
                                 <option selected disabled value="">{{ dataOfEachRow.category }}</option>
@@ -37,17 +37,17 @@
                                 <option value="spirits">spirits</option>
                                 <option value="other">other</option>
                             </select>
-                        </div>
+                        </div> -->
                     </div>
-                    
+
                     <div class="Form">
                         <div>
-                            
+
                             <input type="text" class="disabled" disabled>
-                            
+
                         </div>
                         <div>
-                            
+
                             <input type="text" class="disabled" disabled>
                             <!-- <input type="text" :placeholder="dataOfEachRow.source" v-model="Source"> -->
                         </div>
@@ -57,7 +57,7 @@
                     <div class="Form">
 
                         <div>
-                            
+
                             <input type="text" class="disabled" disabled>
                         </div>
 
@@ -106,14 +106,14 @@
                     <div class="Form">
                         <div>
 
-                            
+
                             <input type="text" class="disabled" disabled>
 
                         </div>
 
                         <div>
 
-                            <input class="disabled" disabled type="text" >
+                            <input class="disabled" disabled type="text">
 
                         </div>
                     </div>
@@ -182,6 +182,17 @@ const data = ref([])
 const isOpen = ref(false)
 const dataOfEachRow = ref()
 
+const options = [
+    { label: "edge", value: "edge" },
+    { label: "magic", value: "magic" },
+    { label: "combat", value: "combat" },
+    { label: "decking", value: "decking" },
+    { label: "rigging", value: "rigging" },
+    { label: "regeneration", value: "regeneration" },
+    { label: "critter", value: "critter" },
+    { label: "spirits", value: "spirits" },
+    { label: "other", value: "other" }
+]
 const Name = ref(null)
 const Category = ref(null)
 const Description = ref(null)
@@ -262,14 +273,19 @@ function getData(rowData) {
 const Validation = () => {
     if (Name.value && Category.value && Description.value) {
         saveData()
-    } else if(!Name.value){
+    } else if (!Name.value) {
         alert("You need to fill Name")
-    }else if (!Category.value){
-        alert("You need to fill Category")  
-    }else if (!Description.value){
-        alert("You need to fill  Description")     
+    } else if (!Category.value) {
+        alert("You need to fill Category")
+    } else if (!Description.value) {
+        alert("You need to fill  Description")
     }
 }
+
+
+
+const setName = (name) => Name.value = name
+const setCategory = (category) => Category.value = category
 
 function saveData() {
     if (!formSwitch.value) {
@@ -307,7 +323,7 @@ function saveData() {
 
 
 
-<style lang="scss">
+<style lang="scss" scoped>
 .Form {
     display: flex;
     width: 100%;
@@ -335,9 +351,7 @@ function saveData() {
             padding: 5px 20px;
         }
 
-        .disabled {
-            margin-top: 24px;
-        }
+
     }
 }
 
