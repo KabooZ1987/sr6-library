@@ -231,7 +231,7 @@ const columns = [{
 
 
 
-useFetch('/api/edge_action/edge_action').then(response => data.value = response.data.value.data.complete)
+useFetch('/api/edge_action').then(response => data.value = response.data.value.data.complete)
 
 definePageMeta({
     layout: 'data-pages',
@@ -254,7 +254,7 @@ function delData(rowData) {
     dataOfEachRow.value = rowData;
     element.value.id = dataOfEachRow.value.id
 
-    useFetch("/api/edge_action/edge_action", { method: "Delete", body: JSON.stringify({ upsert: element.value }) });
+    useFetch("/api/edge_action", { method: "Delete", body: JSON.stringify({ upsert: element.value }) });
     location.reload()
 }
 function addData() {
@@ -350,7 +350,7 @@ function saveData() {
         element.value.description = dataOfEachRow.value.description
     }
 
-    useFetch("/api/edge_action/edge_action", { method: "POST", body: JSON.stringify({ upsert: element.value }) });
+    useFetch("/api/edge_action", { method: "POST", body: JSON.stringify({ upsert: element.value }) });
 
     isOpen.value = false;
     location.reload()

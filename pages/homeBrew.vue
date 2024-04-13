@@ -228,7 +228,7 @@ const columns = [{
 
 
 
-useFetch('/api/homebrew/homebrew').then(response => data.value = response.data.value.data.complete)
+useFetch('/api/homebrew').then(response => data.value = response.data.value.data.complete)
 
 
 definePageMeta({
@@ -247,7 +247,7 @@ function delData(rowData) {
     dataOfEachRow.value = rowData;
     element.value.id = dataOfEachRow.value.id
 
-    useFetch("/api/homebrew/homebrew", { method: "Delete", body: JSON.stringify({ upsert: element.value }) });
+    useFetch("/api/homebrew", { method: "Delete", body: JSON.stringify({ upsert: element.value }) });
     location.reload()
 }
 function addData() {
@@ -306,7 +306,7 @@ function saveData() {
     element.value.description = Description.value.toString();
 
 
-    useFetch("/api/homebrew/homebrew", { method: "POST", body: JSON.stringify({ upsert: element.value }) });
+    useFetch("/api/homebrew", { method: "POST", body: JSON.stringify({ upsert: element.value }) });
 
     isOpen.value = false;
     location.reload()

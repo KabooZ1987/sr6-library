@@ -246,7 +246,7 @@ const columns = [{
 
 
 
-useFetch('/api/rule_/rule').then(response => data.value = response.data.value.data.complete)
+useFetch('/api/rule').then(response => data.value = response.data.value.data.complete)
 definePageMeta({
     layout: 'data-pages',
 
@@ -266,7 +266,7 @@ function delData(rowData) {
     dataOfEachRow.value = rowData;
     element.value.id = dataOfEachRow.value.id
 
-    useFetch("/api/rule_/rule", { method: "Delete", body: JSON.stringify({ upsert: element.value }) });
+    useFetch("/api/rule", { method: "Delete", body: JSON.stringify({ upsert: element.value }) });
     location.reload()
 }
 function addData() {
@@ -325,7 +325,7 @@ function saveData() {
     element.value.category = Category.value.toString();
     element.value.description = Description.value.toString();
 
-    useFetch("/api/rule_/rule", { method: "POST", body: JSON.stringify({ upsert: element.value }) });
+    useFetch("/api/rule", { method: "POST", body: JSON.stringify({ upsert: element.value }) });
 
     isOpen.value = false;
     location.reload()
