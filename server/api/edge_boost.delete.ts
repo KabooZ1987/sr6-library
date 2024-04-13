@@ -8,16 +8,15 @@ export default defineEventHandler(async (event) => {
 
     
     const body = await readBody(event)
-    
-    if(!body?.upsert){
+    const id = body.id
+    if(!id){
         throw createError({
             statusCode: 404,
-            statusMessage: `body empty`,
+            statusMessage: `id empty`,
         });
     }
 
-
-   const result = await prisma.edgeBoost.delete({where:{id: body.upsert.id}})
+   const result = await prisma.edgeBoost.delete({where:{id}})
 
     if (!result) {
       throw createError({

@@ -90,9 +90,6 @@ const columns = [
     label: "Date",
     sortable: true,
   },
-  {
-    key: "actions",
-  },
 ];
 
 const { data } = await useAsyncData("homebrew", () => $fetch("/api/homebrew"), {
@@ -106,15 +103,11 @@ function xButton() {
   Description.value = null;
 }
 
-function delData(rowData) {
-  dataOfEachRow.value = rowData;
-  element.value.id = dataOfEachRow.value.id;
-
-  useFetch("/api/homebrew", {
-    method: "Delete",
-    body: JSON.stringify({ upsert: element.value }),
-  });
-  reloadTrigger.value += 1;
+function delData(id) {
+    $fetch("/api/homebrew", {
+        method: "Delete",
+        body: JSON.stringify({ id }),
+    }).then(() => reloadTrigger.value += 1)
 }
 function addData() {
   isOpen.value = true;
@@ -165,7 +158,7 @@ function saveData() {
   element.value.category = Category.value.toString();
   element.value.description = Description.value.toString();
 
-  useFetch("/api/homebrew", {
+  $fetch("/api/homebrew", {
     method: "POST",
     body: JSON.stringify({ upsert: element.value }),
   }).then(() => reloadTrigger.value += 1)

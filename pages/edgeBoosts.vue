@@ -44,34 +44,7 @@
         <h1>EDGE BOOSTS</h1>
 
         <div class="data-table">
-            <div class="table-tools">
-                <form action="">
-                    <input-field type="text" v-model="serachWord" placeholder="Search here..." />
-                </form>
-
-                <button @click="addData()">
-                    + New Data
-                </button>
-
-                <!-- <UButton size="sm" color="green" variant="solid" :trailing="false" @click="addData()">
-                   + New Data
-                </UButton>
-                <UInput v-model="serachWord" placeholder="Search here..." /> -->
-            </div>
-            <div class="scrollable">
-                <UTable :columns="columns" :rows="filtering" class="border border-primary-200 dark:border-primary-700">
-                    <template #actions-data="{ row }">
-                        <UDropdown :items="items(row)">
-                            <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
-                        </UDropdown>
-
-                        <!-- <UButton icon="i-heroicons-pencil-square" size="sm" color="orange" variant="solid"
-                                :trailing="false" @click="getData(row)" />
-                            <UButton icon="i-heroicons-trash-20-solid" size="sm" color="red" variant="solid"
-                                :trailing="false" @click="delData(row)" /> -->
-                    </template>
-                </UTable>
-            </div>
+            <TableTools :columns="columns" :data="data" @add-data="addData" @get-data="getData" @del-data="delData" />
         </div>
     </div>
 </template>
@@ -86,7 +59,6 @@ const isEditForm = ref(true);
 const reloadTrigger = ref(0);
 const isOpen = ref(false);
 const dataOfEachRow = ref();
-const serachWord = ref();
 
 const Name = ref(null);
 const Cost = ref(null);
@@ -134,28 +106,8 @@ const columns = [
         key: "updated_at",
         label: "Date",
         sortable: true,
-    },
-    {
-        key: "actions",
-    },
+    }
 ];
-
-const items = (row) => [
-    [
-        {
-            label: "Edit",
-            icon: "i-heroicons-pencil-square-20-solid",
-            click: () => getData(row),
-        },
-        {
-            label: "Delete",
-            icon: "i-heroicons-trash-20-solid",
-            click: () => delData(row),
-        },
-    ],
-];
-
-// console.log(await useFetch('/api/edge_boost'));
 
 const { data } = await useAsyncData(
     "edge_boost",
@@ -164,19 +116,6 @@ const { data } = await useAsyncData(
         watch: [reloadTrigger],
     }
 );
-
-const filtering = computed(() => {
-    if (!serachWord.value) {
-        return data.value;
-    }
-    return data.value.filter((row) => {
-        return Object.values(row).some((value) => {
-            return String(value)
-                .toLowerCase()
-                .includes(serachWord.value.trim().toLowerCase());
-        });
-    });
-});
 
 function xButton() {
     isOpen.value = false;
@@ -187,15 +126,11 @@ function xButton() {
     Description.value = null;
 }
 
-function delData(rowData) {
-    dataOfEachRow.value = rowData;
-    element.value.id = dataOfEachRow.value.id;
-
-    useFetch("/api/edge_boost", {
+function delData(id) {
+    $fetch("/api/edge_boost", {
         method: "Delete",
-        body: JSON.stringify({ upsert: element.value }),
-    });
-    reloadTrigger.value += 1;
+        body: JSON.stringify({ id }),
+    }).then(() => reloadTrigger.value += 1)
 }
 function addData() {
     isOpen.value = true;
@@ -259,13 +194,13 @@ function saveData() {
         element.value.description = dataOfEachRow.value.description;
     }
 
-    useFetch("/api/edge_boost", {
+    $fetch("/api/edge_boost", {
         method: "POST",
         body: JSON.stringify({ upsert: element.value }),
     }).then(() => reloadTrigger.value += 1)
 
     xButton();
-    // useFetch("/api/edge_boost",{method:"POST",body:{"upsert":element}})
+    // $fetch("/api/edge_boost",{method:"POST",body:{"upsert":element}})
 }
 </script>
 

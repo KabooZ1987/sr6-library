@@ -16,7 +16,7 @@ generator custom_generator {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "postgresql://webuser:Luebeck%231@localhost:5432/webdb?schema=public"
 }
 
 model EdgeBoost {

@@ -28,7 +28,12 @@
                             label="is Homebrew" />
                             <input-field type="number" :required="false" v-model="Page" label="Page" />
                     </div>
-
+                    <div class="Form">
+                        <select-field v-model="Source" required="false"
+                            :options="SourceBooks"
+                            label="Source" />
+                        <input-field class="disabled hidden" disabled type="text" />
+                    </div>
                     <div class="field">
                         <div>
                             <p>Description<span>*</span></p>
@@ -57,7 +62,7 @@
 
 <script setup>
 import { v4 as uuidv4 } from "uuid";
-import { RuleCategories } from "~/services/enums";
+import { RuleCategories, SourceBooks } from "~/services/enums";
 const UUID = ref();
 
 const isEditForm = ref(true);
@@ -68,6 +73,7 @@ const dataOfEachRow = ref();
 const Name = ref(null);
 const Homebrew = ref(null);
 const Page = ref(null);
+const Source = ref(null);
 const Category = ref(null);
 const Description = ref(null);
 
@@ -77,6 +83,7 @@ const element = ref({
     description: null,
     category: null,
     page: null,
+    source: null,
     homebrew: null,
     updated_at: null,
 });
@@ -108,13 +115,16 @@ const columns = [
         sortable: true,
     },
     {
+        key: "source",
+        label: "Source",
+        sortable: true
+    },
+    {
         key: "updated_at",
         label: "Date",
         sortable: true,
-    },
-    {
-        key: "actions",
-    },
+
+    }
 ];
 
 const { data } = await useAsyncData("rules", () => $fetch("/api/rule"), {
@@ -125,20 +135,17 @@ function xButton() {
     isOpen.value = false;
     Name.value = null;
     Page.value = null;
+    Source.value = null;
     Homebrew.value = null;
     Category.value = null;
     Description.value = null;
 }
 
-function delData(rowData) {
-    dataOfEachRow.value = rowData;
-    element.value.id = dataOfEachRow.value.id;
-
-    useFetch("/api/rule", {
+function delData(id) {
+    $fetch("/api/rule", {
         method: "Delete",
-        body: JSON.stringify({ upsert: element.value }),
-    });
-    reloadTrigger.value += 1;
+        body: JSON.stringify({ id }),
+    }).then(() => reloadTrigger.value += 1)
 }
 function addData() {
     isOpen.value = true
@@ -152,6 +159,7 @@ function getData(rowData) {
     Name.value = dataOfEachRow.value.name
     Homebrew.value = dataOfEachRow.value.homebrew
     Page.value = dataOfEachRow.value.page
+    Source.value = dataOfEachRow.value.source
     Category.value = dataOfEachRow.value.category
     Description.value = dataOfEachRow.value.description
 
@@ -194,10 +202,11 @@ function saveData() {
     element.value.name = Name.value.toString();
     element.value.homebrew = Homebrew.value;
     element.value.page = parseInt(Page.value)
+    element.value.source = Source.value
     element.value.category = Category.value.toString();
     element.value.description = Description.value.toString();
 
-    useFetch("/api/rule", {
+    $fetch("/api/rule", {
         method: "POST",
         body: JSON.stringify({ upsert: element.value }),
     }).then(() => reloadTrigger.value += 1)

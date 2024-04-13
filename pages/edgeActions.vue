@@ -121,9 +121,6 @@ const columns = [
         label: "Date",
         sortable: true,
     },
-    {
-        key: "actions",
-    },
 ];
 
 const { data } = await useAsyncData(
@@ -144,15 +141,11 @@ function xButton() {
     Description.value = null;
 }
 
-function delData(rowData) {
-    dataOfEachRow.value = rowData;
-    element.value.id = dataOfEachRow.value.id;
-
-    useFetch("/api/edge_action", {
+function delData(id) {
+    $fetch("/api/edge_action", {
         method: "Delete",
-        body: JSON.stringify({ upsert: element.value }),
-    });
-    reloadTrigger.value += 1;
+        body: JSON.stringify({ id }),
+    }).then(() => reloadTrigger.value += 1)
 }
 function addData() {
     isOpen.value = true;
@@ -247,7 +240,7 @@ function saveData() {
         element.value.description = dataOfEachRow.value.description;
     }
 
-    useFetch("/api/edge_action", {
+    $fetch("/api/edge_action", {
         method: "POST",
         body: JSON.stringify({ upsert: element.value }),
     }).then(() => reloadTrigger.value += 1)

@@ -13,22 +13,70 @@
         </div>
 
         <div class="scrollable">
-            <UTable :columns="props.columns" :rows="filtering"
+            <UTable :columns="props.columns" :rows="filtering" @select="select"
                 class="border border-primary-200 dark:border-primary-700">
-                <template #actions-data="{ row }">
-                    <UDropdown :items="items(row)">
-                        <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
-                    </UDropdown>
+                <template #description-data="{ row }">
+                        <div class="overflow-ellipsis overflow-hidden w-32" >{{ row.description }}</div>
                 </template>
             </UTable>
         </div>
+        <USlideover v-model="isOpen">
+            <div class="p-4 flex-1">
+                <UCard  :ui="{ body: { base: 'mb-3 grid grid-cols-3' } }">
+                    <div class="text-cool-500">
+                        Name:
+                        <p class="px-3 text-zinc-50">{{ selected.name }}</p>
+                    </div>
+                    <UDivider orientation="vertical" />
+                    <div class="space-y-4 flex flex-col justify-center">
+                        <UButton color="black" label="Edit" icon="i-heroicons-pencil-square-20-solid" block @click="$emit('getData', selected)" />
+                        <UButton color="black" label="Delete" icon="i-heroicons-trash-20-solid" block @click="tryDelete" />
+                    </div>
+                </UCard>
+                <UCard  :ui="{ body: { base: 'grid grid-cols-1' } }">
+                    <div class="text-cool-500">
+                        Description:
+                    </div>
+                    <UTextarea autoresize color="purple" variant="none" :model-value="selected.description" disabled class="text-zinc-50" maxrows="20" />
+                </UCard>
+            </div>
+        </USlideover>
+
     </div>
 </template>
 
 <script setup>
-const props = defineProps(["columns", "data"]);
-const emit = defineEmits(["getData", "delData", "addData"]);
-const searchWord = ref();
+import Swal from 'sweetalert2';
+
+const props = defineProps(["columns", "data"])
+const emit = defineEmits(["getData", "delData", "addData"])
+const searchWord = ref()
+const isOpen = ref(false)
+const selected = ref({})
+const select =  (element) => {
+    selected.value = element
+    isOpen.value = !isOpen.value
+}
+
+function tryDelete(){
+    Swal.fire({
+        title: "Are you sure?",
+        icon: "warning",
+        iconColor: "red",
+        denyButtonText: "No Abort",
+        confirmButtonText: 'Yes Delete!',
+        showConfirmButton: true,
+        showDenyButton: true,
+        showCancelButton: false,
+        denyButtonColor:"green",
+        confirmButtonColor: "red"
+}).then((result) =>{
+        if (!result.isConfirmed) return
+        emit('delData', (selected.value.id))
+        isOpen.value = !isOpen.value
+    })
+    
+}
 
 const filtering = computed(() => {
     if (!searchWord.value) {
@@ -43,24 +91,6 @@ const filtering = computed(() => {
     });
 });
 
-const getDataEmit = (rowData) => emit("getData", rowData);
-
-const delDataEmit = (rowData) => emit("delData", rowData);
-
-const items = (row) => [
-    [
-        {
-            label: "Edit",
-            icon: "i-heroicons-pencil-square-20-solid",
-            click: () => getDataEmit(row),
-        },
-        {
-            label: "Delete",
-            icon: "i-heroicons-trash-20-solid",
-            click: () => delDataEmit(row),
-        },
-    ],
-];
 </script>
 
 <style lang="scss" scoped>
@@ -115,7 +145,6 @@ const items = (row) => [
         }
     }
 }
-
 .save-button {
     margin: 0 20px;
 

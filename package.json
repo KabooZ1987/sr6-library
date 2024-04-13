@@ -14,6 +14,7 @@
     "@prisma/client": "5.11.0",
     "nuxt": "^3.10.3",
     "nuxt-icon": "^0.6.10",
+    "sweetalert2": "^11.10.7",
     "uuid": "^9.0.1",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
