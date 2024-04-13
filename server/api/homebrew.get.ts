@@ -1,8 +1,9 @@
 // server/api/course/chapter/[chapterSlug]/lesson/[lessonSlug].get.ts
 
 import { PrismaClient } from '@prisma/client';
+import fakeData from '@/types/fake.json'
 const prisma = new PrismaClient();
-const resultType = "EdgeBoost"
+const resultType = "homebrew"
 export default defineEventHandler(async (event) => {
 //   const {  } = event.context.params;
   const result = {}
@@ -14,5 +15,5 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  return result;
+  return fakeData.Homebrew.complete;
 });
