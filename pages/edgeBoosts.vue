@@ -17,27 +17,13 @@
 
                 <section>
                     <div class="Form">
-                        <div>
-                            <p>Name<span>*</span></p>
-                            <input-field type="text" v-model="Name" />
-                        </div>
-
-                        <div>
-                            <p>Cost<span>*</span></p>
-                            <input-field type="number" v-model="Cost" />
-                        </div>
+                        <input-field type="text" v-model="Name" label="Name" :required="true" />
+                        <input-field type="number" v-model="Cost" label="Cost" :required="true" />
                     </div>
 
                     <div class="Form">
-                        <div>
-                            <p>Page<span>*</span></p>
-                            <input-field type="number" v-model="Page" />
-                        </div>
-                        <div>
-                            <p>Source<span>*</span></p>
-                            <select-field v-model="Source" required="true" :options="SourceBooks" />
-                            <!-- <input-field type="text" :placeholder="dataOfEachRow.source" v-model="Source" /> -->
-                        </div>
+                        <input-field type="number" v-model="Page" label="Page" :required="true" />
+                        <select-field v-model="Source" :required="true" :options="SourceBooks" label="Source" />
                     </div>
 
                     <div class="field">

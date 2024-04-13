@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p>{{ props.label }}<span v-if="props.label">*</span></p>
+        <p>{{ props.label }}<span v-show="props.label && required">*</span></p>
         <select v-model="modelValue" :required="props.required">
             <option v-for="option in props.options" 
             :key="option.value" 

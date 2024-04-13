@@ -1,15 +1,14 @@
 <template>
     <div>
-        <p>{{ props.label }}<span v-if="props.label">*</span></p>
-        <input :type="type" :placeholder="props.placeholder" v-model="modelValue" :disabled="props.disabled"
+        <p>{{ props.label }}<span v-show="props.label && props.required">*</span></p>
+        <input :type="type" :placeholder="props.placeholder" v-model="modelValue" :disabled="props.disabled" :required="required"
             :class="{ disabled: props.disabled }" />
     </div>
 </template>
 
 <script setup>
 const modelValue = defineModel();
-
-const props = defineProps(["placeholder", "label", "disabled", "type"]);
+const props = defineProps(["placeholder", "label", "disabled", "type", "required"]);
 </script>
 
 <!-- <p>Name<span>*</span></p>

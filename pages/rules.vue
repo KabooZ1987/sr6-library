@@ -17,40 +17,16 @@
 
                 <section>
                     <div class="Form">
-                        <div>
-                            <p>Name<span>*</span></p>
-                            <input-field type="text" v-model="Name" />
-                        </div>
-
-                        <div>
-                            <p>Category<span>*</span></p>
-                            <select-field v-model="Category" required="true" :options="RuleCategories" />
-                        </div>
+                        <input-field type="text" v-model="Name" label="Name" :required="true" />
+                        <select-field v-model="Category" required="true" :options="RuleCategories"
+                            label="Rule Category" />
                     </div>
 
                     <div class="Form">
-                        <div>
-                            <p>Homebrew<span>*</span></p>
-                            <select-field v-model="Homebrew" required="true" :options="[
-            { label: 'Yes', value: true },
-            { label: 'No', value: false },
-        ]" />
-                        </div>
-                        <div>
-                            <input-field type="text" class="disabled" disabled />
-                        </div>
-                    </div>
-
-                    <div class="Form">
-                        <div>
-                            <p>Page</p>
-                            <input-field type="number" v-model="Page" />
-                        </div>
-
-                        <div>
-                            <p></p>
-                            <input-field class="disabled" disabled type="text" />
-                        </div>
+                        <select-field v-model="Homebrew" required="true"
+                            :options="[{ label: 'Yes', value: true }, { label: 'No', value: false },]"
+                            label="is Homebrew" />
+                            <input-field type="number" :required="false" v-model="Page" label="Page" />
                     </div>
 
                     <div class="field">

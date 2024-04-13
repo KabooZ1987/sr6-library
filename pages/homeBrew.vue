@@ -16,28 +16,13 @@
 
         <section>
           <div class="Form">
-            <input-field label="Name" v-model="Name" options="" />
-            <select-field label="Category" v-model="Category" :options="RuleCategories" />
+            <input-field label="Name" v-model="Name" :required="true" />
+            <select-field label="Category" :required="true" v-model="Category" :options="RuleCategories" />
           </div>
 
           <div class="Form">
-            <div>
-              <input-field type="text" class="disabled" disabled />
-            </div>
-            <div>
-              <input-field type="text" class="disabled" disabled />
-            </div>
-          </div>
-
-          <div class="Form">
-            <div>
-              <input-field type="text" class="disabled" disabled />
-            </div>
-
-            <div>
-              <p></p>
-              <input-field class="disabled" disabled type="text" />
-            </div>
+            <input-field class="disabled hidden" disabled type="text" />
+            <input-field class="disabled hidden" disabled type="text" />
           </div>
 
           <div class="field">

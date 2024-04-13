@@ -38,4 +38,7 @@ main {
     margin-top: 50px;
   }
 }
+.hidden{
+  visibility: hidden;
+}
 </style>
