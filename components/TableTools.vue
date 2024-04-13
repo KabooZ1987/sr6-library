@@ -3,7 +3,6 @@
 <template>
     <div class="data-table">
         <div class="table-tools">
-
             <form action="">
                 <input-field type="text" v-model="searchWord" placeholder="Search here..." />
             </form>
@@ -11,11 +10,9 @@
             <button @click="$emit('addData', payload)">
                 + New Data
             </button>
-
         </div>
 
         <div class="scrollable">
-
             <UTable :columns="props.columns" :rows="filtering"
                 class="border border-primary-200 dark:border-primary-700">
                 <template #actions-data="{ row }">
@@ -24,58 +21,51 @@
                     </UDropdown>
                 </template>
             </UTable>
-
         </div>
     </div>
 </template>
 
-
 <script setup>
-
-const props = defineProps(['columns', 'data'])
-const emit = defineEmits(['getData', 'delData', 'addData'])
-const searchWord= ref()
-
-
-
+const props = defineProps(["columns", "data"]);
+const emit = defineEmits(["getData", "delData", "addData"]);
+const searchWord = ref();
 
 const filtering = computed(() => {
     if (!searchWord.value) {
-        return props.data
+        return props.data;
     }
     return props.data.filter((row) => {
         return Object.values(row).some((value) => {
-            return String(value).toLowerCase().includes(searchWord.value.trim().toLowerCase())
-        })
-    })
-})
+            return String(value)
+                .toLowerCase()
+                .includes(searchWord.value.trim().toLowerCase());
+        });
+    });
+});
 
-const getDataEmit = (rowData) => emit('getData', rowData)
+const getDataEmit = (rowData) => emit("getData", rowData);
 
-
-const delDataEmit = (rowData) => emit('delData', rowData)
-
+const delDataEmit = (rowData) => emit("delData", rowData);
 
 const items = (row) => [
-    [{
-        label: 'Edit',
-        icon: 'i-heroicons-pencil-square-20-solid',
-        click: () => getDataEmit(row)
-    }, {
-        label: 'Delete',
-        icon: 'i-heroicons-trash-20-solid',
-        click: () => delDataEmit(row)
-    }]
-]
-
+    [
+        {
+            label: "Edit",
+            icon: "i-heroicons-pencil-square-20-solid",
+            click: () => getDataEmit(row),
+        },
+        {
+            label: "Delete",
+            icon: "i-heroicons-trash-20-solid",
+            click: () => delDataEmit(row),
+        },
+    ],
+];
 </script>
-
-
 
 <style lang="scss" scoped>
 .data-table {
     .table-tools {
-
         padding: 10px;
         display: flex;
         justify-content: space-between;
@@ -96,19 +86,14 @@ const items = (row) => [
                 color: rgb(5, 235, 5);
                 border-color: rgb(5, 235, 5);
             }
-
         }
-
-
 
         input {
             border-radius: 20px;
             padding: 0 20px;
             background-color: rgb(99, 96, 96);
-
         }
     }
-
 
     .scrollable {
         scrollbar-gutter: stable;
@@ -126,10 +111,8 @@ const items = (row) => [
         }
 
         &::-webkit-scrollbar-track {
-            background: transparent
+            background: transparent;
         }
-
-
     }
 }
 
@@ -138,9 +121,7 @@ const items = (row) => [
 
     button {
         padding: 10px 20px;
-
     }
-
 }
 
 .add-button {

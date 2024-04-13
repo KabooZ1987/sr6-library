@@ -6,9 +6,6 @@
   </div>
 </template>
 
-
-
-
 <style lang="scss">
 * {
   margin: 0;
@@ -22,7 +19,6 @@ body {
   padding: 100px 0;
   color: white;
 }
-
 
 main {
   padding: 10px 50px;

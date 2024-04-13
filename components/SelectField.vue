@@ -2,7 +2,12 @@
     <div>
         <p>{{ props.label }}<span v-if="props.label">*</span></p>
         <select v-model="modelValue" :required="props.required">
-            <option v-for="option in props.options" :key="option.value" :value="option.value" :selected="isSelected(option.value)" >{{ option.label }}
+            <option v-for="option in props.options" 
+            :key="option.value" 
+            :value="option.value" 
+            :selected="isSelected(option.value)" 
+            >
+            {{ option.label }}
             </option>
         </select>
     </div>

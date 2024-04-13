@@ -1,11 +1,14 @@
 <template>
     <div>
         <UModal v-model="isOpen" prevent-close>
-            <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+            <UCard :ui="{
+            ring: '',
+            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+        }">
                 <template #header>
                     <div class="flex items-center justify-between">
                         <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-                            {{(isEditForm ? "Edit": "Add New Item")}}
+                            {{ (isEditForm ? "Edit" : "Add New Item") }}
                         </h3>
                         <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
                             @click="xButton()" />
@@ -21,39 +24,35 @@
 
                         <div>
                             <p>Category<span>*</span></p>
-                            <select-field v-model="Category" required="true"
-                            :options="RuleCategories"
-                            />
+                            <select-field v-model="Category" required="true" :options="RuleCategories" />
                         </div>
                     </div>
-                    
+
                     <div class="Form">
                         <div>
                             <p>Homebrew<span>*</span></p>
-                            <select-field v-model="Homebrew" required="true"
-                             :options="[{label:'Yes', value:true},{label:'No', value:false}]"
-                            />
+                            <select-field v-model="Homebrew" required="true" :options="[
+            { label: 'Yes', value: true },
+            { label: 'No', value: false },
+        ]" />
                         </div>
                         <div>
-                            
                             <input-field type="text" class="disabled" disabled />
                         </div>
-                        
                     </div>
-                    
+
                     <div class="Form">
-                        
                         <div>
-                            <input-field type="text" class="disabled" disabled />
+                            <p>Page</p>
+                            <input-field type="number" v-model="Page" />
                         </div>
 
                         <div>
                             <p></p>
                             <input-field class="disabled" disabled type="text" />
                         </div>
-                        
                     </div>
-                    
+
                     <div class="field">
                         <div>
                             <p>Description<span>*</span></p>
@@ -76,186 +75,158 @@
     </div>
 </template>
 
-
-
-
-
-
-
-
-
-
-
-
-
-	
 <!-- Category = source -->
-	
+
 <!-- Homebrew = page -->
 
-
-
-
-
 <script setup>
+import { v4 as uuidv4 } from "uuid";
+import { RuleCategories } from "~/services/enums";
+const UUID = ref();
 
-import { v4 as uuidv4 } from 'uuid';
-import { RuleCategories } from '~/services/enums';
-const UUID = ref()
+const isEditForm = ref(true);
+const reloadTrigger = ref(0);
+const isOpen = ref(false);
+const dataOfEachRow = ref();
 
-const isEditForm = ref(true)
-const reloadTrigger = ref(0)
-const isOpen = ref(false)
-const dataOfEachRow = ref()
-
-const Name = ref(null)
-const Homebrew = ref(null)
-const Category = ref(null)
-const Description = ref(null)
-
+const Name = ref(null);
+const Homebrew = ref(null);
+const Category = ref(null);
+const Description = ref(null);
 
 const element = ref({
-    "id": null,
-    "name": null,
-    "description": null,
-    "category": null,
-    "homebrew": null,
-    "updated_at": null
+    id: null,
+    name: null,
+    description: null,
+    category: null,
+    homebrew: null,
+    updated_at: null,
 });
 
+const columns = [
+    {
+        key: "name",
+        label: "Name",
+        sortable: true,
+    },
+    {
+        key: "category",
+        label: "Category",
+        sortable: true,
+    },
+    {
+        key: "description",
+        label: "Description",
+        sortable: true,
+    },
+    {
+        key: "homebrew",
+        label: "Homebrew",
+        sortable: true,
+    },
+    {
+        key: "updated_at",
+        label: "Date",
+        sortable: true,
+    },
+    {
+        key: "actions",
+    },
+];
 
-
-
-const columns = [{
-    key: 'name',
-    label: 'Name',
-    sortable: true
-}, {
-    key: 'category',
-    label: 'Category',
-    sortable: true
-}, {
-    key: 'description',
-    label: 'Description',
-    sortable: true
-}, {
-    key: 'homebrew',
-    label: 'Homebrew',
-    sortable: true
-}, {
-    key: 'updated_at',
-    label: 'Date',
-    sortable: true
-}, {
-    key: 'actions'
-}]
-
-
-
-
-const {data} = await useAsyncData(
-    'rules',
-    () => $fetch('/api/rule'), {
-    watch: [reloadTrigger]
-  }
-)
-definePageMeta({
-    layout: 'data-pages',
-
-})
+const { data } = await useAsyncData("rules", () => $fetch("/api/rule"), {
+    watch: [reloadTrigger],
+});
 
 function xButton() {
-    isOpen.value = false
-    Name.value = null
+    isOpen.value = false;
+    Name.value = null;
 
-    
-    Homebrew.value = null
-    Category.value = null
-    Description.value = null
+    Homebrew.value = null;
+    Category.value = null;
+    Description.value = null;
 }
 
 function delData(rowData) {
     dataOfEachRow.value = rowData;
-    element.value.id = dataOfEachRow.value.id
+    element.value.id = dataOfEachRow.value.id;
 
-    useFetch("/api/rule", { method: "Delete", body: JSON.stringify({ upsert: element.value }) });
-    reloadTrigger.value += 1
-    
+    useFetch("/api/rule", {
+        method: "Delete",
+        body: JSON.stringify({ upsert: element.value }),
+    });
+    reloadTrigger.value += 1;
 }
 function addData() {
     isOpen.value = true;
     isEditForm.value = false;
-
 }
 function getData(rowData) {
     isEditForm.value = true;
     dataOfEachRow.value = rowData;
-    isOpen.value = true
+    isOpen.value = true;
 
-    Name.value = dataOfEachRow.value.name
-    Homebrew.value = dataOfEachRow.value.homebrew
-    Category.value = dataOfEachRow.value.category
-    Description.value = dataOfEachRow.value.description
+    Name.value = dataOfEachRow.value.name;
+    Homebrew.value = dataOfEachRow.value.homebrew;
+    Category.value = dataOfEachRow.value.category;
+    Description.value = dataOfEachRow.value.description;
 
-
-    return dataOfEachRow
+    return dataOfEachRow;
 }
-
-
 
 const Validation = () => {
-    if (Name.value && Homebrew.value !== null && Category.value && Description.value) {
-        saveData()
-    } else if(!Name.value){
-        alert("You need to fill Name")
-    } else if(!Homebrew.value){
-        alert("You need to fill Homebrew")  
-    }else if (!Category.value){
-        alert("You need to fill Category")  
-    }else if (!Description.value){
-        alert("You need to fill  Description")  
-        
+    if (
+        Name.value &&
+        Homebrew.value !== null &&
+        Category.value &&
+        Description.value
+    ) {
+        saveData();
+    } else if (!Name.value) {
+        alert("You need to fill Name");
+    } else if (!Homebrew.value) {
+        alert("You need to fill Homebrew");
+    } else if (!Category.value) {
+        alert("You need to fill Category");
+    } else if (!Description.value) {
+        alert("You need to fill  Description");
     }
-}
+};
 
 function saveData() {
     if (!isEditForm.value) {
         data.value.filter((row) => {
             do {
                 UUID.value = uuidv4();
-            } while (UUID.value === row.id)
-        })
-        element.value.id = UUID.value
-        element.value.updated_at = new Date()
+            } while (UUID.value === row.id);
+        });
+        element.value.id = UUID.value;
+        element.value.updated_at = new Date();
     } else {
-        element.value.id = dataOfEachRow.value.id
-        element.value.updated_at = dataOfEachRow.value.updated_at
+        element.value.id = dataOfEachRow.value.id;
+        element.value.updated_at = dataOfEachRow.value.updated_at;
     }
 
-   
     element.value.name = Name.value.toString();
     element.value.homebrew = Homebrew.value.toString();
     element.value.category = Category.value.toString();
     element.value.description = Description.value.toString();
 
-    useFetch("/api/rule", { method: "POST", body: JSON.stringify({ upsert: element.value }) });
+    useFetch("/api/rule", {
+        method: "POST",
+        body: JSON.stringify({ upsert: element.value }),
+    });
 
-    reloadTrigger.value += 1
-    xButton()
+    reloadTrigger.value += 1;
+    xButton();
     // useFetch("/api/edge_boost",{method:"POST",body:{"upsert":element}})
-
 }
-
-
 </script>
-
-
 
 <style lang="scss" scoped>
 .Form {
     display: flex;
     width: 100%;
-
 
     div {
         width: 50%;
@@ -278,11 +249,8 @@ function saveData() {
             border-radius: 20px;
             padding: 5px 20px;
         }
-
-
     }
 }
-
 
 .field {
     width: 100%;
@@ -303,5 +271,4 @@ function saveData() {
         }
     }
 }
-
 </style>

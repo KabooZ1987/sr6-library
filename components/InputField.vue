@@ -1,30 +1,19 @@
 <template>
     <div>
         <p>{{ props.label }}<span v-if="props.label">*</span></p>
-        <input 
-        :type="type" 
-        :placeholder="props.placeholder" 
-        v-model="modelValue" 
-        :disabled="props.disabled" 
-        :class="{ 'disabled': props.disabled }" >
+        <input :type="type" :placeholder="props.placeholder" v-model="modelValue" :disabled="props.disabled"
+            :class="{ disabled: props.disabled }" />
     </div>
 </template>
 
 <script setup>
+const modelValue = defineModel();
 
-const modelValue = defineModel()
-
-const props = defineProps(['placeholder', 'label', 'disabled', 'type'])
-
+const props = defineProps(["placeholder", "label", "disabled", "type"]);
 </script>
-
-
-
 
 <!-- <p>Name<span>*</span></p>
 <input-field type="text" :placeholder="dataOfEachRow.name" v-model="Name" /> -->
-
-
 
 <style lang="scss" scoped>
 div {
@@ -49,10 +38,8 @@ div {
         padding: 5px 20px;
     }
 
-    .disabled{
+    .disabled {
         margin-top: 24px;
     }
-
-
 }
 </style>

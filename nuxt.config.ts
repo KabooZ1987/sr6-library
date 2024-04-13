@@ -2,18 +2,12 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
-  modules: [
-    '@nuxt/ui',
-    'nuxt-icon'
-  ],
-  
+  modules: ["@nuxt/ui", "nuxt-icon"],
+
   components: [
     {
-      path: '~/components',
+      path: "~/components",
       pathPrefix: false,
     },
-  ]
-
-
-
+  ],
 });

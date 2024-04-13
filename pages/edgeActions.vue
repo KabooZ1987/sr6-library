@@ -3,12 +3,14 @@
 <template>
     <div>
         <UModal v-model="isOpen" prevent-close>
-            <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
-                
+            <UCard :ui="{
+            ring: '',
+            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+        }">
                 <template #header>
                     <div class="flex items-center justify-between">
                         <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-                             {{(isEditForm ? "Edit": "Add New Item")}}
+                            {{ (isEditForm ? "Edit" : "Add New Item") }}
                         </h3>
                         <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
                             @click="xButton()" />
@@ -35,16 +37,11 @@
                         </div>
                         <div>
                             <p>Source<span>*</span></p>
-                            <select-field v-model="Source" required="true"
-                                :options="SourceBooks"
-                            />
-                            <!-- <input-field type="text" :placeholder="dataOfEachRow.source" v-model="Source" /> -->
+                            <select-field v-model="Source" required="true" :options="SourceBooks" />
                         </div>
-
                     </div>
 
                     <div class="Form">
-
                         <div>
                             <p>Restriction<span>*</span></p>
                             <select-field v-model="Restriction" required="true" :options="EdgeActionRestrictions" />
@@ -54,7 +51,6 @@
                             <p></p>
                             <input-field class="disabled" disabled type="text" />
                         </div>
-
                     </div>
 
                     <div class="field">
@@ -70,7 +66,6 @@
                     </UButton>
                 </div>
             </UCard>
-        
         </UModal>
 
         <h1>EDGE ACTIONS</h1>
@@ -78,205 +73,212 @@
         <div class="data-table">
             <TableTools :columns="columns" :data="data" @add-data="addData" @get-data="getData" @del-data="delData" />
         </div>
-
     </div>
 </template>
 
-
-
 <script setup>
-import { v4 as uuidv4 } from 'uuid';
-import { EdgeActionRestrictions, SourceBooks } from '~/services/enums';
-const UUID = ref()
-const reloadTrigger = ref(0)
-const isEditForm = ref(true)
-const isOpen = ref(false)
-const dataOfEachRow = ref()
+import { v4 as uuidv4 } from "uuid";
+import { EdgeActionRestrictions, SourceBooks } from "~/services/enums";
+const UUID = ref();
+const reloadTrigger = ref(0);
+const isEditForm = ref(true);
+const isOpen = ref(false);
+const dataOfEachRow = ref();
 
-const Name = ref(null)
-const Cost = ref(null)
-const Restriction = ref(null)
-const Page = ref(null)
-const Source = ref(null)
-const Description = ref(null)
-
+const Name = ref(null);
+const Cost = ref(null);
+const Restriction = ref(null);
+const Page = ref(null);
+const Source = ref(null);
+const Description = ref(null);
 
 const element = ref({
-    "id": null,
-    "name": null,
-    "cost": null,
-    "restriction": null,
-    "description": null,
-    "source": null,
-    "page": null,
-    "updated_at": null
+    id: null,
+    name: null,
+    cost: null,
+    restriction: null,
+    description: null,
+    source: null,
+    page: null,
+    updated_at: null,
 });
 
+const columns = [
+    {
+        key: "name",
+        label: "Name",
+        sortable: true,
+    },
+    {
+        key: "cost",
+        label: "Cost",
+        sortable: true,
+    },
+    {
+        key: "restriction",
+        label: "Restriction",
+        sortable: true,
+    },
+    {
+        key: "description",
+        label: "Description",
+        sortable: true,
+    },
+    {
+        key: "source",
+        label: "Source",
+        sortable: true,
+    },
+    {
+        key: "page",
+        label: "Page",
+        sortable: true,
+    },
+    {
+        key: "updated_at",
+        label: "Date",
+        sortable: true,
+    },
+    {
+        key: "actions",
+    },
+];
 
-const columns = [{
-    key: 'name',
-    label: 'Name',
-    sortable: true
-}, {
-    key: 'cost',
-    label: 'Cost',
-    sortable: true
-}, {
-    key: 'restriction',
-    label: 'Restriction',
-    sortable: true
-}, {
-    key: 'description',
-    label: 'Description',
-    sortable: true
-}, {
-    key: 'source',
-    label: 'Source',
-    sortable: true
-}, {
-    key: 'page',
-    label: 'Page',
-    sortable: true
-}, {
-    key: 'updated_at',
-    label: 'Date',
-    sortable: true
-}, {
-    key: 'actions'
-}]
-
-const {data} = await useAsyncData(
-    'edge_action',
-    () => $fetch('/api/edge_action'), {
-    watch: [reloadTrigger]
-  }
-)
-
-definePageMeta({
-    layout: 'data-pages',
-
-})
+const { data } = await useAsyncData(
+    "edge_action",
+    () => $fetch("/api/edge_action"),
+    {
+        watch: [reloadTrigger],
+    }
+);
 
 function xButton() {
-    isOpen.value = false
-    Name.value = null
-    Cost.value = null
-    Restriction.value = null
-    Page.value = null
-    Source.value = null
-    Description.value = null
+    isOpen.value = false;
+    Name.value = null;
+    Cost.value = null;
+    Restriction.value = null;
+    Page.value = null;
+    Source.value = null;
+    Description.value = null;
 }
 
 function delData(rowData) {
     dataOfEachRow.value = rowData;
-    element.value.id = dataOfEachRow.value.id
+    element.value.id = dataOfEachRow.value.id;
 
-    useFetch("/api/edge_action", { method: "Delete", body: JSON.stringify({ upsert: element.value }) });
-    reloadTrigger.value += 1
+    useFetch("/api/edge_action", {
+        method: "Delete",
+        body: JSON.stringify({ upsert: element.value }),
+    });
+    reloadTrigger.value += 1;
 }
 function addData() {
     isOpen.value = true;
     isEditForm.value = false;
-
 }
 function getData(rowData) {
     isEditForm.value = true;
     dataOfEachRow.value = rowData;
-    isOpen.value = true
+    isOpen.value = true;
 
-    Name.value = dataOfEachRow.value.name
-    Cost.value = dataOfEachRow.value.cost
-    Restriction.value = dataOfEachRow.value.restriction
-    Page.value = dataOfEachRow.value.page
-    Source.value = dataOfEachRow.value.source
-    Description.value = dataOfEachRow.value.description
-    return dataOfEachRow
+    Name.value = dataOfEachRow.value.name;
+    Cost.value = dataOfEachRow.value.cost;
+    Restriction.value = dataOfEachRow.value.restriction;
+    Page.value = dataOfEachRow.value.page;
+    Source.value = dataOfEachRow.value.source;
+    Description.value = dataOfEachRow.value.description;
+    return dataOfEachRow;
 }
-
 
 const Validation = () => {
-    if (Name.value && Cost.value && Page.value && Source.value  && Restriction.value && Description.value) {
-        saveData()
-    }else if(!Name.value){
-        alert("You need to fill Name")
-    }else if (!Cost.value){
-        alert("You need to fill Cost")  
-    }else if (!Restriction.value){
-        alert("You need to fill  Restriction")     
-    } else if(!Page.value){
-        alert("You need to fill Page")
-    }else if (!Source.value){
-        alert("You need to fill Source")  
-    }else if (!Description.value){
-        alert("You need to fill  Description")     
+    if (
+        Name.value &&
+        Cost.value &&
+        Page.value &&
+        Source.value &&
+        Restriction.value &&
+        Description.value
+    ) {
+        saveData();
+    } else if (!Name.value) {
+        alert("You need to fill Name");
+    } else if (!Cost.value) {
+        alert("You need to fill Cost");
+    } else if (!Restriction.value) {
+        alert("You need to fill  Restriction");
+    } else if (!Page.value) {
+        alert("You need to fill Page");
+    } else if (!Source.value) {
+        alert("You need to fill Source");
+    } else if (!Description.value) {
+        alert("You need to fill  Description");
     }
-}
+};
 
 function saveData() {
     if (!isEditForm.value) {
         data.value.filter((row) => {
             do {
                 UUID.value = uuidv4();
-            } while (UUID.value === row.id)
-        })
-        element.value.id = UUID.value
-        element.value.updated_at = new Date()
+            } while (UUID.value === row.id);
+        });
+        element.value.id = UUID.value;
+        element.value.updated_at = new Date();
     } else {
-        element.value.id = dataOfEachRow.value.id
-        element.value.updated_at = dataOfEachRow.value.updated_at
+        element.value.id = dataOfEachRow.value.id;
+        element.value.updated_at = dataOfEachRow.value.updated_at;
     }
 
     if (Name.value !== null) {
         element.value.name = Name.value.toString();
     } else {
-        element.value.name = dataOfEachRow.value.name
+        element.value.name = dataOfEachRow.value.name;
     }
 
     if (Cost.value !== null) {
         element.value.cost = Cost.value.toString();
     } else {
-        element.value.cost = dataOfEachRow.value.cost
+        element.value.cost = dataOfEachRow.value.cost;
     }
-    
+
     if (Restriction.value !== null) {
         element.value.restriction = Restriction.value.toString();
     } else {
-        element.value.restriction = dataOfEachRow.value.restriction
+        element.value.restriction = dataOfEachRow.value.restriction;
     }
 
     if (Page.value !== null) {
         element.value.page = Page.value.toString();
     } else {
-        element.value.page = dataOfEachRow.value.page
+        element.value.page = dataOfEachRow.value.page;
     }
-
 
     if (Source.value !== null) {
         element.value.source = Source.value.toString();
     } else {
-
-        element.value.source = dataOfEachRow.value.source
+        element.value.source = dataOfEachRow.value.source;
     }
 
     if (Description.value !== null) {
         element.value.description = Description.value.toString();
     } else {
-        element.value.description = dataOfEachRow.value.description
+        element.value.description = dataOfEachRow.value.description;
     }
 
-    useFetch("/api/edge_action", { method: "POST", body: JSON.stringify({ upsert: element.value }) });
+    useFetch("/api/edge_action", {
+        method: "POST",
+        body: JSON.stringify({ upsert: element.value }),
+    });
 
-    reloadTrigger.value += 1
-    xButton()
+    reloadTrigger.value += 1;
+    xButton();
 }
 </script>
-
 
 <style lang="scss" scoped>
 .Form {
     display: flex;
     width: 100%;
-
 
     div {
         width: 50%;
@@ -299,7 +301,6 @@ function saveData() {
             border-radius: 20px;
             padding: 5px 20px;
         }
-
     }
 }
 
@@ -308,9 +309,7 @@ function saveData() {
 
     button {
         padding: 10px 20px;
-
     }
-
 }
 
 .field {
@@ -318,9 +317,11 @@ function saveData() {
 
     div {
         margin: 20px;
-        span{
+
+        span {
             color: red;
         }
+
         textarea {
             width: 100%;
             height: 200px;
