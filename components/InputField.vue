@@ -2,7 +2,7 @@
     <div>
         <p>{{ props.label }}<span v-if="props.label">*</span></p>
         <input 
-        :type="text" 
+        :type="type" 
         :placeholder="props.placeholder" 
         v-model="modelValue" 
         :disabled="props.disabled" 
@@ -14,7 +14,7 @@
 
 const modelValue = defineModel()
 
-const props = defineProps(['placeholder', 'label', 'disabled'])
+const props = defineProps(['placeholder', 'label', 'disabled', 'type'])
 
 </script>
 
@@ -22,7 +22,7 @@ const props = defineProps(['placeholder', 'label', 'disabled'])
 
 
 <!-- <p>Name<span>*</span></p>
-<input type="text" :placeholder="dataOfEachRow.name" v-model="Name"> -->
+<input-field type="text" :placeholder="dataOfEachRow.name" v-model="Name" /> -->
 
 
 

@@ -4,40 +4,22 @@
             <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
                 <template #header>
                     <div class="flex items-center justify-between">
-                        <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white" v-show="formSwitch">
-                            Edit
-                        </h3>
-                        <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
-                            v-show="!formSwitch">
-                            Add New Item
+                        <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white" >
+                            {{(isEditForm ? "Edit": "Add New Item")}}
                         </h3>
                         <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
                             @click="xButton()" />
                     </div>
                 </template>
 
-                <section v-show="formSwitch" v-if="formSwitch">
+                <section>
                     <div class="Form">
 
-                        <Input label="Name" v-model="Name" :placeholder="dataOfEachRow.name" @update="setName"
+                        <input-field label="Name" v-model="Name"
                             options="" />
-                        <SelectField label="Category" v-model="Category" :selected="dataOfEachRow.category"
-                            :options="options"  @update="setCategory"/>
-                        <!-- <div>
-                            <p>Category<span>*</span></p>
-                            <select v-model="Category" required>
-                                <option selected disabled value="">{{ dataOfEachRow.category }}</option>
-                                <option value="edge">edge</option>
-                                <option value="magic">magic</option>
-                                <option value="combat">combat</option>
-                                <option value="decking">decking</option>
-                                <option value="rigging">rigging</option>
-                                <option value="regeneration">regeneration</option>
-                                <option value="critter">critter</option>
-                                <option value="spirits">spirits</option>
-                                <option value="other">other</option>
-                            </select>
-                        </div> -->
+                        <select-field label="Category" v-model="Category"
+                            :options="RuleCategories"
+                        />
                     </div>
 
                     <div class="Form">
@@ -49,7 +31,6 @@
                         <div>
 
                             <input-field type="text" class="disabled" disabled />
-                            <!-- <input type="text" :placeholder="dataOfEachRow.source" v-model="Source"> -->
                         </div>
 
                     </div>
@@ -71,70 +52,6 @@
                     <div class="field">
                         <div>
                             <p>Description<span>*</span></p>
-                            <textarea type="text" :placeholder="dataOfEachRow.description" v-model="Description" />
-                        </div>
-                    </div>
-                </section>
-
-
-
-                <section v-show="!formSwitch" v-else>
-
-                    <div class="Form">
-                        <div>
-                            <p>New Name<span>*</span></p>
-                            <input-field type="text" v-model="Name" />
-                        </div>
-
-                        <div>
-                            <p>New Category<span>*</span></p>
-                            <select v-model="Category" required>
-                                <option selected disabled value=""></option>
-                                <option value="edge">edge</option>
-                                <option value="magic">magic</option>
-                                <option value="combat">combat</option>
-                                <option value="decking">decking</option>
-                                <option value="rigging">rigging</option>
-                                <option value="regeneration">regeneration</option>
-                                <option value="critter">critter</option>
-                                <option value="spirits">spirits</option>
-                                <option value="other">other</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="Form">
-                        <div>
-
-
-                            <input-field type="text" class="disabled" disabled />
-
-                        </div>
-
-                        <div>
-
-                            <input-field class="disabled" disabled type="text" />
-
-                        </div>
-                    </div>
-
-                    <div class="Form">
-
-                        <div>
-
-                            <input-field class="disabled" disabled type="text" />
-                        </div>
-
-                        <div>
-
-                            <input-field class="disabled" disabled type="text" />
-                        </div>
-
-                    </div>
-
-                    <div class="field">
-                        <div>
-                            <p>New Description<span>*</span></p>
                             <textarea type="text" v-model="Description" />
                         </div>
                     </div>
@@ -175,24 +92,13 @@
 
 <script setup>
 import { v4 as uuidv4 } from 'uuid';
+import { RuleCategories } from '~/services/enums';
 const UUID = ref()
 
-const formSwitch = ref(true)
+const isEditForm = ref(true)
 const reloadTrigger = ref(0)
 const isOpen = ref(false)
 const dataOfEachRow = ref()
-
-const options = [
-    { label: "edge", value: "edge" },
-    { label: "magic", value: "magic" },
-    { label: "combat", value: "combat" },
-    { label: "decking", value: "decking" },
-    { label: "rigging", value: "rigging" },
-    { label: "regeneration", value: "regeneration" },
-    { label: "critter", value: "critter" },
-    { label: "spirits", value: "spirits" },
-    { label: "other", value: "other" }
-]
 const Name = ref(null)
 const Category = ref(null)
 const Description = ref(null)
@@ -257,11 +163,11 @@ function delData(rowData) {
 }
 function addData() {
     isOpen.value = true;
-    formSwitch.value = false;
+    isEditForm.value = false;
 
 }
 function getData(rowData) {
-    formSwitch.value = true;
+    isEditForm.value = true;
     dataOfEachRow.value = rowData;
     isOpen.value = true
 
@@ -293,7 +199,7 @@ const setName = (name) => Name.value = name
 const setCategory = (category) => Category.value = category
 
 function saveData() {
-    if (!formSwitch.value) {
+    if (!isEditForm.value) {
         data.value.filter((row) => {
             do {
                 UUID.value = uuidv4();

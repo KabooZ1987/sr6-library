@@ -7,51 +7,38 @@
                 
                 <template #header>
                     <div class="flex items-center justify-between">
-                        <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white" v-show="formSwitch">
-                            Edit
-                        </h3>
-                        <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
-                            v-show="!formSwitch">
-                            Add New Item
+                        <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+                             {{(isEditForm ? "Edit": "Add New Item")}}
                         </h3>
                         <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
                             @click="xButton()" />
                     </div>
                 </template>
 
-                <section v-show="formSwitch" v-if="formSwitch">
+                <section>
                     <div class="Form">
                         <div>
                             <p>Name<span>*</span></p>
-                            <input type="text" :placeholder="dataOfEachRow.name" v-model="Name">
+                            <input-field type="text" v-model="Name" />
                         </div>
 
                         <div>
                             <p>Cost<span>*</span></p>
-                            <input type="text" :placeholder="dataOfEachRow.cost" v-model="Cost">
+                            <input-field type="number" v-model="Cost" />
                         </div>
                     </div>
 
                     <div class="Form">
                         <div>
                             <p>Page<span>*</span></p>
-                            <input type="text" :placeholder="dataOfEachRow.page" v-model="Page">
-
+                            <input-field type="number" v-model="Page" />
                         </div>
                         <div>
                             <p>Source<span>*</span></p>
-                            <select v-model="Source" required>
-                                <option selected disabled value="">{{ dataOfEachRow.source }}</option>
-                                <option value="core">core</option>
-                                <option value="wyrd">wyrd</option>
-                                <option value="wild_life">wild_life</option>
-                                <option value="firing_squad">firing_squad</option>
-                                <option value="companion">companion</option>
-                                <option value="body_shop">body_shop</option>
-                                <option value="shifter">shifter</option>
-                                <option value="homebrew">homebrew</option>
-                            </select>
-                            <!-- <input type="text" :placeholder="dataOfEachRow.source" v-model="Source"> -->
+                            <select-field v-model="Source" required="true"
+                                :options="SourceBooks"
+                            />
+                            <!-- <input-field type="text" :placeholder="dataOfEachRow.source" v-model="Source" /> -->
                         </div>
 
                     </div>
@@ -60,7 +47,7 @@
 
                         <div>
                             <p>Restriction<span>*</span></p>
-                            <input-field type="text" v-model="Restriction" />
+                            <select-field v-model="Restriction" required="true" :options="EdgeActionRestrictions" />
                         </div>
 
                         <div>
@@ -73,60 +60,6 @@
                     <div class="field">
                         <div>
                             <p>Description<span>*</span></p>
-                            <textarea type="text" :placeholder="dataOfEachRow.description" v-model="Description" />
-                        </div>
-                    </div>
-                </section>
-                <section v-show="!formSwitch" v-else>
-
-                    <div class="Form">
-                        <div>
-                            <p>New Name<span>*</span></p>
-                            <input-field type="text" v-model="Name" />
-                        </div>
-
-                        <div>
-                            <p>New Cost<span>*</span></p>
-                            <input-field type="text" v-model="Cost" />
-                        </div>
-                    </div>
-
-                    <div class="Form">
-                        <div>
-                            <p>New Page<span>*</span></p>
-                            <input-field type="text" v-model="Page" />
-
-                        </div>
-                        <div>
-                            <p>New Source<span>*</span></p>
-                            <select v-model="Source" required>
-                                <option selected disabled value=""></option>
-                                <option value="core">core</option>
-                                <option value="wyrd">wyrd</option>
-                                <option value="wild_life">wild_life</option>
-                                <option value="firing_squad">firing_squad</option>
-                                <option value="companion">companion</option>
-                                <option value="body_shop">body_shop</option>
-                                <option value="shifter">shifter</option>
-                                <option value="homebrew">homebrew</option>
-                            </select>
-                            <!-- <input-field type="text" v-model="Source" /> -->
-                        </div>
-
-                    </div>
-
-                    <div class="Form">
-
-                        <div>
-                            <p>New Restriction<span>*</span></p>
-                            <input-field type="text" v-model="Restriction" />
-                        </div>
-
-                    </div>
-
-                    <div class="field">
-                        <div>
-                            <p>New Description<span>*</span></p>
                             <textarea type="text" v-model="Description" />
                         </div>
                     </div>
@@ -153,9 +86,10 @@
 
 <script setup>
 import { v4 as uuidv4 } from 'uuid';
+import { EdgeActionRestrictions, SourceBooks } from '~/services/enums';
 const UUID = ref()
 const reloadTrigger = ref(0)
-const formSwitch = ref(true)
+const isEditForm = ref(true)
 const isOpen = ref(false)
 const dataOfEachRow = ref()
 
@@ -223,8 +157,6 @@ definePageMeta({
 
 })
 
-
-
 function xButton() {
     isOpen.value = false
     Name.value = null
@@ -244,11 +176,11 @@ function delData(rowData) {
 }
 function addData() {
     isOpen.value = true;
-    formSwitch.value = false;
+    isEditForm.value = false;
 
 }
 function getData(rowData) {
-    formSwitch.value = true;
+    isEditForm.value = true;
     dataOfEachRow.value = rowData;
     isOpen.value = true
 
@@ -258,11 +190,8 @@ function getData(rowData) {
     Page.value = dataOfEachRow.value.page
     Source.value = dataOfEachRow.value.source
     Description.value = dataOfEachRow.value.description
-
-
     return dataOfEachRow
 }
-
 
 
 const Validation = () => {
@@ -284,7 +213,7 @@ const Validation = () => {
 }
 
 function saveData() {
-    if (!formSwitch.value) {
+    if (!isEditForm.value) {
         data.value.filter((row) => {
             do {
                 UUID.value = uuidv4();
@@ -339,8 +268,6 @@ function saveData() {
 
     reloadTrigger.value += 1
     xButton()
-    // useFetch("/api/edge_boost",{method:"POST",body:{"upsert":element}})
-
 }
 </script>
 

@@ -5,7 +5,7 @@
         <div class="table-tools">
 
             <form action="">
-                <input type="text" v-model="searchWord" placeholder="Search here...">
+                <input-field type="text" v-model="searchWord" placeholder="Search here..." />
             </form>
 
             <button @click="$emit('addData', payload)">
@@ -33,7 +33,7 @@
 <script setup>
 
 const props = defineProps(['columns', 'data'])
-const emit = defineEmits(['getData', 'delData'])
+const emit = defineEmits(['getData', 'delData', 'addData'])
 const searchWord= ref()
 
 
