@@ -236,15 +236,15 @@ function saveData() {
     }
 
     if (Cost.value !== null) {
-        element.value.cost = Cost.value.toString();
+        element.value.cost = parseFloat(Cost.value)
     } else {
-        element.value.cost = dataOfEachRow.value.cost;
+        element.value.cost = parseFloat(dataOfEachRow.value.cost)
     }
 
     if (Page.value !== null) {
-        element.value.page = Page.value.toString();
+        element.value.page = parseInt(Page.value)
     } else {
-        element.value.page = dataOfEachRow.value.page;
+        element.value.page = parseInt(dataOfEachRow.value.page)
     }
 
     if (Source.value !== null) {
@@ -262,9 +262,7 @@ function saveData() {
     useFetch("/api/edge_boost", {
         method: "POST",
         body: JSON.stringify({ upsert: element.value }),
-    });
-
-    reloadTrigger.value += 1;
+    }).then(() => reloadTrigger.value += 1)
 
     xButton();
     // useFetch("/api/edge_boost",{method:"POST",body:{"upsert":element}})

@@ -67,6 +67,7 @@ const dataOfEachRow = ref();
 
 const Name = ref(null);
 const Homebrew = ref(null);
+const Page = ref(null);
 const Category = ref(null);
 const Description = ref(null);
 
@@ -75,6 +76,7 @@ const element = ref({
     name: null,
     description: null,
     category: null,
+    page: null,
     homebrew: null,
     updated_at: null,
 });
@@ -101,6 +103,11 @@ const columns = [
         sortable: true,
     },
     {
+        key: "page",
+        label: "Page",
+        sortable: true,
+    },
+    {
         key: "updated_at",
         label: "Date",
         sortable: true,
@@ -117,7 +124,7 @@ const { data } = await useAsyncData("rules", () => $fetch("/api/rule"), {
 function xButton() {
     isOpen.value = false;
     Name.value = null;
-
+    Page.value = null;
     Homebrew.value = null;
     Category.value = null;
     Description.value = null;
@@ -134,18 +141,19 @@ function delData(rowData) {
     reloadTrigger.value += 1;
 }
 function addData() {
-    isOpen.value = true;
-    isEditForm.value = false;
+    isOpen.value = true
+    isEditForm.value = false
 }
 function getData(rowData) {
-    isEditForm.value = true;
-    dataOfEachRow.value = rowData;
-    isOpen.value = true;
+    isEditForm.value = true
+    dataOfEachRow.value = rowData
+    isOpen.value = true
 
-    Name.value = dataOfEachRow.value.name;
-    Homebrew.value = dataOfEachRow.value.homebrew;
-    Category.value = dataOfEachRow.value.category;
-    Description.value = dataOfEachRow.value.description;
+    Name.value = dataOfEachRow.value.name
+    Homebrew.value = dataOfEachRow.value.homebrew
+    Page.value = dataOfEachRow.value.page
+    Category.value = dataOfEachRow.value.category
+    Description.value = dataOfEachRow.value.description
 
     return dataOfEachRow;
 }
@@ -184,18 +192,16 @@ function saveData() {
     }
 
     element.value.name = Name.value.toString();
-    element.value.homebrew = Homebrew.value.toString();
+    element.value.homebrew = Homebrew.value;
+    element.value.page = parseInt(Page.value)
     element.value.category = Category.value.toString();
     element.value.description = Description.value.toString();
 
     useFetch("/api/rule", {
         method: "POST",
         body: JSON.stringify({ upsert: element.value }),
-    });
-
-    reloadTrigger.value += 1;
+    }).then(() => reloadTrigger.value += 1)
     xButton();
-    // useFetch("/api/edge_boost",{method:"POST",body:{"upsert":element}})
 }
 </script>
 

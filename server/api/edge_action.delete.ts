@@ -17,14 +17,7 @@ export default defineEventHandler(async (event) => {
     }
 
 
-    fakeData.EdgeAction.complete.find((element, index) => {
-        if (element.id == body.upsert.id){
-          fakeData.EdgeAction.complete.splice(index,1)
-          return true
-        }
-    })
-
-    const result = {}
+   const result = await prisma.edgeAction.delete({where:{id: body.upsert.id}})
 
     if (!result) {
       throw createError({
@@ -33,5 +26,5 @@ export default defineEventHandler(async (event) => {
       });
     }
     
-  return {data: fakeData.EdgeAction};
+  return result;
 });

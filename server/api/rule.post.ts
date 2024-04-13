@@ -6,25 +6,21 @@ const prisma = new PrismaClient();
 const resultType = "Rule"
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  
+  let result = {}
   if(!body?.upsert){
     throw createError({
       statusCode: 404,
       statusMessage: `body empty`,
-    });
-  }
+    })
 
-  const previousData = fakeData.Rule.complete.find((element, index) => {
-    if (element.id == body.upsert.id){
-      fakeData.Rule.complete[index] = body.upsert
-      return true
-    }
-  })
-  if(typeof previousData == "undefined"){ 
-    fakeData.Rule.complete.push(body.upsert)
+  }else{
+
+    result =  await prisma.rule.upsert({
+      where: { id: body.upsert.id ?? "" },
+      create: body.upsert,
+      update: body.upsert
+     })  
   }
- 
-  const result = {}
 
   if (!result) {
     throw createError({
@@ -33,5 +29,5 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  return {data: fakeData.Rule};
+  return result;
 });

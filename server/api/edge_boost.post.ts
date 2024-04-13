@@ -6,25 +6,21 @@ const prisma = new PrismaClient();
 const resultType = "EdgeBoost"
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  
+  let result = {}
   if(!body?.upsert){
     throw createError({
       statusCode: 404,
       statusMessage: `body empty`,
-    });
-  }
+    })
 
-  const previousData = fakeData.EdgeBoost.complete.find((element, index) => {
-    if (element.id == body.upsert.id){
-      fakeData.EdgeBoost.complete[index] = body.upsert
-      return true
-    }
-  })
-  if(typeof previousData == "undefined"){ 
-    fakeData.EdgeBoost.complete.push(body.upsert)
+  }else{
+
+    result =  await prisma.edgeBoost.upsert({
+      where: { id: body.upsert.id ?? "" },
+      create: body.upsert,
+      update: body.upsert
+     })  
   }
- 
-  const result = {}
 
   if (!result) {
     throw createError({
@@ -33,5 +29,5 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  return {data: fakeData.EdgeBoost};
+  return result;
 });

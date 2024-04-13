@@ -3,10 +3,10 @@
 import { PrismaClient } from '@prisma/client';
 import fakeData from '@/types/fake.json'
 const prisma = new PrismaClient();
-const resultType = "homebrew"
+const resultType = "Homebrew"
 export default defineEventHandler(async (event) => {
-//   const {  } = event.context.params;
-  const result = {}
+
+  const result = await prisma.homebrew.findMany({})
 
   if (!result) {
     throw createError({
@@ -15,5 +15,5 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  return fakeData.Homebrew.complete;
+  return result;
 });

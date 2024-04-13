@@ -217,22 +217,22 @@ function saveData() {
         element.value.name = dataOfEachRow.value.name;
     }
 
-    if (Cost.value !== null) {
-        element.value.cost = Cost.value.toString();
-    } else {
-        element.value.cost = dataOfEachRow.value.cost;
-    }
-
     if (Restriction.value !== null) {
         element.value.restriction = Restriction.value.toString();
     } else {
         element.value.restriction = dataOfEachRow.value.restriction;
     }
 
-    if (Page.value !== null) {
-        element.value.page = Page.value.toString();
+    if (Cost.value !== null) {
+        element.value.cost = parseFloat(Cost.value)
     } else {
-        element.value.page = dataOfEachRow.value.page;
+        element.value.cost = parseFloat(dataOfEachRow.value.cost)
+    }
+
+    if (Page.value !== null) {
+        element.value.page = parseInt(Page.value)
+    } else {
+        element.value.page = parseInt(dataOfEachRow.value.page)
     }
 
     if (Source.value !== null) {
@@ -250,9 +250,9 @@ function saveData() {
     useFetch("/api/edge_action", {
         method: "POST",
         body: JSON.stringify({ upsert: element.value }),
-    });
+    }).then(() => reloadTrigger.value += 1)
 
-    reloadTrigger.value += 1;
+    
     xButton();
 }
 </script>

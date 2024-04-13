@@ -3,7 +3,7 @@
 import { PrismaClient } from '@prisma/client';
 import fakeData from '@/types/fake.json'
 const prisma = new PrismaClient();
-const resultType = "homebrew"
+const resultType = "Homebrew"
 export default defineEventHandler(async (event) => {
 
     
@@ -17,14 +17,7 @@ export default defineEventHandler(async (event) => {
     }
 
 
-    fakeData.Homebrew.complete.find((element, index) => {
-        if (element.id == body.upsert.id){
-          fakeData.Homebrew.complete.splice(index,1)
-          return true
-        }
-    })
-
-    const result = {}
+   const result = await prisma.homebrew.delete({where:{id: body.upsert.id}})
 
     if (!result) {
       throw createError({
@@ -33,5 +26,5 @@ export default defineEventHandler(async (event) => {
       });
     }
     
-  return {data: fakeData.Homebrew};
+  return result;
 });

@@ -3,28 +3,24 @@
 import { PrismaClient } from '@prisma/client';
 import fakeData from '@/types/fake.json'
 const prisma = new PrismaClient();
-const resultType = "homebrew"
+const resultType = "Homebrew"
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  
+  let result = {}
   if(!body?.upsert){
     throw createError({
       statusCode: 404,
       statusMessage: `body empty`,
-    });
-  }
+    })
 
-  const previousData = fakeData.Homebrew.complete.find((element, index) => {
-    if (element.id == body.upsert.id){
-      fakeData.Homebrew.complete[index] = body.upsert
-      return true
-    }
-  })
-  if(typeof previousData == "undefined"){ 
-    fakeData.Homebrew.complete.push(body.upsert)
+  }else{
+
+    result =  await prisma.homebrew.upsert({
+      where: { id: body.upsert.id ?? "" },
+      create: body.upsert,
+      update: body.upsert
+     })  
   }
- 
-  const result = {}
 
   if (!result) {
     throw createError({
@@ -33,5 +29,5 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  return {data: fakeData.Homebrew};
+  return result;
 });

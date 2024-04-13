@@ -168,11 +168,8 @@ function saveData() {
   useFetch("/api/homebrew", {
     method: "POST",
     body: JSON.stringify({ upsert: element.value }),
-  });
-
-  reloadTrigger.value += 1;
+  }).then(() => reloadTrigger.value += 1)
   xButton();
-  // useFetch("/api/edge_boost",{method:"POST",body:{"upsert":element}})
 }
 </script>
 

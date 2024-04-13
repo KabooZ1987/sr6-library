@@ -17,15 +17,7 @@ export default defineEventHandler(async (event) => {
     }
 
 
-    fakeData.EdgeBoost.complete.find((element, index) => {
-        if (element.id == body.upsert.id){
-          fakeData.EdgeBoost.complete.splice(index,1)
-          return true
-        }
-    })
-
-
-    const result = {}
+   const result = await prisma.edgeBoost.delete({where:{id: body.upsert.id}})
 
     if (!result) {
       throw createError({
@@ -34,5 +26,5 @@ export default defineEventHandler(async (event) => {
       });
     }
     
-  return {data: fakeData.EdgeBoost};
+  return result;
 });

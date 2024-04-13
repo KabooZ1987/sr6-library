@@ -5,8 +5,8 @@ import fakeData from '@/types/fake.json'
 const prisma = new PrismaClient();
 const resultType = "EdgeBoost"
 export default defineEventHandler(async (event) => {
-//   const {  } = event.context.params;
-  const result = {}
+
+  const result = await prisma.edgeBoost.findMany({})
 
   if (!result) {
     throw createError({
@@ -15,5 +15,5 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  return fakeData.EdgeBoost.complete;
+  return result;
 });
