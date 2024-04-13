@@ -43,12 +43,12 @@
                     <div class="Form">
                         <div>
 
-                            <input type="text" class="disabled" disabled>
+                            <input-field type="text" class="disabled" disabled />
 
                         </div>
                         <div>
 
-                            <input type="text" class="disabled" disabled>
+                            <input-field type="text" class="disabled" disabled />
                             <!-- <input type="text" :placeholder="dataOfEachRow.source" v-model="Source"> -->
                         </div>
 
@@ -58,12 +58,12 @@
 
                         <div>
 
-                            <input type="text" class="disabled" disabled>
+                            <input-field type="text" class="disabled" disabled />
                         </div>
 
                         <div>
                             <p></p>
-                            <input class="disabled" disabled type="text">
+                            <input-field class="disabled" disabled type="text" />
                         </div>
 
                     </div>
@@ -83,7 +83,7 @@
                     <div class="Form">
                         <div>
                             <p>New Name<span>*</span></p>
-                            <input type="text" v-model="Name">
+                            <input-field type="text" v-model="Name" />
                         </div>
 
                         <div>
@@ -107,13 +107,13 @@
                         <div>
 
 
-                            <input type="text" class="disabled" disabled>
+                            <input-field type="text" class="disabled" disabled />
 
                         </div>
 
                         <div>
 
-                            <input class="disabled" disabled type="text">
+                            <input-field class="disabled" disabled type="text" />
 
                         </div>
                     </div>
@@ -122,12 +122,12 @@
 
                         <div>
 
-                            <input class="disabled" disabled type="text">
+                            <input-field class="disabled" disabled type="text" />
                         </div>
 
                         <div>
 
-                            <input class="disabled" disabled type="text">
+                            <input-field class="disabled" disabled type="text" />
                         </div>
 
                     </div>
@@ -178,7 +178,7 @@ import { v4 as uuidv4 } from 'uuid';
 const UUID = ref()
 
 const formSwitch = ref(true)
-const data = ref([])
+const reloadTrigger = ref(0)
 const isOpen = ref(false)
 const dataOfEachRow = ref()
 
@@ -228,7 +228,12 @@ const columns = [{
 
 
 
-useFetch('/api/homebrew').then(response => data.value = response.data.value.data.complete)
+const {data} = await useAsyncData(
+    'homebrew',
+    () => $fetch('/api/homebrew'), {
+    watch: [reloadTrigger]
+  }
+)
 
 
 definePageMeta({
@@ -248,7 +253,7 @@ function delData(rowData) {
     element.value.id = dataOfEachRow.value.id
 
     useFetch("/api/homebrew", { method: "Delete", body: JSON.stringify({ upsert: element.value }) });
-    location.reload()
+    reloadTrigger.value += 1
 }
 function addData() {
     isOpen.value = true;
@@ -308,8 +313,8 @@ function saveData() {
 
     useFetch("/api/homebrew", { method: "POST", body: JSON.stringify({ upsert: element.value }) });
 
-    isOpen.value = false;
-    location.reload()
+    reloadTrigger.value += 1
+    xButton()
     // useFetch("/api/edge_boost",{method:"POST",body:{"upsert":element}})
 
 }

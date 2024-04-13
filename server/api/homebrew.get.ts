@@ -15,5 +15,5 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  return {data: fakeData.Homebrew};
+  return fakeData.Homebrew.complete;
 });

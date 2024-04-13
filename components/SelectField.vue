@@ -1,7 +1,7 @@
 <template>
     <div>
         <p>{{ props.label }}<span v-if="props.label">*</span></p>
-        <select @input="handleInput" :value="props.modelValue" :required="props.required">
+        <select v-model="modelValue" :required="props.required">
             <option selected disabled value="">{{ props.selected }}</option>
             <option v-for="option in props.options" :key="option.value" :value="option.value">{{ option.label }}
             </option>
@@ -10,13 +10,8 @@
 </template>
 
 <script setup>
-
-const props = defineProps(['label', 'modelValue', 'required', 'options', 'selected'])
-const emit = defineEmits(['update'])
-
-const handleInput = (event) =>{
-    emit('update',event.target.value)
-}
+const modelValue = defineModel()
+const props = defineProps(['label', 'required', 'options', 'selected'])
 </script>
 
 

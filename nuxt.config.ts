@@ -2,12 +2,9 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
-  css: [
-    '@fortawesome/fontawesome-svg-core/styles.css'
-  ],
-
   modules: [
-    '@nuxt/ui'
+    '@nuxt/ui',
+    'nuxt-icon'
   ],
   
   components: [

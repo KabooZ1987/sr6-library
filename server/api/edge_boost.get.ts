@@ -15,5 +15,5 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  return {data: fakeData.EdgeBoost};
+  return fakeData.EdgeBoost.complete;
 });

@@ -55,7 +55,7 @@
                         </div>
                         <div>
                             
-                            <input type="text" class="disabled" disabled>
+                            <input-field type="text" class="disabled" disabled />
                             <!-- <input type="text" :placeholder="dataOfEachRow.source" v-model="Source"> -->
                         </div>
                         
@@ -64,12 +64,12 @@
                     <div class="Form">
                         
                         <div>
-                            <input type="text" class="disabled" disabled>
+                            <input-field type="text" class="disabled" disabled />
                         </div>
 
                         <div>
                             <p></p>
-                            <input class="disabled" disabled type="text">
+                            <input-field class="disabled" disabled type="text" />
                         </div>
                         
                     </div>
@@ -91,7 +91,7 @@
                     <div class="Form">
                         <div>
                             <p>New Name<span>*</span></p>
-                            <input type="text" v-model="Name">
+                            <input-field type="text" v-model="Name" />
                         </div>
                         
                         <div>
@@ -124,8 +124,8 @@
                         </div>
                         <div>
                             
-                            <input type="text" class="disabled" disabled>
-                            <!-- <input type="text" v-model="Source"> -->
+                            <input-field type="text" class="disabled" disabled />
+                            <!-- <input-field type="text" v-model="Source" /> -->
                         </div>
 
                     </div>
@@ -134,12 +134,12 @@
 
                         <div>
                             
-                            <input type="text" class="disabled" disabled>
+                            <input-field type="text" class="disabled" disabled />
                         </div>
 
                         <div>
                             
-                            <input class="disabled" disabled type="text">
+                            <input-field class="disabled" disabled type="text" />
                         </div>
 
                     </div>
@@ -197,7 +197,7 @@ import { v4 as uuidv4 } from 'uuid';
 const UUID = ref()
 
 const formSwitch = ref(true)
-const data = ref([])
+const reloadTrigger = ref(0)
 const isOpen = ref(false)
 const dataOfEachRow = ref()
 
@@ -246,7 +246,12 @@ const columns = [{
 
 
 
-useFetch('/api/rule').then(response => data.value = response.data.value.data.complete)
+const {data} = await useAsyncData(
+    'rules',
+    () => $fetch('/api/rule'), {
+    watch: [reloadTrigger]
+  }
+)
 definePageMeta({
     layout: 'data-pages',
 
@@ -267,7 +272,8 @@ function delData(rowData) {
     element.value.id = dataOfEachRow.value.id
 
     useFetch("/api/rule", { method: "Delete", body: JSON.stringify({ upsert: element.value }) });
-    location.reload()
+    reloadTrigger.value += 1
+    
 }
 function addData() {
     isOpen.value = true;
@@ -327,8 +333,8 @@ function saveData() {
 
     useFetch("/api/rule", { method: "POST", body: JSON.stringify({ upsert: element.value }) });
 
-    isOpen.value = false;
-    location.reload()
+    reloadTrigger.value += 1
+    xButton()
     // useFetch("/api/edge_boost",{method:"POST",body:{"upsert":element}})
 
 }

@@ -25,7 +25,7 @@
             <div class="burger-Menu">
                 <span @click="toggleMobileNav" v-show="Tablet" :class="{ 'icon-active': mobileNavOpen }">
                     <client-only>
-                        <font-awesome-icon :icon="['fas', 'bars']" />
+                        <Icon name="uil:bars" />
                     </client-only>
                 </span>
                 <!-- <span @click="toggleMobileNav" v-show="mobile"  :class="{'icon-active' : mobileNavOpen}">menu</span> -->
@@ -291,7 +291,7 @@ header {
     }
 
     nav {
-        .berger-Menu span {
+        .burger-Menu span {
             font-size: 20px;
         }
 

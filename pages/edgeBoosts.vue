@@ -65,19 +65,19 @@
                     <div class="Form">
                         <div>
                             <p>New Name<span>*</span></p>
-                            <input type="text" v-model="Name">
+                            <input-field type="text" v-model="Name" />
                         </div>
 
                         <div>
                             <p>New Cost<span>*</span></p>
-                            <input type="text" v-model="Cost">
+                            <input-field type="text" v-model="Cost" />
                         </div>
                     </div>
 
                     <div class="Form">
                         <div>
                             <p>New Page<span>*</span></p>
-                            <input type="text" v-model="Page">
+                            <input-field type="text" v-model="Page" />
 
                         </div>
                         <div>
@@ -93,7 +93,7 @@
                                 <option value="shifter">shifter</option>
                                 <option value="homebrew">homebrew</option>
                             </select>
-                            <!-- <input type="text" v-model="Source"> -->
+                            <!-- <input-field type="text" v-model="Source" /> -->
                         </div>
 
                     </div>
@@ -163,7 +163,7 @@ import { v4 as uuidv4 } from 'uuid';
 const UUID = ref()
 
 const formSwitch = ref(true)
-const data = ref([])
+const reloadTrigger = ref(0)
 const isOpen = ref(false)
 const dataOfEachRow = ref()
 const serachWord = ref()
@@ -227,7 +227,12 @@ const items = (row) => [
 
 // console.log(await useFetch('/api/edge_boost'));
 
-useFetch('/api/edge_boost').then(response => data.value = response.data.value.data.complete)
+const {data} = await useAsyncData(
+    'edge_boost',
+    () => $fetch('/api/edge_boost'), {
+    watch: [reloadTrigger]
+  }
+)
 
 
 const filtering = computed(() => {
@@ -260,7 +265,7 @@ function delData(rowData) {
     element.value.id = dataOfEachRow.value.id
 
     useFetch("/api/edge_boost", { method: "Delete", body: JSON.stringify({ upsert: element.value }) });
-    location.reload()
+    reloadTrigger.value += 1
 }
 function addData() {
     isOpen.value = true;
@@ -332,8 +337,10 @@ function saveData() {
 
     useFetch("/api/edge_boost", { method: "POST", body: JSON.stringify({ upsert: element.value }) });
 
-    isOpen.value = false;
-    location.reload()
+    
+    reloadTrigger.value += 1
+
+    xButton()
     // useFetch("/api/edge_boost",{method:"POST",body:{"upsert":element}})
 
 }

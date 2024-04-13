@@ -4,6 +4,7 @@
     <div>
         <UModal v-model="isOpen" prevent-close>
             <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+                
                 <template #header>
                     <div class="flex items-center justify-between">
                         <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white" v-show="formSwitch">
@@ -59,12 +60,12 @@
 
                         <div>
                             <p>Restriction<span>*</span></p>
-                            <input type="text" v-model="Restriction">
+                            <input-field type="text" v-model="Restriction" />
                         </div>
 
                         <div>
                             <p></p>
-                            <input class="disabled" disabled type="text">
+                            <input-field class="disabled" disabled type="text" />
                         </div>
 
                     </div>
@@ -81,19 +82,19 @@
                     <div class="Form">
                         <div>
                             <p>New Name<span>*</span></p>
-                            <input type="text" v-model="Name">
+                            <input-field type="text" v-model="Name" />
                         </div>
 
                         <div>
                             <p>New Cost<span>*</span></p>
-                            <input type="text" v-model="Cost">
+                            <input-field type="text" v-model="Cost" />
                         </div>
                     </div>
 
                     <div class="Form">
                         <div>
                             <p>New Page<span>*</span></p>
-                            <input type="text" v-model="Page">
+                            <input-field type="text" v-model="Page" />
 
                         </div>
                         <div>
@@ -109,7 +110,7 @@
                                 <option value="shifter">shifter</option>
                                 <option value="homebrew">homebrew</option>
                             </select>
-                            <!-- <input type="text" v-model="Source"> -->
+                            <!-- <input-field type="text" v-model="Source" /> -->
                         </div>
 
                     </div>
@@ -118,12 +119,7 @@
 
                         <div>
                             <p>New Restriction<span>*</span></p>
-                            <input type="text" v-model="Restriction">
-                        </div>
-
-                        <div>
-                            <p></p>
-                            <input class="disabled" disabled type="text">
+                            <input-field type="text" v-model="Restriction" />
                         </div>
 
                     </div>
@@ -141,26 +137,15 @@
                     </UButton>
                 </div>
             </UCard>
+        
         </UModal>
 
-
-
-
-
         <h1>EDGE ACTIONS</h1>
-
-
-
-
-
 
         <div class="data-table">
             <TableTools :columns="columns" :data="data" @add-data="addData" @get-data="getData" @del-data="delData" />
         </div>
 
-        <!-- <div class="data-table">
-            <UTable  :columns="columns" :rows="pure" />
-        </div>  -->
     </div>
 </template>
 
@@ -169,9 +154,8 @@
 <script setup>
 import { v4 as uuidv4 } from 'uuid';
 const UUID = ref()
-
+const reloadTrigger = ref(0)
 const formSwitch = ref(true)
-const data = ref([])
 const isOpen = ref(false)
 const dataOfEachRow = ref()
 
@@ -227,11 +211,12 @@ const columns = [{
     key: 'actions'
 }]
 
-
-
-
-
-useFetch('/api/edge_action').then(response => data.value = response.data.value.data.complete)
+const {data} = await useAsyncData(
+    'edge_action',
+    () => $fetch('/api/edge_action'), {
+    watch: [reloadTrigger]
+  }
+)
 
 definePageMeta({
     layout: 'data-pages',
@@ -255,7 +240,7 @@ function delData(rowData) {
     element.value.id = dataOfEachRow.value.id
 
     useFetch("/api/edge_action", { method: "Delete", body: JSON.stringify({ upsert: element.value }) });
-    location.reload()
+    reloadTrigger.value += 1
 }
 function addData() {
     isOpen.value = true;
@@ -352,8 +337,8 @@ function saveData() {
 
     useFetch("/api/edge_action", { method: "POST", body: JSON.stringify({ upsert: element.value }) });
 
-    isOpen.value = false;
-    location.reload()
+    reloadTrigger.value += 1
+    xButton()
     // useFetch("/api/edge_boost",{method:"POST",body:{"upsert":element}})
 
 }

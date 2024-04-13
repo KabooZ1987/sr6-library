@@ -5,7 +5,7 @@
         <div class="table-tools">
 
             <form action="">
-                <input type="text" v-model="serachWord" placeholder="Search here...">
+                <input type="text" v-model="searchWord" placeholder="Search here...">
             </form>
 
             <button @click="$emit('addData', payload)">
@@ -34,18 +34,18 @@
 
 const props = defineProps(['columns', 'data'])
 const emit = defineEmits(['getData', 'delData'])
-const serachWord = ref()
+const searchWord= ref()
 
 
 
 
 const filtering = computed(() => {
-    if (!serachWord.value) {
+    if (!searchWord.value) {
         return props.data
     }
     return props.data.filter((row) => {
         return Object.values(row).some((value) => {
-            return String(value).toLowerCase().includes(serachWord.value.trim().toLowerCase())
+            return String(value).toLowerCase().includes(searchWord.value.trim().toLowerCase())
         })
     })
 })

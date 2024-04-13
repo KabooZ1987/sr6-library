@@ -4,8 +4,7 @@
         <input 
         :type="text" 
         :placeholder="props.placeholder" 
-        :value="props.modelValue" 
-        @input="handleInput" 
+        v-model="modelValue" 
         :disabled="props.disabled" 
         :class="{ 'disabled': props.disabled }" >
     </div>
@@ -13,18 +12,9 @@
 
 <script setup>
 
+const modelValue = defineModel()
 
-
-const props = defineProps(['modelValue', 'placeholder', 'label', 'disabled'])
-const emit = defineEmits(['update'])
-
-
-
-
-const handleInput = (event) =>{
-    emit('update',event.target.value)
-}
-
+const props = defineProps(['placeholder', 'label', 'disabled'])
 
 </script>
 
