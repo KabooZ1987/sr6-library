@@ -44,7 +44,7 @@ model Rule {
   id          String        @id @unique @default(cuid())
   category    rule_category
   name        String
-  description String?
+  description String
   updated_at  DateTime      @default(now()) @updatedAt
   homebrew    Boolean       @default(false)
   source      source_book?

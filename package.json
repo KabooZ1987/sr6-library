@@ -12,6 +12,8 @@
   "dependencies": {
     "@nuxt/ui": "^2.14.2",
     "@prisma/client": "5.11.0",
+    "@vuelidate/core": "^2.0.3",
+    "@vuelidate/validators": "^2.0.4",
     "nuxt": "^3.10.3",
     "nuxt-icon": "^0.6.10",
     "uuid": "^9.0.1",
@@ -19,6 +21,7 @@
     "vue-router": "^4.3.0"
   },
   "devDependencies": {
+    "nuxt-primevue": "^0.3.1",
     "prisma": "^5.11.0",
     "prisma-generator-fake-data": "^0.14.1",
     "sass": "^1.72.0"
