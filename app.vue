@@ -15,9 +15,7 @@
 
 body {
   overflow: hidden;
-  background-color: rgb(50, 50, 50);
   padding: 100px 0;
-  color: white;
 }
 
 main {
@@ -32,10 +30,6 @@ main {
 
   h1 {
     font-size: 32px;
-  }
-
-  .data-table {
-    margin-top: 50px;
   }
 }
 .hidden{

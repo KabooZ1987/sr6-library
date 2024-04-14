@@ -29,16 +29,14 @@
                     </div>
 
                     <div class="Form">
-                        
                         <select-field v-model="Restriction" :required="true" :options="EdgeActionRestrictions" label="Restriction" />
                         <input-field class="disabled hidden" disabled type="text" />
-                        
                     </div>
 
                     <div class="field">
                         <div>
                             <p>Description<span>*</span></p>
-                            <textarea type="text" v-model="Description" />
+                            <textarea type="text" v-model="Description" class="bg-neutral-100 dark:bg-neutral-800" />
                         </div>
                     </div>
                 </section>

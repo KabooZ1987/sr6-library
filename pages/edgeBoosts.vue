@@ -29,7 +29,7 @@
                     <div class="field">
                         <div>
                             <p>Description</p>
-                            <textarea type="text" v-model="Description" />
+                            <textarea type="text" v-model="Description" class="bg-neutral-100 dark:bg-neutral-800" />
                         </div>
                     </div>
                 </section>
@@ -232,7 +232,7 @@ function saveData() {
         input {
             border-radius: 20px;
             padding: 0 20px;
-            background-color: rgb(99, 96, 96);
+            // background-color: rgb(99, 96, 96);
         }
     }
 

@@ -1,8 +1,12 @@
 <template>
     <div>
         <p>{{ props.label }}<span v-show="props.label && props.required">*</span></p>
-        <input :type="type" :placeholder="props.placeholder" v-model="modelValue" :disabled="props.disabled" :required="required"
-            :class="{ disabled: props.disabled }" />
+        <UInput  :type="type" :placeholder="props.placeholder" v-model="modelValue" :disabled="props.disabled" :required="required"
+            :class="{ disabled: props.disabled, 'mr-auto': true, 'w-full': true }"
+            :ui="{
+            color: { white: { outline: 'bg-neutral-100 dark:bg-neutral-800'}},
+            }"
+            />
     </div>
 </template>
 
@@ -16,11 +20,10 @@ const props = defineProps(["placeholder", "label", "disabled", "type", "required
 
 <style lang="scss" scoped>
 div {
-    width: 50%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 20px;
+    margin-top: 20px;
 
     p {
         margin-right: auto;

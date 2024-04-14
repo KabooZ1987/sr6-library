@@ -1,31 +1,25 @@
 <template>
     <div>
         <p>{{ props.label }}<span v-show="props.label && required">*</span></p>
-        <select v-model="modelValue" :required="props.required">
-            <option v-for="option in props.options" 
-            :key="option.value" 
-            :value="option.value" 
-            :selected="isSelected(option.value)" 
-            >
-            {{ option.label }}
-            </option>
-        </select>
+        <USelect v-model="modelValue" :required="props.required" :options="options" class="mr-auto w-full"
+        :ui="{
+            color: { white: { outline: 'bg-neutral-100 dark:bg-neutral-800'}},
+        }"
+        />
     </div>
 </template>
 
 <script setup>
 const modelValue = defineModel()
 const props = defineProps(['label', 'required', 'options'])
-function isSelected(value) { return value == modelValue.value}
 </script>
 
 <style lang="scss" scoped>
 div {
-    width: 50%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 20px;
+    margin-top: 20px;
 
     p {
         margin-right: auto;
@@ -45,19 +39,3 @@ div {
 
 }
 </style>
-
-
-
-
-
-<!-- 
-            { label: "edge", value: "edge" },
-            { label: "magic", value: "magic" },
-            { label: "combat", value: "combat" },
-            { label: "decking", value: "decking" },
-            { label: "rigging", value: "rigging" },
-            { label: "regeneration", value: "regeneration" },
-            { label: "critter", value: "critter" },
-            { label: "spirits", value: "spirits" },
-            { label: "other", value: "other" }
- -->

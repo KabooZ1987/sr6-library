@@ -25,7 +25,7 @@
                 <UCard  :ui="{ body: { base: 'mb-3 grid grid-cols-3' } }">
                     <div class="text-cool-500">
                         Name:
-                        <p class="px-3 text-zinc-50">{{ selected.name }}</p>
+                        <p class="px-3 text-zinc-700 dark:text-zinc-50">{{ selected.name }}</p>
                     </div>
                     <UDivider orientation="vertical" />
                     <div class="space-y-4 flex flex-col justify-center">
@@ -37,7 +37,7 @@
                     <div class="text-cool-500">
                         Description:
                     </div>
-                    <UTextarea autoresize color="purple" variant="none" :model-value="selected.description" disabled class="text-zinc-50" maxrows="20" />
+                    <UTextarea autoresize color="purple" variant="none" :model-value="selected.description" disabled class="text-zinc-800 dark:text-zinc-50" maxrows="20" />
                 </UCard>
             </div>
         </USlideover>
@@ -116,12 +116,6 @@ const filtering = computed(() => {
                 color: rgb(5, 235, 5);
                 border-color: rgb(5, 235, 5);
             }
-        }
-
-        input {
-            border-radius: 20px;
-            padding: 0 20px;
-            background-color: rgb(99, 96, 96);
         }
     }
 

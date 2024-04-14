@@ -1,8 +1,9 @@
 <template>
     <header :class="{ 'scrolled-nav': scrollNav }">
         <div class="logo">
-            <span>uLogo</span>
+            <span>SR6</span>
         </div>
+        <color-mode-button />
         <nav>
             <ul v-show="!Tablet" class="navigation">
                 <li>
@@ -27,7 +28,6 @@
                         <Icon name="uil:bars" />
                     </client-only>
                 </span>
-                <!-- <span @click="toggleMobileNav" v-show="mobile"  :class="{'icon-active' : mobileNavOpen}">menu</span> -->
             </div>
             <transition name="mobile-nav">
                 <ul v-show="mobileNavOpen" class="sideBar">
@@ -110,7 +110,7 @@ header {
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
-    background-color: rgba(4, 180, 19, 0.616);
+    background-color: rgba(4, 180, 19);
     color: white;
     z-index: 40;
     width: 100%;
@@ -220,7 +220,7 @@ header {
                     &:hover,
                     &.router-link-exact-active {
                         color: rgb(18, 97, 8);
-                        background-color: rgba(104, 226, 114, 0.712);
+                        background-color: rgba(104, 226, 114);
                     }
 
                     &.router-link-exact-active {
