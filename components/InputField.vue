@@ -1,9 +1,18 @@
 <template>
-    <div>
-        <p>{{ props.label }}<span v-show="props.label && props.required">*</span></p>
+    
+    <div v-if="props.label">
+        <p v-if="props.label">{{ props.label }}<span v-show="props.label && props.required">*</span></p>
         <input :type="type" :placeholder="props.placeholder" v-model="modelValue" :disabled="props.disabled" :required="required"
-            :class="{ disabled: props.disabled }" />
+        :class="{ disabled: props.disabled }" />
     </div>
+        
+    <section v-else>
+        <p v-if="props.label">{{ props.label }}<span v-show="props.label && props.required">*</span></p>
+        <input :type="type" :placeholder="props.placeholder" v-model="modelValue" :disabled="props.disabled" :required="required"
+        :class="{ disabled: props.disabled }" />
+    </section>
+
+
 </template>
 
 <script setup>
@@ -37,8 +46,6 @@ div {
         padding: 5px 20px;
     }
 
-    .disabled {
-        margin-top: 24px;
-    }
+
 }
 </style>
