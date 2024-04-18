@@ -28,7 +28,7 @@
           <div class="field">
             <div>
               <p>Description<span>*</span></p>
-              <textarea type="text" v-model="Description" class="bg-neutral-100 dark:bg-neutral-800" />
+              <textarea type="text" v-model="Description" class="bg-neutral-100 dark:bg-neutral-800 mt-1" />
             </div>
           </div>
         </section>

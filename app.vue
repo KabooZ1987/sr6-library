@@ -17,7 +17,15 @@ body {
   overflow: hidden;
   padding: 100px 0;
 }
-
+div{
+  p {
+    margin-right: auto;
+    font-size: 0.9rem;
+    span {
+        color: red;
+    }
+  }
+}
 main {
   padding: 10px 50px;
 
@@ -25,11 +33,17 @@ main {
     font-size: 18px;
     text-align: justify;
     text-justify: inter-word;
-    margin-top: 30px;
   }
 
   h1 {
     font-size: 32px;
+  }
+}
+label {
+  margin-right: auto;
+  font-size: 0.9rem;  
+  span {
+      color: red;
   }
 }
 .hidden{

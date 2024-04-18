@@ -1,7 +1,7 @@
 <template>
     <div>
-        <p>{{ props.label }}<span v-show="props.label && required">*</span></p>
-        <USelect v-model="modelValue" :required="props.required" :options="options" class="mr-auto w-full"
+        <label class="label" :for="props.label" >{{ props.label }}<span v-show="props.label && required">*</span></label>
+        <USelect :id="props.label" v-model="modelValue" :required="props.required" :options="options" class="mr-auto w-full"
         :ui="{
             color: { white: { outline: 'bg-neutral-100 dark:bg-neutral-800'}},
         }"
@@ -19,15 +19,7 @@ div {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 20px;
-
-    p {
-        margin-right: auto;
-
-        span {
-            color: red;
-        }
-    }
+    margin-top: 0.25rem;
 
     input,
     select {

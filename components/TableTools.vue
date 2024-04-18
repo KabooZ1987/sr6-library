@@ -3,13 +3,26 @@
 <template>
     <div class="data-table">
         <div class="table-tools">
+        
             <form action="">
                 <input-field type="text" v-model="searchWord" placeholder="Search here..." />
             </form>
 
-            <button @click="$emit('addData', payload)">
-                + New Data
-            </button>
+            <UButton @click="$emit('addData', payload)" label="+ New Data" 
+            color="white"
+            :padded="true"
+            size="md"
+            variant="solid"
+                :ui="{
+                    rounded: 'rounded-md',
+                    color:{
+                        white:{
+                            solid:'text-fuchsia-600 dark:text-fuchsia-600'
+                        }
+                    }
+                }"
+            />
+        
         </div>
 
         <div class="scrollable">
@@ -21,23 +34,28 @@
             </UTable>
         </div>
         <USlideover v-model="isOpen">
+
+
             <div class="p-4 flex-1">
-                <UCard  :ui="{ body: { base: 'mb-3 grid grid-cols-3' } }">
-                    <div class="text-cool-500">
-                        Name:
-                        <p class="px-3 text-zinc-700 dark:text-zinc-50">{{ selected.name }}</p>
-                    </div>
-                    <UDivider orientation="vertical" />
-                    <div class="space-y-4 flex flex-col justify-center">
-                        <UButton color="black" label="Edit" icon="i-heroicons-pencil-square-20-solid" block @click="$emit('getData', selected)" />
-                        <UButton color="black" label="Delete" icon="i-heroicons-trash-20-solid" block @click="tryDelete" />
-                    </div>
-                </UCard>
                 <UCard  :ui="{ body: { base: 'grid grid-cols-1' } }">
+                    <template #header>
+                        <div class="flex items-center justify-between">
+                            <h3 class="tpx-3 text-zinc-700 dark:text-zinc-50">
+                            {{ selected.name }}
+                            </h3>
+                            <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="isOpen = false" />
+                        </div>
+                    </template>
                     <div class="text-cool-500">
                         Description:
                     </div>
                     <UTextarea autoresize color="purple" variant="none" :model-value="selected.description" disabled class="text-zinc-800 dark:text-zinc-50" maxrows="20" />
+                    <template #footer>
+                        <div class="space-y-4 flex flex-col justify-center">
+                            <UButton color="black" label="Edit" icon="i-heroicons-pencil-square-20-solid" block @click="$emit('getData', selected)" />
+                            <UButton color="black" label="Delete" icon="i-heroicons-trash-20-solid" block @click="tryDelete" />
+                        </div>
+                    </template>
                 </UCard>
             </div>
         </USlideover>
@@ -99,24 +117,7 @@ const filtering = computed(() => {
         padding: 10px;
         display: flex;
         justify-content: space-between;
-        margin-bottom: 15px;
         align-items: center;
-        border-bottom: solid 1px gray;
-
-        button {
-            display: inline-block;
-            box-sizing: border-box;
-            color: rgb(1, 179, 1);
-            border-radius: 20px;
-            padding: 2px 8px;
-            font-size: 15px;
-            border: 2px solid rgb(1, 179, 1);
-
-            &:hover {
-                color: rgb(5, 235, 5);
-                border-color: rgb(5, 235, 5);
-            }
-        }
     }
 
     .scrollable {

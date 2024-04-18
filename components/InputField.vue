@@ -1,7 +1,7 @@
 <template>
     <div>
-        <p>{{ props.label }}<span v-show="props.label && props.required">*</span></p>
-        <UInput  :type="type" :placeholder="props.placeholder" v-model="modelValue" :disabled="props.disabled" :required="required"
+        <label class="label" :for="props.label" >{{ props.label }}<span v-show="props.label && required">*</span></label>
+        <UInput :id="props.label"  :type="type" :placeholder="props.placeholder" v-model="modelValue" :disabled="props.disabled" :required="required"
             :class="{ disabled: props.disabled, 'mr-auto': true, 'w-full': true }"
             :ui="{
             color: { white: { outline: 'bg-neutral-100 dark:bg-neutral-800'}},
@@ -23,15 +23,7 @@ div {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 20px;
-
-    p {
-        margin-right: auto;
-
-        span {
-            color: red;
-        }
-    }
+    margin-top: 0.25rem;
 
     input,
     select {

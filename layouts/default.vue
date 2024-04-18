@@ -1,60 +1,50 @@
 <template>
-    <header :class="{ 'scrolled-nav': scrollNav }">
+    <header :class="{ 'scrolled-nav': scrollNav, 'bg-zinc-800':true, 'text-fuchsia-700':true  }">
         <div class="logo">
+            <color-mode-button />
             <span>SR6</span>
+            
         </div>
-        <color-mode-button />
         <nav>
             <ul v-show="!Tablet" class="navigation">
                 <li>
                     <NuxtLink class="link" to="/">Home</NuxtLink>
                 </li>
                 <li>
-                    <NuxtLink class="link" to="/edgeBoosts">edge boosts</NuxtLink>
+                    <NuxtLink class="link" to="/edgeBoosts">Edge boosts</NuxtLink>
                 </li>
                 <li>
-                    <NuxtLink class="link" to="/edgeActions">edge actions</NuxtLink>
+                    <NuxtLink class="link" to="/edgeActions">Edge actions</NuxtLink>
                 </li>
                 <li>
-                    <NuxtLink class="link" to="/rules">rules</NuxtLink>
+                    <NuxtLink class="link" to="/rules">Rules</NuxtLink>
                 </li>
                 <li>
-                    <NuxtLink class="link" to="/homeBrew">homebrew</NuxtLink>
+                    <NuxtLink class="link" to="/homeBrew">Homebrew</NuxtLink>
                 </li>
             </ul>
+        
             <div class="burger-Menu">
                 <span @click="toggleMobileNav" v-show="Tablet" :class="{ 'icon-active': mobileNavOpen }">
-                    <client-only>
-                        <Icon name="uil:bars" />
-                    </client-only>
+                    <Icon name="uil:bars" />
                 </span>
             </div>
             <transition name="mobile-nav">
-                <ul v-show="mobileNavOpen" class="sideBar">
+                <ul v-show="mobileNavOpen" class="sideBar bg-zinc-800 text-fuchsia-700" @click="toggleMobileNav">
                     <li>
-                        <NuxtLink class="link" to="/">
-                            <p>Home</p>
-                        </NuxtLink>
+                        <NuxtLink class="link" to="/">Home</NuxtLink>
                     </li>
                     <li>
-                        <NuxtLink class="link" to="/edgeBoosts">
-                            <p>edge boosts</p>
-                        </NuxtLink>
+                        <NuxtLink class="link" to="/edgeBoosts">Edge boosts</NuxtLink>
                     </li>
                     <li>
-                        <NuxtLink class="link" to="/edgeActions">
-                            <p>edge actions</p>
-                        </NuxtLink>
+                        <NuxtLink class="link" to="/edgeActions">Edge actions</NuxtLink>
                     </li>
                     <li>
-                        <NuxtLink class="link" to="/rules">
-                            <p>rules</p>
-                        </NuxtLink>
+                        <NuxtLink class="link" to="/rules">Rules</NuxtLink>
                     </li>
                     <li>
-                        <NuxtLink class="link" to="/homeBrew">
-                            <p>homebrew</p>
-                        </NuxtLink>
+                        <NuxtLink class="link" to="/homeBrew">Homebrew</NuxtLink>
                     </li>
                 </ul>
             </transition>
@@ -67,7 +57,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onBeforeMount } from "vue";
 
 const scrollNav = ref(false);
 const Tablet = ref(false);
@@ -76,11 +66,12 @@ const windowWidth = ref(false);
 
 if (typeof window !== "undefined") {
     window.addEventListener("resize", checkScreenSize);
-
-    onMounted(() => {
-        window.addEventListener("scroll", updateScroll);
-    });
+    window.addEventListener("scroll", updateScroll);
 }
+
+    onMounted(() => {        
+        checkScreenSize();
+    });
 
 function updateScroll() {
     const scrollPosition = window.scrollY;
@@ -110,11 +101,10 @@ header {
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
-    background-color: rgba(4, 180, 19);
-    color: white;
+    height: 4rem;
     z-index: 40;
     width: 100%;
-    padding: 15px 2%;
+    padding: 0 2%;
     position: fixed;
     top: 0;
     transition: 0.5s ease all;
@@ -144,7 +134,6 @@ header {
         ul,
         .link {
             font-weight: 600;
-            color: white;
             list-style: none;
             text-decoration: none;
         }
@@ -167,7 +156,6 @@ header {
 
                     &:hover,
                     &.router-link-exact-active {
-                        color: rgb(19, 58, 15);
                         transition: 0.5s ease-out;
                     }
                 }
@@ -199,9 +187,8 @@ header {
             position: fixed;
             width: 100%;
             max-width: 250px;
-            height: 100%;
-            background-color: rgb(4, 180, 19);
-            top: 0;
+            height: 100%; 
+            top: 4rem;
             left: 0;
 
             li {
@@ -209,8 +196,6 @@ header {
                     padding: 0.5rem 1rem;
                     display: flex;
                     font-size: 20px;
-
-                    color: white;
                     padding-bottom: 4px;
 
                     p {
@@ -219,12 +204,12 @@ header {
 
                     &:hover,
                     &.router-link-exact-active {
-                        color: rgb(18, 97, 8);
-                        background-color: rgba(104, 226, 114);
+                        color: #fafafa;
+                        background-color:#a21caf;
                     }
 
                     &.router-link-exact-active {
-                        border-right: solid rgb(18, 97, 8) 5px;
+                        border-right: solid #4a044e 0.4rem;
                     }
                 }
             }
