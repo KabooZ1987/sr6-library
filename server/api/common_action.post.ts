@@ -1,9 +1,8 @@
 // server/api/course/chapter/[chapterSlug]/lesson/[lessonSlug].get.ts
 
 import { PrismaClient } from '@prisma/client';
-
 const prisma = new PrismaClient();
-const resultType = "EdgeAction"
+const resultType = "Action"
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   let result = {}
@@ -15,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
   }else{
 
-    result =  await prisma.edgeAction.upsert({
+    result =  await prisma.action.upsert({
       where: { id: body.upsert.id ?? "" },
       create: body.upsert,
       update: body.upsert

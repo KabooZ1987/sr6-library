@@ -3,10 +3,10 @@
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
-const resultType = "EdgeBoost"
+const resultType = "Action"
 export default defineEventHandler(async (event) => {
 
-  const result = await prisma.edgeBoost.findMany({})
+  const result = await prisma.action.findMany({})
 
   if (!result) {
     throw createError({

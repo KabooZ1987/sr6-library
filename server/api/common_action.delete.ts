@@ -3,7 +3,7 @@
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
-const resultType = "EdgeBoost"
+const resultType = "Action"
 export default defineEventHandler(async (event) => {
 
     
@@ -12,11 +12,12 @@ export default defineEventHandler(async (event) => {
     if(!id){
         throw createError({
             statusCode: 404,
-            statusMessage: `id empty`,
+            statusMessage: `body empty`,
         });
     }
 
-   const result = await prisma.edgeBoost.delete({where:{id}})
+
+   const result = await prisma.action.delete({where:{id}})
 
     if (!result) {
       throw createError({
