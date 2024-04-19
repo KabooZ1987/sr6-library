@@ -23,9 +23,7 @@
                     </div>
 
                     <div class="Form">
-                        <select-field v-model="Homebrew" required="true"
-                            :options="[{ label: 'Yes', value: true }, { label: 'No', value: false },]"
-                            label="is Homebrew" />
+                        <UCheckbox v-model="Homebrew" required="true" label="is Homebrew" />
                             <input-field type="number" :required="false" v-model="Page" label="Page" />
                     </div>
                     <div class="Form">
@@ -107,11 +105,6 @@ const columns = [
     {
         key: "homebrew",
         label: "Homebrew",
-        sortable: true,
-    },
-    {
-        key: "page",
-        label: "Page",
         sortable: true,
     },
     {

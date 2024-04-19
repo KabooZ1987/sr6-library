@@ -98,11 +98,6 @@ const columns = [
         sortable: true,
     },
     {
-        key: "page",
-        label: "Page",
-        sortable: true,
-    },
-    {
         key: "updated_at",
         label: "Date",
         sortable: true,

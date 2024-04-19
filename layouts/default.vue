@@ -11,6 +11,9 @@
                     <NuxtLink class="link" to="/">Home</NuxtLink>
                 </li>
                 <li>
+                    <NuxtLink class="link" to="/commonActions">Actions</NuxtLink>
+                </li>
+                <li>
                     <NuxtLink class="link" to="/edgeBoosts">Edge boosts</NuxtLink>
                 </li>
                 <li>

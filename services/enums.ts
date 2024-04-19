@@ -32,3 +32,48 @@ export const RuleCategories = Object.freeze([
     {value: "spirits",label: "Spirits" },
     {value: "other",label: "Other" }
 ])
+
+export const Attributes = Object.freeze([
+    {value: "body",label: "Body" },
+    {value: "agility",label: "Agility" },
+    {value: "reflex",label: "Reflex" },
+    {value: "strength",label: "Strength" },
+    {value: "willpower",label: "Willpower" },
+    {value: "logic",label: "Logic" },
+    {value: "intuition",label: "Intuition" },
+    {value: "charisma",label: "Charisma" },
+    {value: "magic",label: "Magic" },
+    {value: "resonance",label: "Resonance" },
+    {value: "edge",label: "Edge" },
+    {value: "essence",label: "Essence" }
+])
+
+export const Skills = Object.freeze([
+    {value: "astral",label: "Astral" },
+    {value: "athletics",label: "Athletics" },
+    {value: "biotech",label: "Biotech" },
+    {value: "close_combat",label: "Close Combat" },
+    {value: "con",label: "Con" },
+    {value: "conjuring",label: "Conjuring" },
+    {value: "cracking",label: "Cracking" },
+    {value: "electronics",label: "Electronics" },
+    {value: "enchanting",label: "Enchanting" },
+    {value: "engineering",label: "Engineering" },
+    {value: "firearms",label: "Firearms" },
+    {value: "influence",label: "Influence" },
+    {value: "outdoors",label: "Outdoors" },
+    {value: "perception",label: "Perception" },
+    {value: "piloting",label: "Piloting" },
+    {value: "sorcery",label: "Sorcery" },
+    {value: "stealth",label: "Stealth" },
+    {value: "tasking",label: "Tasking" },
+    {value: "exotic_weapons",label: "Exotic Weapons" },
+    {value: "other",label: "Other" }
+])
+
+export const ActionTypes = Object.freeze([
+    {value: "minor",label: "Minor" },
+    {value: "major",label: "Major" },
+    {value: "free",label: "Free" },
+    {value: "whole_round",label: "Whole Round" }
+])
