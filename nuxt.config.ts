@@ -8,11 +8,18 @@ export default defineNuxtConfig({
   colorMode: {
     preference: "dark",
   },
-  modules: ["@nuxt/ui", "nuxt-icon"],
-
+  modules: ["@nuxt/ui", "nuxt-icon", 'nuxt-primevue'],
+  css: ['~/assets/css/main.scss'],
+  primevue: {
+    options: {
+      unstyled: true
+    },
+    importPT: {  as: 'Lara', from: require.resolve(__dirname + '/presets/lara/') }
+  },
   components: [
     {
       path: "~/components",
+      exclude: ["Editor", "Chart"],
       pathPrefix: false,
     },
   ],

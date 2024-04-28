@@ -1,0 +1,43 @@
+.data-table {
+    .table-tools {
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .scrollable {
+        scrollbar-gutter: stable;
+        overflow: scroll;
+        height: 65vh;
+        overflow-x: hidden;
+
+        &::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: rgb(1, 179, 1);
+            border-radius: 10px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+    }
+}
+.save-button {
+    margin: 0 20px;
+
+    button {
+        padding: 10px 20px;
+    }
+}
+
+.add-button {
+    margin-top: 20px;
+
+    .plus-icon {
+        font-size: 15px;
+    }
+}

@@ -19,7 +19,7 @@ const isDark = computed({
       :ui="{
         color:{
           white:{
-            ghost: 'dark:text-fuchsia-700 text-fuchsia-700'
+            ghost: 'dark:text-fuchsia-700 text-fuchsia-700 bg-zinc-800 dark:bg-zinc-800 border-zinc-600'
           }
         }
       }"

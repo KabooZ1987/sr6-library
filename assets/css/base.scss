@@ -1,0 +1,114 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    overflow: hidden;
+    padding: 100px 0;
+  }
+  div{
+    p {
+      margin-right: auto;
+      font-size: 0.9rem;
+      span {
+          color: red;
+      }
+    }
+  }
+  main {
+    padding: 10px 50px;
+  
+    div p {
+      font-size: 18px;
+      text-align: justify;
+      text-justify: inter-word;
+    }
+  
+    h1 {
+      font-size: 32px;
+    }
+  }
+  label {
+    margin-right: auto;
+    font-size: 0.9rem;  
+    span {
+        color: red;
+    }
+  }
+  .hidden{
+    visibility: hidden;
+  }
+  .Form {
+    display: flex;
+    width: 100%;
+
+    div {
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 20px;
+
+        input,
+        select {
+            width: 100%;
+            border-radius: 20px;
+            padding: 5px 20px;
+        }
+    }
+}
+
+.save-button {
+    margin: 0 20px;
+
+    button {
+        padding: 10px 20px;
+    }
+}
+
+.field {
+    width: 100%;
+
+    div {
+        margin: 20px;
+
+        span {
+            color: red;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            border-radius: 20px;
+            padding: 5px 20px;
+            resize: none;
+        }
+    }
+}
+:root {
+    --primary-50: 236 253 245;
+    --primary-100: 209 250 229;
+    --primary-200: 167 243 208;
+    --primary-300: 110 231 183;
+    --primary-400: 52 211 153;
+    --primary-500: 16 185 129;
+    --primary-600: 5 150 105;
+    --primary-700: 4 120 87;
+    --primary-800: 6 95 70;
+    --primary-900: 4 78 56;
+    --primary-950: 2 44 34;
+    --surface-0: 255 255 255;
+    --surface-50: 248 250 252;
+    --surface-100: 241 245 249;
+    --surface-200: 226 232 240;
+    --surface-300: 203 213 225;
+    --surface-400: 148 163 184;
+    --surface-500: 100 116 139;
+    --surface-600: 71 85 105;
+    --surface-700: 45 55 72;
+    --surface-800: 30 41 59;
+    --surface-900: 15 23 42;
+    --surface-950: 3 6 23;
+}
