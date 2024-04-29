@@ -8,19 +8,8 @@
                 <input-field type="text" v-model="searchWord" placeholder="Search here..." />
             </form>
 
-            <UButton @click="$emit('addData', payload)" label="+ New Data" 
-            color="white"
-            :padded="true"
-            size="md"
-            variant="solid"
-                :ui="{
-                    rounded: 'rounded-md',
-                    color:{
-                        white:{
-                            solid:'text-fuchsia-600 dark:text-fuchsia-600'
-                        }
-                    }
-                }"
+            <Button @click="$emit('addData', payload)" label="+ New Data" 
+                :pt="{root:'text-fuchsia-600 dark:text-fuchsia-600'}"
             />
         
         </div>
@@ -43,7 +32,10 @@
                             <h3 class="tpx-3 text-zinc-700 dark:text-zinc-50">
                             {{ selected.name }}
                             </h3>
-                            <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="isOpen = false" />
+                            <Button icon="i-heroicons-x-mark-20-solid" class="w-12 h-12" style="padding:0!important" :pt="{
+                                icon:'w-8 h-8'
+                                }"
+                                @click="isOpen = false" />
                         </div>
                     </template>
                     <div class="text-cool-500">
@@ -52,8 +44,8 @@
                     <UTextarea autoresize color="purple" variant="none" :model-value="selected.description" disabled class="text-zinc-800 dark:text-zinc-50" maxrows="20" />
                     <template #footer>
                         <div class="space-y-4 flex flex-col justify-center">
-                            <UButton color="black" label="Edit" icon="i-heroicons-pencil-square-20-solid" block @click="$emit('getData', selected)" />
-                            <UButton color="black" label="Delete" icon="i-heroicons-trash-20-solid" block @click="tryDelete" />
+                            <Button color="black" label="Edit" icon="i-heroicons-pencil-square-20-solid" block @click="$emit('getData', selected)" />
+                            <Button color="black" label="Delete" icon="i-heroicons-trash-20-solid" block @click="tryDelete" />
                         </div>
                     </template>
                 </UCard>
@@ -111,6 +103,3 @@ const filtering = computed(() => {
 
 </script>
 
-<style lang="scss" scoped>
-
-</style>

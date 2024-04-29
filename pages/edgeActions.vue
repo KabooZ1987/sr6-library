@@ -12,7 +12,9 @@
                         <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
                             {{ (isEditForm ? "Edit" : "Add New Item") }}
                         </h3>
-                        <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                        <Button icon="i-heroicons-x-mark-20-solid" class="w-12 h-12" style="padding:0!important" :pt="{
+                                icon:'w-8 h-8'
+                                }"
                             @click="xButton()" />
                     </div>
                 </template>
