@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@nuxt/ui": "^2.14.2",
-    "@prisma/client": "5.12.1",
+    "@prisma/client": "5.15.1",
     "nuxt": "^3.11.2",
     "primevue": "^3.52.0",
     "sweetalert2": "^11.10.8",
@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "nuxt-primevue": "^0.3.1",
-    "prisma": "^5.12.1",
+    "prisma": "5.15.1",
     "sass": "^1.75.0"
   }
 }
