@@ -28,6 +28,11 @@
             <input-field class="disabled hidden" disabled type="text" />
           </div>
 
+          <div class="Form">
+            <image-upload-button />
+            
+          </div>
+
           <div class="field">
             <div>
               <p>Description<span>*</span></p>

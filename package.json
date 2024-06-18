@@ -17,7 +17,8 @@
     "sweetalert2": "^11.10.8",
     "uuid": "^9.0.1",
     "vue": "^3.4.23",
-    "vue-router": "^4.3.2"
+    "vue-router": "^4.3.2",
+    "vue3-markdown-it": "^1.0.10"
   },
   "devDependencies": {
     "nuxt-primevue": "^0.3.1",

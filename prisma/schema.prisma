@@ -5,13 +5,13 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native"]
 }
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://webuser:Luebeck%231@localhost:5432/webdb?schema=public"
+  url      = "postgresql://webuser:Luebeck%231@192.168.88.157:5432/webdb?schema=public"
 }
 
 model EdgeBoost {
@@ -19,6 +19,8 @@ model EdgeBoost {
   name        String
   cost        Int
   description String
+  image       Image?      @relation(fields: [imageId], references: [id])
+  imageId     Int?
   source      source_book
   page        Int
   updated_at  DateTime    @default(now()) @updatedAt
@@ -30,6 +32,8 @@ model EdgeAction {
   cost        Int
   restriction edge_action_restriction
   description String
+  image       Image?                  @relation(fields: [imageId], references: [id])
+  imageId     Int?
   source      source_book
   page        Int
   updated_at  DateTime                @default(now()) @updatedAt
@@ -51,20 +55,34 @@ model Homebrew {
   category    rule_category
   name        String
   description String
+  image       Image?        @relation(fields: [imageId], references: [id])
+  imageId     Int?
   updated_at  DateTime      @default(now()) @updatedAt
 }
 
 model Action {
-  id          String                  @id @unique @default(cuid())
+  id          String       @id @unique @default(cuid())
   name        String
   type        action_type
   homebrew    Boolean
   attribute   attribute?
   skill       skill?
   description String
+  image       Image?       @relation(fields: [imageId], references: [id])
+  imageId     Int?
   source      source_book?
   page        Int?
-  updated_at  DateTime                @default(now()) @updatedAt
+  updated_at  DateTime     @default(now()) @updatedAt
+}
+
+model Image {
+  id         Int          @id @unique @default(autoincrement())
+  image      Bytes
+  hash       String
+  Homebrew   Homebrew[]
+  EdgeBoost  EdgeBoost[]
+  EdgeAction EdgeAction[]
+  Action     Action[]
 }
 
 enum attribute {
