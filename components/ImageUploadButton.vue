@@ -1,6 +1,7 @@
 <template>
     <div>
-        <FileUpload mode="basic" name="demo[]" url="/api/upload" accept="image/*" :maxFileSize="1000000" @upload="onUpload" :auto="true" chooseLabel="Browse" />
+        <!-- TODO: make it work to be image or button -->
+        <FileUpload mode="basic" name="demo[]" url="/api/upload_image" accept="image/*" :maxFileSize="1000000" @upload="onUpload" :auto="true" chooseLabel="Browse" />
     </div>
 </template>
 

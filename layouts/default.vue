@@ -3,7 +3,6 @@
         <div class="logo">
             <color-mode-button />
             <span>SR6</span>
-            
         </div>
         <nav>
             <ul v-show="!Tablet" class="navigation">
