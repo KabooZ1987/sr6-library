@@ -16,13 +16,16 @@ export default defineNuxtConfig({
     preference: "dark",
   },
 
-  modules: ["@nuxt/ui", "nuxt-icon", '@primevue/nuxt-module', 'formidable'],
+  modules: ['@primevue/nuxt-module', 'formidable'],
   css: ['~/assets/css/main.scss'],
 
   primevue: {
     options: {
         theme: {
-            preset: Lara
+            preset: Lara,
+            options: {
+              darkModeSelector: '.dark',
+          }
         }
     }
 },
