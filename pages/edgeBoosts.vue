@@ -1,7 +1,7 @@
 <template>
     <div>
-        <UModal v-model="isOpen" prevent-close>
-            <UCard :ui="{
+        <Dialog  v-model="isOpen" prevent-close>
+            <Card :ui="{
             ring: '',
             divide: 'divide-y divide-gray-100 dark:divide-gray-800',
         }">
@@ -36,12 +36,12 @@
                     </div>
                 </section>
                 <div class="save-button">
-                    <UButton size="sm" color="blue" variant="solid" :trailing="false" @click="saveData()">
+                    <Button size="sm" color="blue" variant="solid" :trailing="false" @click="saveData()">
                         Save
-                    </UButton>
+                    </Button>
                 </div>
-            </UCard>
-        </UModal>
+            </Card>
+        </Dialog>
 
         <h1>EDGE BOOSTS</h1>
 

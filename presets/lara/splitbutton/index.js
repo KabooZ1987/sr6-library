@@ -197,7 +197,7 @@ export default {
             ]
         }
     },
-    menubutton: {
+    menuButton: {
         root: ({ parent }) => ({
             class: [
                 'relative',

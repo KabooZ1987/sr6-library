@@ -598,7 +598,7 @@ export default {
                 ]
             }
         },
-        filtermenubutton: ({ context }) => ({
+        filtermenuButton: ({ context }) => ({
             class: [
                 'relative',
                 // Flex & Alignment

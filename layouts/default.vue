@@ -28,7 +28,7 @@
         
             <div class="burger-Menu">
                 <span @click="toggleMobileNav" v-show="Tablet" :class="{ 'icon-active': mobileNavOpen }">
-                    <UIcon name="i-heroicons-bars-3" />
+                    <i class="i-heroicons-bars-3" />
                 </span>
             </div>
             <transition name="mobile-nav">

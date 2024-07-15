@@ -1,7 +1,7 @@
 <template>
     <div>
-        <UModal v-model="isOpen" prevent-close>
-            <UCard :ui="{
+        <Dialog v-model="isOpen" prevent-close>
+            <Card :ui="{
             ring: '',
             divide: 'divide-y divide-gray-100 dark:divide-gray-800',
         }">
@@ -31,7 +31,7 @@
                             label="Skill" />
                     </div>
                     <div class="Form">
-                        <UCheckbox v-model="Homebrew" required="true" label="is Homebrew" />
+                        <Checkbox v-model="Homebrew" required="true" label="is Homebrew" />
                         <select-field v-model="Source" :required="false"
                             :options="SourceBooks"
                             label="Source" />  
@@ -48,12 +48,12 @@
                     </div>
                 </section>
                 <div class="save-button">
-                    <UButton size="sm" color="blue" variant="solid" :trailing="false" @click="Validation">
+                    <Button size="sm" color="blue" variant="solid" :trailing="false" @click="Validation">
                         Save
-                    </UButton>
+                    </Button>
                 </div>
-            </UCard>
-        </UModal>
+            </Card>
+        </Dialog>
 
         <h1>ACTIONS</h1>
         <div class="data-table">
@@ -63,6 +63,7 @@
 </template>
 
 <script setup>
+import Card from "primevue/card";
 import { v4 as uuidv4 } from "uuid";
 import { ActionTypes, Attributes, Skills, SourceBooks } from "~/services/enums";
 const UUID = ref();
