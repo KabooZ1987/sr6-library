@@ -11,7 +11,7 @@ export default defineNuxtConfig({
     preference: "dark",
   },
 
-  modules: ["@nuxt/ui", "nuxt-icon"],
+  modules: ["@nuxt/ui", "@nuxt/icon"],
 
   components: [
     {
