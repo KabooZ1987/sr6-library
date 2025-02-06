@@ -1,40 +1,34 @@
 <template>
     <div>
         <UModal v-model="isOpen" prevent-close>
-            <UCard :ui="{
-            ring: '',
-            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-        }">
+            <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
                 <template #header>
                     <div class="flex items-center justify-between">
                         <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-                            {{ (isEditForm ? "Edit" : "Add New Item") }}
+                            {{ isEditForm ? "Edit" : "Add New Item" }}
                         </h3>
                         <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
-                            @click="xButton()" />
+                            @click="closeModal" />
                     </div>
                 </template>
 
-                <section>
-                    <div class="Form">
-                        <input-field type="text" v-model="Name" label="Name" :required="true" />
-                        <input-field type="number" v-model="Cost" label="Cost" :required="true" />
+                <section class="p-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <InputField type="text" v-model="form.name" label="Name" :required="true" />
+                        <InputField type="number" v-model="form.cost" label="Cost" :required="true" />
+                        <InputField type="number" v-model="form.page" label="Page" :required="true" />
+                        <SelectField v-model="form.source" :required="true" :options="SourceBooks" label="Source" />
                     </div>
 
-                    <div class="Form">
-                        <input-field type="number" v-model="Page" label="Page" :required="true" />
-                        <select-field v-model="Source" :required="true" :options="SourceBooks" label="Source" />
-                    </div>
-
-                    <div class="field">
-                        <div>
-                            <p>Description</p>
-                            <textarea type="text" v-model="Description" class="bg-neutral-100 dark:bg-neutral-800 mt-1" />
-                        </div>
+                    <div class="mt-4">
+                        <p class="mb-1">Description</p>
+                        <textarea v-model="form.description"
+                            class="w-full h-48 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-2 resize-none" />
                     </div>
                 </section>
-                <div class="save-button">
-                    <UButton size="sm" color="blue" variant="solid" :trailing="false" @click="saveData()">
+
+                <div class="p-4">
+                    <UButton size="sm" color="blue" variant="solid" @click="saveItem">
                         Save
                     </UButton>
                 </div>
@@ -44,7 +38,8 @@
         <h1>EDGE BOOSTS</h1>
 
         <div class="data-table">
-            <TableTools :columns="columns" :data="data" @add-data="addData" @get-data="getData" @del-data="delData" />
+            <TableTools :columns="columns" :data="data" @add-data="openAddModal" @get-data="openEditModal"
+                @del-data="deleteItem" />
         </div>
     </div>
 </template>
@@ -53,20 +48,11 @@
 import { ref } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import { SourceBooks } from "~/services/enums";
-const UUID = ref();
 
-const isEditForm = ref(true);
-const reloadTrigger = ref(0);
 const isOpen = ref(false);
-const dataOfEachRow = ref();
-
-const Name = ref(null);
-const Cost = ref(null);
-const Page = ref(null);
-const Source = ref(null);
-const Description = ref(null);
-
-const element = ref({
+const isEditForm = ref(false);
+const reloadTrigger = ref(0);
+const form = ref({
     id: null,
     name: null,
     cost: null,
@@ -75,131 +61,144 @@ const element = ref({
     page: null,
     updated_at: null,
 });
+const dataOfEachRow = ref(null);
 
 const columns = [
-    {
-        key: "name",
-        label: "Name",
-        sortable: true,
-    },
-    {
-        key: "cost",
-        label: "Cost",
-        sortable: true,
-    },
-    {
-        key: "description",
-        label: "Description",
-        sortable: true,
-    },
-    {
-        key: "source",
-        label: "Source",
-        sortable: true,
-    },
-    {
-        key: "updated_at",
-        label: "Date",
-        sortable: true,
-    }
+    { key: "name", label: "Name", sortable: true },
+    { key: "cost", label: "Cost", sortable: true },
+    { key: "description", label: "Description", sortable: true },
+    { key: "source", label: "Source", sortable: true },
+    { key: "updated_at", label: "Date", sortable: true },
 ];
 
-const { data } = await useAsyncData(
-    "edge_boost",
-    () => $fetch("/api/edge_boost"),
-    {
-        watch: [reloadTrigger],
-    }
-);
+const { data } = await useAsyncData("edge_boost", () => $fetch("/api/edge_boost"), {
+    watch: [reloadTrigger],
+});
 
-function xButton() {
+const closeModal = () => {
     isOpen.value = false;
-    Name.value = null;
-    Cost.value = null;
-    Page.value = null;
-    Source.value = null;
-    Description.value = null;
-}
+    resetForm();
+};
 
-function delData(id) {
-    $fetch("/api/edge_boost", {
-        method: "Delete",
-        body: JSON.stringify({ id }),
-    }).then(() => reloadTrigger.value += 1)
-}
-function addData() {
+const deleteItem = async (id) => {
+    await $fetch("/api/edge_boost", { method: "DELETE", body: JSON.stringify({ id }) });
+    reloadTrigger.value++;
+};
+
+const openAddModal = () => {
     isOpen.value = true;
     isEditForm.value = false;
-}
-function getData(rowData) {
+    resetForm();
+};
+
+const openEditModal = (rowData) => {
     isEditForm.value = true;
-    dataOfEachRow.value = rowData;
     isOpen.value = true;
+    dataOfEachRow.value = rowData;
+    form.value = { ...rowData };
+};
 
-    Name.value = dataOfEachRow.value.name;
-    Cost.value = dataOfEachRow.value.cost;
-    Page.value = dataOfEachRow.value.page;
-    Source.value = dataOfEachRow.value.source;
-    Description.value = dataOfEachRow.value.description;
+const resetForm = () => {
+    form.value = {
+        id: null,
+        name: null,
+        cost: null,
+        description: null,
+        source: null,
+        page: null,
+        updated_at: null,
+    };
+};
 
-    return dataOfEachRow;
-}
+const saveItem = async () => {
+    if (!form.value.name || !form.value.cost || !form.value.page || !form.value.source || !form.value.description) {
+        alert("Please fill in all required fields.");
+        return;
+    }
 
-function saveData() {
     if (!isEditForm.value) {
-        data.value.filter((row) => {
-            do {
-                UUID.value = uuidv4();
-            } while (UUID.value === row.id);
-        });
-        element.value.id = UUID.value;
-        element.value.updated_at = new Date();
+        form.value.id = uuidv4();
+        form.value.updated_at = new Date();
     } else {
-        element.value.id = dataOfEachRow.value.id;
-        element.value.updated_at = dataOfEachRow.value.updated_at;
+        form.value.id = dataOfEachRow.value.id;
+        form.value.updated_at = dataOfEachRow.value.updated_at;
     }
 
-    if (Name.value !== null) {
-        element.value.name = Name.value.toString();
-    } else {
-        element.value.name = dataOfEachRow.value.name;
+    try {
+        await $fetch("/api/edge_boost", { method: "POST", body: JSON.stringify({ upsert: form.value }) });
+        reloadTrigger.value++;
+        closeModal();
+    } catch (error) {
+        console.error("Error saving item:", error);
+        alert("An error occurred while saving. Please try again.");
     }
-
-    if (Cost.value !== null) {
-        element.value.cost = parseFloat(Cost.value)
-    } else {
-        element.value.cost = parseFloat(dataOfEachRow.value.cost)
-    }
-
-    if (Page.value !== null) {
-        element.value.page = parseInt(Page.value)
-    } else {
-        element.value.page = parseInt(dataOfEachRow.value.page)
-    }
-
-    if (Source.value !== null) {
-        element.value.source = Source.value.toString();
-    } else {
-        element.value.source = dataOfEachRow.value.source;
-    }
-
-    if (Description.value !== null) {
-        element.value.description = Description.value.toString();
-    } else {
-        element.value.description = dataOfEachRow.value.description;
-    }
-
-    $fetch("/api/edge_boost", {
-        method: "POST",
-        body: JSON.stringify({ upsert: element.value }),
-    }).then(() => reloadTrigger.value += 1)
-
-    xButton();
-    // $fetch("/api/edge_boost",{method:"POST",body:{"upsert":element}})
-}
+};
 </script>
 
 <style lang="scss" scoped>
+/* Utility classes for layout and spacing */
+.p-4 {
+    padding: 1rem;
+}
+
+.grid {
+    display: grid;
+}
+
+.grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.md\:grid-cols-2 {
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.gap-4 {
+    gap: 1rem;
+}
+
+.mt-4 {
+    margin-top: 1rem;
+}
+
+.mb-1 {
+    margin-bottom: 0.25rem;
+}
+
+/* Utility classes for width, height, background, and borders */
+.w-full {
+    width: 100%;
+}
+
+.h-48 {
+    height: 12rem;
+}
+
+.bg-neutral-100 {
+    background-color: #f5f5f5;
+}
+
+.dark\:bg-neutral-800 {
+    @media (prefers-color-scheme: dark) {
+        background-color: #272727;
+    }
+}
+
+.rounded-lg {
+    border-radius: 0.5rem;
+}
+
+.p-2 {
+    padding: 0.5rem;
+}
+
+.resize-none {
+    resize: none;
+}
+
+/* Specific styles for data table */
 .data-table {
     .table-tools {
         padding: 10px;
@@ -210,8 +209,6 @@ function saveData() {
         border-bottom: solid 1px gray;
 
         button {
-            display: inline-block;
-            box-sizing: border-box;
             color: rgb(1, 179, 1);
             border-radius: 20px;
             padding: 2px 8px;
@@ -227,7 +224,6 @@ function saveData() {
         input {
             border-radius: 20px;
             padding: 0 20px;
-            // background-color: rgb(99, 96, 96);
         }
     }
 
@@ -252,6 +248,7 @@ function saveData() {
     }
 }
 
+/* Specific styles for save button */
 .save-button {
     margin: 0 20px;
 
@@ -260,55 +257,12 @@ function saveData() {
     }
 }
 
+/* Specific styles for add button (if needed) */
 .add-button {
     margin-top: 20px;
 
     .plus-icon {
         font-size: 15px;
-    }
-}
-
-.Form {
-    display: flex;
-    width: 100%;
-
-    div {
-        width: 50%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin: 20px;
-
-        p {
-            margin-right: auto;
-
-            span {
-                color: red;
-            }
-        }
-
-        input,
-        select {
-            width: 100%;
-            border-radius: 20px;
-            padding: 5px 20px;
-        }
-    }
-}
-
-.field {
-    width: 100%;
-
-    div {
-        margin: 20px;
-
-        textarea {
-            width: 100%;
-            height: 200px;
-            border-radius: 20px;
-            padding: 5px 20px;
-            resize: none;
-        }
     }
 }
 </style>
