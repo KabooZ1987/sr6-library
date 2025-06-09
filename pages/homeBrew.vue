@@ -79,23 +79,23 @@ const element = ref({
 
 const columns = [
   {
-    key: "name",
-    label: "Name",
+    field: "name",
+    Name: "Name",
     sortable: true,
   },
   {
-    key: "category",
-    label: "Category",
+    field: "category",
+    Name: "Category",
     sortable: true,
   },
   {
-    key: "description",
-    label: "Description",
+    field: "description",
+    Name: "Description",
     sortable: true,
   },
   {
-    key: "updated_at",
-    label: "Date",
+    field: "updated_at",
+    Name: "Date",
     sortable: true,
   },
 ];

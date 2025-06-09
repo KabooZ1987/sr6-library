@@ -11,7 +11,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://webuser:Luebeck%231@192.168.88.157:5432/webdb?schema=public"
+  url      = "postgresql://webuser:Luebeck%231@95.216.197.222:5432/webdb?schema=public"
 }
 
 model EdgeBoost {

@@ -1,0 +1,12 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+ALWAYS use Nuxt, Typescript and Tailwind.css
+
+make and use components for reusability
+
+comment code parts for clarity
+
+write clean

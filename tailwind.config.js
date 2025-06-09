@@ -2,8 +2,12 @@ import colors from 'tailwindcss/colors'
 
 export default {
     content: [
-        "presets/**/*.{js,vue,ts}"
+        './components/**/*.{vue,js}',
+        './pages/**/*.{vue,js}',
+        './app.vue',
+        './layouts/**/*.vue'
     ],
+    plugins: [require('tailwindcss-primeui')],
     theme: {
         extend: {
             colors: {

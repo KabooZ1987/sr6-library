@@ -1,22 +1,31 @@
 <template>
     <div>
         <h1>Welcome to the new World</h1>
-        <div class="grid grid-cols-1 lg:gap-5 lg:grid-cols-3 overflow-auto mt-5" style="height:64vh">
-            <NuxtLink v-for="site, key in sites" :id="key" :to="site.url">
-                <Card  class="mb-4 w-full" >
-                    <template #header>
-                        <h3 class="text-fuchsia-700 dark:text-fuchsia-600">{{ site.name }}</h3>
-                    </template>
+        <div class="w-auto grid grid-cols-1 lg:grid-rows-2 lg:gap-4 lg:grid-cols-3 overflow-y-auto max-h-170">
+            <NuxtLink v-for="(link, key) in sites" :id="key" :to="link.url">
+              <Card
+                  :key="link.name"
+                  class=" min-h-50 justify-around m-2 text-fuchsia-700 dark:text-fuchsia-600 bg-gray-900 border border-sky-700 shadow-xl text-white rounded-2xl transition transform hover:scale-102"
+              >
+                <template #title>
+                  <div class="text-fuchsia-700 dark:text-fuchsia-600 text-lg font-semibold text-sky-400">
+                    {{ link.name }}
+                  </div>
+                </template>
 
-                    <Textarea :value="site.description" variant="none" 
-                    :padded="false"
-                    :maxrows="2"
-                    class=""
-                    :ui="{
-                        base:'cursor-pointer select-none',
-                    }"
-                    />
-                </Card>
+                <template #content>
+                  <p class="text-sm text-gray-300 mb-4">
+                    {{ link.description }}
+                  </p>
+                  <a
+                      :href="link.url"
+                      target="_blank"
+                      class="text-fuchsia-700 dark:text-fuchsia-600 text-sm font-medium text-sky-100 hover:underline"
+                  >
+                    👉→
+                  </a>
+                </template>
+              </Card>
             </NuxtLink>
         </div>
     </div>
@@ -25,7 +34,7 @@
 <script setup lang="ts">
 import Textarea from 'primevue/textarea';
 
-const sites = [
+const sites: {name: string; description: string,url: string}[] = [
     {
         name:'Common Actions',
         url:'/commonActions',

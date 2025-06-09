@@ -10,23 +10,26 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@nuxt/kit": "^3.12.3",
-    "@primevue/themes": "^4.0.0",
-    "@prisma/client": "5.16.2",
-    "formidable": "^3.5.1",
-    "nuxt": "^3.12.3",
+    "@nuxt/kit": "^3.17.5",
+    "@nuxtjs/tailwindcss": "7.0.0-beta.0",
+    "@primevue/forms": "^4.3.5",
+    "@prisma/client": "6.9.0",
+    "@types/formidable": "^3.4.5",
+    "formidable": "v3",
+    "marked": "^15.0.12",
+    "nuxt": "^3.17.5",
     "primeicons": "^7.0.0",
-    "primevue": "^4.0.0",
-    "sweetalert2": "^11.12.2",
-    "uuid": "^10.0.0",
-    "vue": "^3.4.31",
-    "vue-router": "^4.4.0",
-    "vue3-markdown-it": "^1.0.10"
+    "primevue": "^4.3.5",
+    "sweetalert2": "11.14.2",
+    "tailwindcss": "^4.1.8",
+    "tailwindcss-primeui": "^0.6.1",
+    "uuid": "^11.1.0",
+    "vue": "^3.5.16",
+    "vue-router": "^4.4.0"
   },
   "devDependencies": {
-    "@primevue/nuxt-module": "^4.0.0",
-    "nuxt-primevue": "^3.0.0",
-    "prisma": "5.16.2",
-    "sass": "^1.77.8"
+    "@primevue/nuxt-module": "^4.3.5",
+    "prisma": "6.9.0",
+    "sass": "1.89.1"
   }
 }

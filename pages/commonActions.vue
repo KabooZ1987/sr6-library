@@ -1,63 +1,73 @@
 <template>
     <div>
-        <Dialog v-model="isOpen" prevent-close>
-            <Card :ui="{
-            ring: '',
-            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-        }">
-                <template #header>
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-                            {{ (isEditForm ? "Edit" : "Add New Item") }}
-                        </h3>
-                        <Button icon="i-heroicons-x-mark-20-solid" class="w-12 h-12" style="padding:0!important" :pt="{
-                                icon:'w-8 h-8'
-                                }"
-                            @click="xButton()" />
-                    </div>
-                </template>
+<!--        <Dialog v-model="isOpen" prevent-close>-->
+<!--            <Card :ui="{-->
+<!--            ring: '',-->
+<!--            divide: 'divide-y divide-gray-100 dark:divide-gray-800',-->
+<!--        }">-->
+<!--                <template #header>-->
+<!--                    <div class="flex items-center justify-between">-->
+<!--                        <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">-->
+<!--                            {{ (isEditForm ? "Edit" : "Add New Item") }}-->
+<!--                        </h3>-->
+<!--                        <Button icon="i-heroicons-x-mark-20-solid" class="w-12 h-12" style="padding:0!important" :pt="{-->
+<!--                                icon:'w-8 h-8'-->
+<!--                                }"-->
+<!--                            @click="xButton()" />-->
+<!--                    </div>-->
+<!--                </template>-->
 
-                <section>
-                    <div class="Form">
-                        <input-field type="text" v-model="Name" label="Name" :required="true" />
-                        <select-field v-model="Type" :required="true"
-                            :options="ActionTypes"
-                            label="Action Type" />  
-                    </div>
-                    <div class="Form">
-                        <select-field v-model="Attribute" required="true" :options="Attributes"
-                            label="Attribute" />
-                        <select-field v-model="Skill" required="true" :options="Skills"
-                            label="Skill" />
-                    </div>
-                    <div class="Form">
-                        <Checkbox v-model="Homebrew" required="true" label="is Homebrew" />
-                        <select-field v-model="Source" :required="false"
-                            :options="SourceBooks"
-                            label="Source" />  
-                    </div>
-                    <div class="Form">
-                        <input-field type="number" :required="false" v-model="Page" label="Page" />
-                        <input-field class="disabled hidden" disabled type="text" />
-                    </div>
-                    <div class="field">
-                        <div>
-                            <p>Description<span>*</span></p>
-                            <textarea type="text" v-model="Description" class="bg-neutral-100 dark:bg-neutral-800 mt-1" />
-                        </div>
-                    </div>
-                </section>
-                <div class="save-button">
-                    <Button size="sm" color="blue" variant="solid" :trailing="false" @click="Validation">
-                        Save
-                    </Button>
-                </div>
-            </Card>
-        </Dialog>
+<!--                <section>-->
+<!--                    <div class="Form">-->
+<!--                        <input-field type="text" v-model="Name" label="Name" :required="true" />-->
+<!--                        <select-field v-model="Type" :required="true"-->
+<!--                            :options="ActionTypes"-->
+<!--                            label="Action Type" />  -->
+<!--                    </div>-->
+<!--                    <div class="Form">-->
+<!--                        <select-field v-model="Attribute" required="true" :options="Attributes"-->
+<!--                            label="Attribute" />-->
+<!--                        <select-field v-model="Skill" required="true" :options="Skills"-->
+<!--                            label="Skill" />-->
+<!--                    </div>-->
+<!--                    <div class="Form">-->
+<!--                        <Checkbox v-model="Homebrew" required="true" label="is Homebrew" />-->
+<!--                        <select-field v-model="Source" :required="false"-->
+<!--                            :options="SourceBooks"-->
+<!--                            label="Source" />  -->
+<!--                    </div>-->
+<!--                    <div class="Form">-->
+<!--                        <input-field type="number" :required="false" v-model="Page" label="Page" />-->
+<!--                        <input-field class="disabled hidden" disabled type="text" />-->
+<!--                    </div>-->
+<!--                    <div class="field">-->
+<!--                        <div>-->
+<!--                            <p>Description<span>*</span></p>-->
+<!--                            <textarea type="text" v-model="Description" class="bg-neutral-100 dark:bg-neutral-800 mt-1" />-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </section>-->
+<!--                <div class="save-button">-->
+<!--                    <Button size="sm" color="blue" variant="solid" :trailing="false" @click="Validation">-->
+<!--                        Save-->
+<!--                    </Button>-->
+<!--                </div>-->
+<!--            </Card>-->
+<!--        </Dialog>-->
 
         <h1>ACTIONS</h1>
         <div class="data-table">
-            <TableTools :columns="columns" :data="data" @add-data="addData" @get-data="getData" @del-data="delData" />
+<!--            <PrimeTable>-->
+<!--                <template #name></template>-->
+<!--                <template #description></template>-->
+<!--                <template #attribute></template>-->
+<!--                <template #skill></template>-->
+<!--                <template #type></template>-->
+<!--                <template #homebrew></template>-->
+<!--                <template #source></template>-->
+<!--                <template #updated_at></template>-->
+<!--            </PrimeTable>-->
+          <DataTableWrapper :items="data" :columns="columns" />
         </div>
     </div>
 </template>
@@ -97,43 +107,43 @@ const element = ref({
 
 const columns = [
     {
-        key: "name",
-        label: "Name",
+        field: "name",
+        Name: "Name",
         sortable: true,
     },
     {
-        key: "description",
-        label: "Description",
+        field: "description",
+        Name: "Description",
         sortable: true,
     },
     {
-        key: "attribute",
-        label: "Attribute",
+        field: "attribute",
+        Name: "Attribute",
         sortable: true,
     },
     {
-        key: "skill",
-        label: "Skill",
+        field: "skill",
+        Name: "Skill",
         sortable: true,
     },
     {
-        key: "type",
-        label: "Type",
+        field: "type",
+        Name: "Type",
         sortable: true,
     },
     {
-        key: "homebrew",
-        label: "Homebrew",
+        field: "homebrew",
+        Name: "Homebrew",
         sortable: true,
     },
     {
-        key: "source",
-        label: "Source",
+        field: "source",
+        Name: "Source",
         sortable: true
     },
     {
-        key: "updated_at",
-        label: "Date",
+        field: "updated_at",
+        Name: "Date",
         sortable: true,
 
     }

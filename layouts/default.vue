@@ -26,10 +26,10 @@
                 </li>
             </ul>
         
-            <div class="burger-Menu">
-                <span @click="toggleMobileNav" v-show="Tablet" :class="{ 'icon-active': mobileNavOpen }">
-                    <i class="i-heroicons-bars-3" />
-                </span>
+            <div @click="toggleMobileNav" v-show="Tablet" :class="['transition-transform duration-300', mobileNavOpen ? 'rotate-90 origin-center' : '']">
+
+                    <i :class="[PrimeIcons.BARS,'text-2xl' ]" />
+
             </div>
             <transition name="mobile-nav">
                 <ul v-show="mobileNavOpen" class="sideBar bg-zinc-800 text-fuchsia-700" @click="toggleMobileNav">
@@ -60,6 +60,7 @@
 
 <script setup>
 import { ref, onMounted, onBeforeMount } from "vue";
+import { PrimeIcons } from '@primevue/core/api';
 
 const scrollNav = ref(false);
 const Tablet = ref(false);
@@ -162,25 +163,6 @@ header {
                     }
                 }
             }
-        }
-
-        .burger-Menu {
-            display: flex;
-            align-items: center;
-            position: absolute;
-            top: 0;
-            right: 24px;
-            height: 100%;
-
-            span {
-                cursor: pointer;
-                font-size: 25px;
-                transition: 0.8s ease all;
-            }
-        }
-
-        .icon-active {
-            transform: rotate(180deg);
         }
 
         .sideBar {

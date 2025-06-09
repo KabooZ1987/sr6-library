@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 // const laraPath = path.resolve(__dirname, 'presets', 'lara');
-import Lara from '@primevue/themes/lara';
+import Aura from '@primeuix/themes/aura';
+import tailwindcss from "@tailwindcss/vite";
 
 
 export default defineNuxtConfig({
@@ -12,17 +13,14 @@ export default defineNuxtConfig({
     host: "0.0.0.0"
   },
 
-  colorMode: {
-    preference: "dark",
-  },
-
-  modules: ['@primevue/nuxt-module', 'formidable'],
+  modules: ['@primevue/nuxt-module', '@nuxtjs/tailwindcss'],
   css: ['~/assets/css/main.scss'],
 
   primevue: {
     options: {
-        theme: {
-            preset: Lara,
+        theme:
+            {
+            preset: Aura,
             options: {
               darkModeSelector: '.dark',
           }
@@ -33,10 +31,8 @@ export default defineNuxtConfig({
   components: [
     {
       path: "~/components",
-      exclude: ["Editor", "Chart"],
       pathPrefix: false,
     },
   ],
-
-  compatibilityDate: "2024-07-14",
+  compatibilityDate: "2025-06-06",
 });

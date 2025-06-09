@@ -80,28 +80,28 @@ const element = ref({
 
 const columns = [
     {
-        key: "name",
-        label: "Name",
+        field: "name",
+        Name: "Name",
         sortable: true,
     },
     {
-        key: "cost",
-        label: "Cost",
+        field: "cost",
+        Name: "Cost",
         sortable: true,
     },
     {
-        key: "description",
-        label: "Description",
+        field: "description",
+        Name: "Description",
         sortable: true,
     },
     {
-        key: "source",
-        label: "Source",
+        field: "source",
+        Name: "Source",
         sortable: true,
     },
     {
-        key: "updated_at",
-        label: "Date",
+        field: "updated_at",
+        Name: "Date",
         sortable: true,
     }
 ];
