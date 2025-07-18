@@ -1,176 +1,321 @@
 <template>
   <div>
-    <Dialog  v-model="isOpen" prevent-close>
-      <Card :ui="{
-      ring: '',
-      divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-    }">
-        <template #header>
-          <div class="flex items-center justify-between">
-            <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-              {{ (isEditForm ? "Edit" : "Add New Item") }}
-            </h3>
-            <Button icon="i-heroicons-x-mark-20-solid" class="w-12 h-12" style="padding:0!important" :pt="{
-                                icon:'w-8 h-8'
-                                }"
-                            @click="xButton()" />
-          </div>
-        </template>
-
-        <section>
-          <div class="Form">
-            <input-field label="Name" v-model="Name" :required="true" />
-            <select-field label="Category" :required="true" v-model="Category" :options="RuleCategories" />
-          </div>
-
-          <div class="Form">
-            <input-field class="disabled hidden" disabled type="text" />
-            <input-field class="disabled hidden" disabled type="text" />
-          </div>
-
-          <div class="Form">
-            <image-upload-button />
-            
-          </div>
-
-          <div class="field">
-            <div>
-              <p>Description<span>*</span></p>
-              <textarea type="text" v-model="Description" class="bg-neutral-100 dark:bg-neutral-800 mt-1" />
+    <!-- Edit Modal -->
+    <Dialog 
+        :visible="showEditModal" 
+        modal 
+        :header="isEditForm ? 'Edit Homebrew' : 'Add New Homebrew'"
+        :style="{ width: '90vw', maxWidth: '600px' }"
+        @hide="closeEditModal"
+    >
+        <form @submit.prevent="handleSave" class="p-fluid">
+            <div class="form-grid">
+                <div class="form-row">
+                    <InputField 
+                        type="text" 
+                        v-model="formData.name" 
+                        label="Name" 
+                        :required="true" 
+                    />
+                    <SelectField 
+                        v-model="formData.category" 
+                        :required="true"
+                        :options="RuleCategories"
+                        label="Category" 
+                    />
+                </div>
+                <div class="form-row">
+                    <div class="spacer"></div>
+                    <div class="spacer"></div>
+                </div>
+                <div class="form-row">
+                    <ImageUploadButton />
+                    <div class="spacer"></div>
+                </div>
+                <div class="form-full-width">
+                    <div class="field">
+                        <label class="field-label">Description <span class="required">*</span></label>
+                        <Textarea 
+                            v-model="formData.description" 
+                            rows="6"
+                            class="description-textarea"
+                            placeholder="Enter homebrew description..."
+                        />
+                    </div>
+                </div>
             </div>
-          </div>
-        </section>
-        <div class="save-button">
-          <Button size="sm" color="blue" variant="solid" :trailing="false" @click="Validation">
-            Save
-          </Button>
-        </div>
-      </Card>
+            <div class="form-actions">
+                <Button 
+                    type="button" 
+                    label="Cancel" 
+                    severity="secondary" 
+                    @click="closeEditModal"
+                />
+                <Button 
+                    type="submit" 
+                    :label="isEditForm ? 'Update' : 'Create'"
+                    :loading="saving"
+                />
+            </div>
+        </form>
     </Dialog>
 
-    <h1>HOMEBREW</h1>
+    <!-- Detail Modal -->
+    <DetailModal
+        :visible="showDetailModal"
+        :item="selectedItem"
+        data-type="homebrew"
+        :modal-sections="modalSections"
+        :show-edit-button="true"
+        @close="closeDetailModal"
+        @edit="handleEdit"
+    />
 
-    <div class="data-table">
-      <TableTools :columns="columns" :data="data" @add-data="addData" @get-data="getData" @del-data="delData" />
+    <div class="page-container">
+        <div class="page-header">
+            <h1 class="page-title">HOMEBREW</h1>
+            <Button 
+                label="Add New Homebrew" 
+                icon="pi pi-plus" 
+                @click="handleAdd"
+                class="add-button"
+            />
+        </div>
+
+        <div class="data-table">
+            <OptimizedDataTable 
+                :data="data || []"
+                data-type="homebrew"
+                :loading="pending"
+                :searchable="true"
+                :filterable="true"
+                @view="handleView"
+                @edit="handleEdit"
+                @delete="handleDelete"
+            />
+        </div>
     </div>
+
+    <!-- Delete Confirmation Dialog -->
+    <ConfirmDialog />
+    
+    <!-- Toast Notifications -->
+    <Toast />
   </div>
 </template>
 
 <script setup>
-import { v4 as uuidv4 } from "uuid";
-import { RuleCategories } from "~/services/enums";
-const UUID = ref();
+import { ref, computed } from 'vue';
+import { v4 as uuidv4 } from 'uuid';
+import { useConfirm } from 'primevue/useconfirm';
+import { useToast } from 'primevue/usetoast';
+import { RuleCategories } from '~/services/enums';
+import { columnConfigurationService } from '~/services/columnConfiguration';
 
-const isEditForm = ref(true);
+// Composables
+const confirm = useConfirm();
+const toast = useToast();
+
+// Reactive state
 const reloadTrigger = ref(0);
-const isOpen = ref(false);
-const dataOfEachRow = ref();
-const Name = ref(null);
-const Category = ref(null);
-const Description = ref(null);
+const showDetailModal = ref(false);
+const showEditModal = ref(false);
+const isEditForm = ref(false);
+const selectedItem = ref(null);
+const saving = ref(false);
 
-const element = ref({
-  id: null,
-  name: null,
-  description: null,
-  category: null,
-  updated_at: null,
+// Form data
+const formData = ref({
+    id: null,
+    name: '',
+    description: '',
+    category: '',
+    updated_at: null,
 });
 
-const columns = [
-  {
-    field: "name",
-    Name: "Name",
-    sortable: true,
-  },
-  {
-    field: "category",
-    Name: "Category",
-    sortable: true,
-  },
-  {
-    field: "description",
-    Name: "Description",
-    sortable: true,
-  },
-  {
-    field: "updated_at",
-    Name: "Date",
-    sortable: true,
-  },
-];
-
-const { data } = await useAsyncData("homebrew", () => $fetch("/api/homebrew"), {
-  watch: [reloadTrigger],
+// Data fetching
+const { data, pending, refresh } = await useAsyncData('homebrew', () => $fetch('/api/homebrew'), {
+    watch: [reloadTrigger],
 });
 
-function xButton() {
-  isOpen.value = false;
-  Name.value = null;
-  Category.value = null;
-  Description.value = null;
+// Modal configuration
+const modalSections = computed(() => {
+    try {
+        return columnConfigurationService.getModalSections('homebrew');
+    } catch (error) {
+        console.error('Error getting modal sections:', error);
+        return [];
+    }
+});
+
+// Event handlers
+function handleView(item) {
+    selectedItem.value = item;
+    showDetailModal.value = true;
 }
 
-function delData(id) {
-    $fetch("/api/homebrew", {
-        method: "Delete",
-        body: JSON.stringify({ id }),
-    }).then(() => reloadTrigger.value += 1)
-}
-function addData() {
-  isOpen.value = true;
-  isEditForm.value = false;
-}
-function getData(rowData) {
-  isEditForm.value = true;
-  dataOfEachRow.value = rowData;
-  isOpen.value = true;
-
-  Name.value = dataOfEachRow.value.name;
-  Category.value = dataOfEachRow.value.category;
-  Description.value = dataOfEachRow.value.description;
-
-  return dataOfEachRow;
+function handleEdit(item) {
+    selectedItem.value = item;
+    isEditForm.value = true;
+    
+    // Populate form data
+    formData.value = {
+        id: item.id,
+        name: item.name || '',
+        description: item.description || '',
+        category: item.category || '',
+        updated_at: item.updated_at,
+    };
+    
+    showEditModal.value = true;
 }
 
-const Validation = () => {
-  if (Name.value && Category.value && Description.value) {
-    saveData();
-  } else if (!Name.value) {
-    alert("You need to fill Name");
-  } else if (!Category.value) {
-    alert("You need to fill Category");
-  } else if (!Description.value) {
-    alert("You need to fill  Description");
-  }
-};
-
-const setName = (name) => (Name.value = name);
-const setCategory = (category) => (Category.value = category);
-
-function saveData() {
-  if (!isEditForm.value) {
-    data.value.filter((row) => {
-      do {
-        UUID.value = uuidv4();
-      } while (UUID.value === row.id);
+function handleDelete(item) {
+    confirm.require({
+        message: `Are you sure you want to delete "${item.name}"?`,
+        header: 'Delete Confirmation',
+        icon: 'pi pi-exclamation-triangle',
+        rejectClass: 'p-button-secondary p-button-outlined',
+        rejectLabel: 'Cancel',
+        acceptLabel: 'Delete',
+        accept: async () => {
+            try {
+                await $fetch('/api/homebrew', {
+                    method: 'DELETE',
+                    body: JSON.stringify({ id: item.id }),
+                });
+                
+                toast.add({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: 'Homebrew deleted successfully',
+                    life: 3000
+                });
+                
+                reloadTrigger.value += 1;
+            } catch (error) {
+                console.error('Error deleting homebrew:', error);
+                toast.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Failed to delete homebrew',
+                    life: 3000
+                });
+            }
+        }
     });
-    element.value.id = UUID.value;
-    element.value.updated_at = new Date();
-  } else {
-    element.value.id = dataOfEachRow.value.id;
-    element.value.updated_at = dataOfEachRow.value.updated_at;
-  }
-
-  element.value.name = Name.value.toString();
-  element.value.category = Category.value.toString();
-  element.value.description = Description.value.toString();
-
-  $fetch("/api/homebrew", {
-    method: "POST",
-    body: JSON.stringify({ upsert: element.value }),
-  }).then(() => reloadTrigger.value += 1)
-  xButton();
 }
+
+function handleAdd() {
+    selectedItem.value = null;
+    isEditForm.value = false;
+    
+    // Reset form data
+    formData.value = {
+        id: null,
+        name: '',
+        description: '',
+        category: '',
+        updated_at: null,
+    };
+    
+    showEditModal.value = true;
+}
+
+async function handleSave() {
+    // Validation
+    if (!formData.value.name?.trim()) {
+        toast.add({
+            severity: 'warn',
+            summary: 'Validation Error',
+            detail: 'Name is required',
+            life: 3000
+        });
+        return;
+    }
+    
+    if (!formData.value.category?.trim()) {
+        toast.add({
+            severity: 'warn',
+            summary: 'Validation Error',
+            detail: 'Category is required',
+            life: 3000
+        });
+        return;
+    }
+    
+    if (!formData.value.description?.trim()) {
+        toast.add({
+            severity: 'warn',
+            summary: 'Validation Error',
+            detail: 'Description is required',
+            life: 3000
+        });
+        return;
+    }
+
+    saving.value = true;
+    
+    try {
+        const payload = { ...formData.value };
+        
+        if (!isEditForm.value) {
+            // Generate new ID for new items
+            payload.id = uuidv4();
+            payload.updated_at = new Date();
+        }
+        
+        await $fetch('/api/homebrew', {
+            method: 'POST',
+            body: JSON.stringify({ upsert: payload }),
+        });
+        
+        toast.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: `Homebrew ${isEditForm.value ? 'updated' : 'created'} successfully`,
+            life: 3000
+        });
+        
+        closeEditModal();
+        reloadTrigger.value += 1;
+        
+    } catch (error) {
+        console.error('Error saving homebrew:', error);
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: `Failed to ${isEditForm.value ? 'update' : 'create'} homebrew`,
+            life: 3000
+        });
+    } finally {
+        saving.value = false;
+    }
+}
+
+function closeDetailModal() {
+    showDetailModal.value = false;
+    selectedItem.value = null;
+}
+
+function closeEditModal() {
+    showEditModal.value = false;
+    selectedItem.value = null;
+    isEditForm.value = false;
+    
+    // Reset form data
+    formData.value = {
+        id: null,
+        name: '',
+        description: '',
+        category: '',
+        updated_at: null,
+    };
+}
+
+// Expose add function for potential toolbar integration
+defineExpose({
+    handleAdd
+});
 </script>
 

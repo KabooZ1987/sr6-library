@@ -1,6 +1,7 @@
 <template>
     <div>
-        <Dialog  v-model="isOpen" prevent-close>
+        <!-- Edit Modal -->
+        <Dialog v-model="isOpen" prevent-close>
             <Card :ui="{
             ring: '',
             divide: 'divide-y divide-gray-100 dark:divide-gray-800',
@@ -43,25 +44,64 @@
             </Card>
         </Dialog>
 
+        <!-- Detail Modal -->
+        <DetailModal
+            :visible="showDetailModal"
+            :item="selectedItem"
+            :data-type="'edgeBoosts'"
+            :modal-sections="modalSections"
+            :show-edit-button="true"
+            @close="closeDetailModal"
+            @edit="editItem"
+        />
+
         <h1>EDGE BOOSTS</h1>
 
         <div class="data-table">
-            <TableTools :columns="columns" :data="data" @add-data="addData" @get-data="getData" @del-data="delData" />
+            <!-- Add New Button -->
+            <div class="mb-4">
+                <Button 
+                    icon="pi pi-plus" 
+                    label="Add New Edge Boost" 
+                    @click="addData"
+                    class="add-button"
+                />
+            </div>
+
+            <!-- Optimized Data Table -->
+            <OptimizedDataTable
+                :data="data || []"
+                data-type="edgeBoosts"
+                :loading="pending"
+                :searchable="true"
+                :filterable="true"
+                @view="viewItem"
+                @edit="editItem"
+                @delete="confirmDelete"
+            />
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import { SourceBooks } from "~/services/enums";
+import { columnConfigurationService } from "~/services/columnConfiguration";
+
 const UUID = ref();
 
+// Edit Modal State
 const isEditForm = ref(true);
 const reloadTrigger = ref(0);
 const isOpen = ref(false);
 const dataOfEachRow = ref();
 
+// Detail Modal State
+const showDetailModal = ref(false);
+const selectedItem = ref(null);
+
+// Form Fields
 const Name = ref(null);
 const Cost = ref(null);
 const Page = ref(null);
@@ -78,35 +118,18 @@ const element = ref({
     updated_at: null,
 });
 
-const columns = [
-    {
-        field: "name",
-        Name: "Name",
-        sortable: true,
-    },
-    {
-        field: "cost",
-        Name: "Cost",
-        sortable: true,
-    },
-    {
-        field: "description",
-        Name: "Description",
-        sortable: true,
-    },
-    {
-        field: "source",
-        Name: "Source",
-        sortable: true,
-    },
-    {
-        field: "updated_at",
-        Name: "Date",
-        sortable: true,
+// Get modal sections configuration for edgeBoosts
+const modalSections = computed(() => {
+    try {
+        return columnConfigurationService.getModalSections('edgeBoosts');
+    } catch (error) {
+        console.error('Error getting modal sections:', error);
+        return [];
     }
-];
+});
 
-const { data } = await useAsyncData(
+// Data fetching with loading state
+const { data, pending } = await useAsyncData(
     "edge_boost",
     () => $fetch("/api/edge_boost"),
     {
@@ -114,6 +137,7 @@ const { data } = await useAsyncData(
     }
 );
 
+// Modal Management Functions
 function xButton() {
     isOpen.value = false;
     Name.value = null;
@@ -123,27 +147,51 @@ function xButton() {
     Description.value = null;
 }
 
+function closeDetailModal() {
+    showDetailModal.value = false;
+    selectedItem.value = null;
+}
+
+// OptimizedDataTable Event Handlers
+function viewItem(item) {
+    selectedItem.value = item;
+    showDetailModal.value = true;
+}
+
+function editItem(item) {
+    isEditForm.value = true;
+    dataOfEachRow.value = item;
+    isOpen.value = true;
+
+    Name.value = item.name;
+    Cost.value = item.cost;
+    Page.value = item.page;
+    Source.value = item.source;
+    Description.value = item.description;
+}
+
+function confirmDelete(item) {
+    if (confirm(`Are you sure you want to delete "${item.name}"?`)) {
+        delData(item.id);
+    }
+}
+
+// Legacy Functions (updated for new structure)
 function delData(id) {
     $fetch("/api/edge_boost", {
         method: "Delete",
         body: JSON.stringify({ id }),
     }).then(() => reloadTrigger.value += 1)
 }
+
 function addData() {
     isOpen.value = true;
     isEditForm.value = false;
 }
+
 function getData(rowData) {
-    isEditForm.value = true;
-    dataOfEachRow.value = rowData;
-    isOpen.value = true;
-
-    Name.value = dataOfEachRow.value.name;
-    Cost.value = dataOfEachRow.value.cost;
-    Page.value = dataOfEachRow.value.page;
-    Source.value = dataOfEachRow.value.source;
-    Description.value = dataOfEachRow.value.description;
-
+    // Legacy function - now handled by editItem
+    editItem(rowData);
     return dataOfEachRow;
 }
 

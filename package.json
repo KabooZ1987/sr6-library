@@ -7,7 +7,9 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "test": "vitest",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "@nuxt/kit": "^3.17.5",
@@ -15,7 +17,9 @@
     "@primevue/forms": "^4.3.5",
     "@prisma/client": "6.9.0",
     "@types/formidable": "^3.4.5",
+    "@vitejs/plugin-vue": "^6.0.0",
     "formidable": "v3",
+    "jsdom": "^26.1.0",
     "marked": "^15.0.12",
     "nuxt": "^3.17.5",
     "primeicons": "^7.0.0",
@@ -29,7 +33,10 @@
   },
   "devDependencies": {
     "@primevue/nuxt-module": "^4.3.5",
+    "@types/bun": "^1.2.18",
+    "@vue/test-utils": "^2.4.6",
     "prisma": "6.9.0",
-    "sass": "1.89.1"
+    "sass": "1.89.1",
+    "vitest": "^3.2.4"
   }
 }
