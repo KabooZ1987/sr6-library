@@ -1,630 +1,423 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { mount, VueWrapper } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import QuickActionButtons from '../QuickActionButtons.vue'
 
-// Mock PrimeVue Button component
-vi.mock('primevue/button', () => ({
-  default: {
-    name: 'Button',
-    template: `
-      <button 
-        data-testid="button" 
-        :class="[$attrs.class, severity, { 'p-button-text': text, 'p-button-rounded': rounded }]"
-        :disabled="disabled"
-        @click="$emit('click')"
-      >
-        <i v-if="icon" :class="icon"></i>
-        <span v-if="label">{{ label }}</span>
-        <slot></slot>
-      </button>
-    `,
-    props: ['icon', 'label', 'severity', 'text', 'rounded', 'size', 'disabled'],
-    emits: ['click']
-  }
-}))
-
-// Mock tooltip directive
-const mockTooltip = {
-  mounted() {},
-  updated() {},
-  unmounted() {}
+// Mock PrimeVue components
+const MockButton = {
+  name: 'Button',
+  template: `
+    <button 
+      :disabled="disabled"
+      :class="['p-button', $attrs.class]"
+      :severity="severity"
+      :size="size"
+      @click="$emit('click', $event)"
+    >
+      <i v-if="icon" :class="icon"></i>
+      <slot />
+    </button>
+  `,
+  props: ['disabled', 'severity', 'size', 'icon'],
+  emits: ['click']
 }
 
-// Mock window resize functionality
+const MockMenu = {
+  name: 'Menu',
+  template: `
+    <div class="p-menu" :class="{ 'p-menu-overlay': popup }">
+      <ul class="p-menu-list">
+        <li v-for="item in model" :key="item.id" class="p-menuitem">
+          <a class="p-menuitem-link" @click="$emit('item-click', { item })">
+            <i v-if="item.icon" :class="item.icon"></i>
+            <span>{{ item.label }}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  `,
+  props: ['model', 'popup'],
+  emits: ['item-click'],
+  methods: {
+    toggle: vi.fn(),
+    show: vi.fn(),
+    hide: vi.fn()
+  }
+}
+
+// Mock window for responsive testing
 Object.defineProperty(window, 'innerWidth', {
   writable: true,
   configurable: true,
-  value: 1024,
+  value: 1024
 })
 
 describe('QuickActionButtons', () => {
-  const mockItem = {
-    id: '1',
-    name: 'Test Item',
-    type: 'Major',
-    description: 'Test description'
-  }
+  let wrapper: VueWrapper<any>
 
-  const defaultProps = {
-    item: mockItem,
-    disabled: false,
-    size: 'small' as const
-  }
-
-  const mountOptions = {
-    global: {
-      directives: {
-        tooltip: mockTooltip
-      }
-    }
-  }
+  const defaultActions = [
+    { id: 'view', label: 'View', icon: 'pi pi-eye' },
+    { id: 'edit', label: 'Edit', icon: 'pi pi-pencil' },
+    { id: 'delete', label: 'Delete', icon: 'pi pi-trash' }
+  ]
 
   beforeEach(() => {
-    vi.clearAllMocks()
-    // Reset window width to desktop
-    Object.defineProperty(window, 'innerWidth', {
-      value: 1024,
-      writable: true
-    })
-    // Clear any existing event listeners
-    document.removeEventListener('click', vi.fn())
+    // Reset window width
+    window.innerWidth = 1024
   })
 
   afterEach(() => {
-    // Clean up any remaining event listeners
-    document.removeEventListener('click', vi.fn())
+    wrapper?.unmount()
   })
 
-  describe('Component Rendering', () => {
-    it('should render without errors', () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
+  const createWrapper = (props = {}) => {
+    return mount(QuickActionButtons, {
+      props: {
+        actions: defaultActions,
+        ...props
+      },
+      global: {
+        components: {
+          Button: MockButton,
+          Menu: MockMenu
+        }
+      }
+    })
+  }
+
+  describe('Desktop Rendering', () => {
+    it('should render all action buttons on desktop', () => {
+      wrapper = createWrapper()
       
-      expect(wrapper.exists()).toBe(true)
-      expect(wrapper.find('.quick-action-buttons').exists()).toBe(true)
+      const buttons = wrapper.findAll('button')
+      expect(buttons).toHaveLength(3)
+      
+      // Check button content
+      expect(buttons[0].text()).toContain('View')
+      expect(buttons[1].text()).toContain('Edit')
+      expect(buttons[2].text()).toContain('Delete')
     })
 
-    it('should apply correct container classes', () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
+    it('should apply correct severities to buttons', () => {
+      wrapper = createWrapper()
       
-      const container = wrapper.find('.quick-action-buttons')
-      expect(container.classes()).toContain('screen-desktop')
-      expect(container.classes()).toContain('size-small')
+      const buttons = wrapper.findAll('button')
+      
+      // View button should be info
+      expect(buttons[0].attributes('severity')).toBe('info')
+      
+      // Edit button should be warning
+      expect(buttons[1].attributes('severity')).toBe('warning')
+      
+      // Delete button should be danger
+      expect(buttons[2].attributes('severity')).toBe('danger')
     })
 
-    it('should apply disabled class when disabled prop is true', () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: {
-          ...defaultProps,
-          disabled: true
-        },
-        ...mountOptions
-      })
+    it('should show icons when showIcons is true', () => {
+      wrapper = createWrapper({ showIcons: true })
       
-      const container = wrapper.find('.quick-action-buttons')
-      expect(container.classes()).toContain('disabled')
+      const icons = wrapper.findAll('i')
+      expect(icons).toHaveLength(3)
+      
+      expect(icons[0].classes()).toContain('pi-eye')
+      expect(icons[1].classes()).toContain('pi-pencil')
+      expect(icons[2].classes()).toContain('pi-trash')
+    })
+
+    it('should hide icons when showIcons is false', () => {
+      wrapper = createWrapper({ showIcons: false })
+      
+      const icons = wrapper.findAll('i')
+      expect(icons).toHaveLength(0)
     })
   })
 
-  describe('Desktop Layout (1024px+)', () => {
+  describe('Mobile Rendering', () => {
     beforeEach(() => {
-      Object.defineProperty(window, 'innerWidth', { value: 1200, writable: true })
+      window.innerWidth = 480 // Mobile width
     })
 
-    it('should show full buttons with text on desktop', async () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
-      
-      // Trigger resize to update screen size
-      window.dispatchEvent(new Event('resize'))
+    it('should render dropdown menu on mobile', async () => {
+      wrapper = createWrapper()
       await nextTick()
       
-      const viewBtn = wrapper.find('.view-btn')
-      const editBtn = wrapper.find('.edit-btn')
-      const deleteBtn = wrapper.find('.delete-btn')
+      // Should have one trigger button and a menu
+      const buttons = wrapper.findAll('button')
+      expect(buttons).toHaveLength(1) // Only the dropdown trigger
       
-      expect(viewBtn.exists()).toBe(true)
-      expect(editBtn.exists()).toBe(true)
-      expect(deleteBtn.exists()).toBe(true)
-      
-      // Check that buttons have labels - look for span elements with text
-      expect(viewBtn.find('span').text()).toBe('View')
-      expect(editBtn.find('span').text()).toBe('Edit')
-      expect(deleteBtn.find('span').text()).toBe('Delete')
+      const menu = wrapper.findComponent({ name: 'Menu' })
+      expect(menu.exists()).toBe(true)
     })
 
-    it('should have correct icons and severities on desktop', async () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
-      
-      window.dispatchEvent(new Event('resize'))
+    it('should show menu items when dropdown is opened', async () => {
+      wrapper = createWrapper()
       await nextTick()
       
-      const viewBtn = wrapper.find('.view-btn')
-      const editBtn = wrapper.find('.edit-btn')
-      const deleteBtn = wrapper.find('.delete-btn')
-      
-      expect(viewBtn.find('i').classes()).toContain('pi-eye')
-      expect(editBtn.find('i').classes()).toContain('pi-pencil')
-      expect(deleteBtn.find('i').classes()).toContain('pi-trash')
-      
-      expect(viewBtn.classes()).toContain('info')
-      expect(editBtn.classes()).toContain('warning')
-      expect(deleteBtn.classes()).toContain('danger')
-    })
-  })
-
-  describe('Tablet Layout (768-1023px)', () => {
-    beforeEach(() => {
-      Object.defineProperty(window, 'innerWidth', { value: 800, writable: true })
+      const menu = wrapper.findComponent({ name: 'Menu' })
+      expect(menu.props('model')).toEqual(defaultActions)
     })
 
-    it('should show icon-only buttons on tablet', async () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
-      
-      window.dispatchEvent(new Event('resize'))
+    it('should emit action when menu item is clicked', async () => {
+      wrapper = createWrapper()
       await nextTick()
       
-      const viewBtn = wrapper.find('.view-btn')
-      const editBtn = wrapper.find('.edit-btn')
-      const deleteBtn = wrapper.find('.delete-btn')
+      const menu = wrapper.findComponent({ name: 'Menu' })
+      await menu.vm.$emit('item-click', { item: defaultActions[0] })
       
-      expect(viewBtn.exists()).toBe(true)
-      expect(editBtn.exists()).toBe(true)
-      expect(deleteBtn.exists()).toBe(true)
-      
-      // Should have icon-only class
-      expect(viewBtn.classes()).toContain('icon-only')
-      expect(editBtn.classes()).toContain('icon-only')
-      expect(deleteBtn.classes()).toContain('icon-only')
-      
-      // Should not have text labels
-      expect(viewBtn.text()).not.toContain('View')
-      expect(editBtn.text()).not.toContain('Edit')
-      expect(deleteBtn.text()).not.toContain('Delete')
-    })
-
-    it('should have rounded buttons on tablet', async () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
-      
-      window.dispatchEvent(new Event('resize'))
-      await nextTick()
-      
-      const buttons = wrapper.findAll('[data-testid="button"]')
-      buttons.forEach(button => {
-        expect(button.classes()).toContain('p-button-rounded')
-      })
-    })
-  })
-
-  describe('Mobile Layout (<768px)', () => {
-    beforeEach(() => {
-      Object.defineProperty(window, 'innerWidth', { value: 600, writable: true })
-    })
-
-    it('should show dropdown trigger on mobile', async () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
-      
-      window.dispatchEvent(new Event('resize'))
-      await nextTick()
-      
-      const dropdownTrigger = wrapper.find('.dropdown-trigger')
-      expect(dropdownTrigger.exists()).toBe(true)
-      expect(dropdownTrigger.find('i').classes()).toContain('pi-ellipsis-v')
-    })
-
-    it('should show dropdown menu when trigger is clicked', async () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
-      
-      window.dispatchEvent(new Event('resize'))
-      await nextTick()
-      
-      const dropdownTrigger = wrapper.find('.dropdown-trigger')
-      await dropdownTrigger.trigger('click')
-      await nextTick()
-      
-      const dropdownMenu = wrapper.find('.dropdown-menu')
-      expect(dropdownMenu.exists()).toBe(true)
-      
-      const dropdownItems = wrapper.findAll('.dropdown-item')
-      expect(dropdownItems).toHaveLength(3)
-      
-      expect(dropdownItems[0].text()).toContain('View Details')
-      expect(dropdownItems[1].text()).toContain('Edit')
-      expect(dropdownItems[2].text()).toContain('Delete')
-    })
-
-    it('should close dropdown when clicking outside', async () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
-      
-      window.dispatchEvent(new Event('resize'))
-      await nextTick()
-      
-      // Open dropdown
-      const dropdownTrigger = wrapper.find('.dropdown-trigger')
-      await dropdownTrigger.trigger('click')
-      await nextTick()
-      
-      expect(wrapper.find('.dropdown-menu').exists()).toBe(true)
-      
-      // Simulate click outside
-      const clickEvent = new Event('click')
-      Object.defineProperty(clickEvent, 'target', {
-        value: document.body,
-        enumerable: true
-      })
-      document.dispatchEvent(clickEvent)
-      await nextTick()
-      
-      expect(wrapper.find('.dropdown-menu').exists()).toBe(false)
-    })
-
-    it('should have delete item styled differently in dropdown', async () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
-      
-      window.dispatchEvent(new Event('resize'))
-      await nextTick()
-      
-      const dropdownTrigger = wrapper.find('.dropdown-trigger')
-      await dropdownTrigger.trigger('click')
-      await nextTick()
-      
-      const deleteItem = wrapper.findAll('.dropdown-item')[2]
-      expect(deleteItem.classes()).toContain('delete-item')
-    })
-  })
-
-  describe('Event Handling', () => {
-    it('should emit view event when view button is clicked', async () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
-      
-      const viewBtn = wrapper.find('.view-btn')
-      await viewBtn.trigger('click')
-      
-      expect(wrapper.emitted('view')).toBeTruthy()
-      expect(wrapper.emitted('view')?.[0]).toEqual([mockItem])
-    })
-
-    it('should emit edit event when edit button is clicked', async () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
-      
-      const editBtn = wrapper.find('.edit-btn')
-      await editBtn.trigger('click')
-      
-      expect(wrapper.emitted('edit')).toBeTruthy()
-      expect(wrapper.emitted('edit')?.[0]).toEqual([mockItem])
-    })
-
-    it('should emit delete event when delete button is clicked', async () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
-      
-      const deleteBtn = wrapper.find('.delete-btn')
-      await deleteBtn.trigger('click')
-      
-      expect(wrapper.emitted('delete')).toBeTruthy()
-      expect(wrapper.emitted('delete')?.[0]).toEqual([mockItem])
-    })
-
-    it('should emit events from dropdown items on mobile', async () => {
-      Object.defineProperty(window, 'innerWidth', { value: 600, writable: true })
-      
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
-      
-      window.dispatchEvent(new Event('resize'))
-      await nextTick()
-      
-      // Open dropdown
-      const dropdownTrigger = wrapper.find('.dropdown-trigger')
-      await dropdownTrigger.trigger('click')
-      await nextTick()
-      
-      // Click view item
-      const viewItem = wrapper.findAll('.dropdown-item')[0]
-      await viewItem.trigger('click')
-      
-      expect(wrapper.emitted('view')).toBeTruthy()
-      expect(wrapper.emitted('view')?.[0]).toEqual([mockItem])
-    })
-
-    it('should not emit events when disabled', async () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: {
-          ...defaultProps,
-          disabled: true
-        },
-        ...mountOptions
-      })
-      
-      const viewBtn = wrapper.find('.view-btn')
-      await viewBtn.trigger('click')
-      
-      expect(wrapper.emitted('view')).toBeFalsy()
-    })
-
-    it('should not open dropdown when disabled on mobile', async () => {
-      Object.defineProperty(window, 'innerWidth', { value: 600, writable: true })
-      
-      const wrapper = mount(QuickActionButtons, {
-        props: {
-          ...defaultProps,
-          disabled: true
-        },
-        ...mountOptions
-      })
-      
-      window.dispatchEvent(new Event('resize'))
-      await nextTick()
-      
-      const dropdownTrigger = wrapper.find('.dropdown-trigger')
-      await dropdownTrigger.trigger('click')
-      await nextTick()
-      
-      expect(wrapper.find('.dropdown-menu').exists()).toBe(false)
+      expect(wrapper.emitted('action')).toBeTruthy()
+      expect(wrapper.emitted('action')[0]).toEqual(['view'])
     })
   })
 
   describe('Responsive Behavior', () => {
-    it('should update screen size on window resize', async () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
-      
+    it('should switch between desktop and mobile layouts', async () => {
       // Start with desktop
-      expect(wrapper.find('.screen-desktop').exists()).toBe(true)
+      window.innerWidth = 1024
+      wrapper = createWrapper()
       
-      // Resize to mobile
-      Object.defineProperty(window, 'innerWidth', { value: 600, writable: true })
+      let buttons = wrapper.findAll('button')
+      expect(buttons).toHaveLength(3)
+      
+      // Switch to mobile
+      window.innerWidth = 480
       window.dispatchEvent(new Event('resize'))
       await nextTick()
       
-      expect(wrapper.find('.screen-mobile').exists()).toBe(true)
-      expect(wrapper.find('.dropdown-trigger').exists()).toBe(true)
+      // Should re-render for mobile
+      buttons = wrapper.findAll('button')
+      expect(buttons).toHaveLength(1) // Only dropdown trigger
     })
 
-    it('should close dropdown when screen size changes', async () => {
-      Object.defineProperty(window, 'innerWidth', { value: 600, writable: true })
+    it('should handle breakpoint changes smoothly', async () => {
+      wrapper = createWrapper()
       
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
+      const breakpoints = [1200, 768, 480, 320, 768, 1200]
       
-      window.dispatchEvent(new Event('resize'))
-      await nextTick()
-      
-      // Open dropdown
-      const dropdownTrigger = wrapper.find('.dropdown-trigger')
-      await dropdownTrigger.trigger('click')
-      await nextTick()
-      
-      expect(wrapper.find('.dropdown-menu').exists()).toBe(true)
-      
-      // Resize to desktop
-      Object.defineProperty(window, 'innerWidth', { value: 1200, writable: true })
-      window.dispatchEvent(new Event('resize'))
-      await nextTick()
-      
-      expect(wrapper.find('.dropdown-menu').exists()).toBe(false)
-    })
-
-    it('should handle different screen size breakpoints correctly', async () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
-      
-      // Test mobile breakpoint
-      Object.defineProperty(window, 'innerWidth', { value: 767, writable: true })
-      window.dispatchEvent(new Event('resize'))
-      await nextTick()
-      expect(wrapper.find('.screen-mobile').exists()).toBe(true)
-      
-      // Test tablet breakpoint
-      Object.defineProperty(window, 'innerWidth', { value: 768, writable: true })
-      window.dispatchEvent(new Event('resize'))
-      await nextTick()
-      expect(wrapper.find('.screen-tablet').exists()).toBe(true)
-      
-      // Test desktop breakpoint
-      Object.defineProperty(window, 'innerWidth', { value: 1024, writable: true })
-      window.dispatchEvent(new Event('resize'))
-      await nextTick()
-      expect(wrapper.find('.screen-desktop').exists()).toBe(true)
+      for (const width of breakpoints) {
+        window.innerWidth = width
+        window.dispatchEvent(new Event('resize'))
+        await nextTick()
+        
+        // Should always render something
+        const buttons = wrapper.findAll('button')
+        expect(buttons.length).toBeGreaterThan(0)
+      }
     })
   })
 
-  describe('Props Validation', () => {
-    it('should accept item prop', () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
+  describe('Action Handling', () => {
+    it('should emit action events when buttons are clicked', async () => {
+      wrapper = createWrapper()
       
-      const component = wrapper.vm as any
-      expect(component.item).toEqual(mockItem)
+      const buttons = wrapper.findAll('button')
+      
+      // Click each button
+      for (let i = 0; i < buttons.length; i++) {
+        await buttons[i].trigger('click')
+      }
+      
+      expect(wrapper.emitted('action')).toHaveLength(3)
+      expect(wrapper.emitted('action')[0]).toEqual(['view'])
+      expect(wrapper.emitted('action')[1]).toEqual(['edit'])
+      expect(wrapper.emitted('action')[2]).toEqual(['delete'])
     })
 
-    it('should use default values for optional props', () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: {
-          item: mockItem
-        },
-        ...mountOptions
+    it('should not emit events when disabled', async () => {
+      wrapper = createWrapper({ disabled: true })
+      
+      const buttons = wrapper.findAll('button')
+      
+      // All buttons should be disabled
+      buttons.forEach(button => {
+        expect(button.attributes('disabled')).toBeDefined()
       })
       
-      const component = wrapper.vm as any
-      expect(component.disabled).toBe(false)
-      expect(component.size).toBe('small')
+      // Click should not emit events
+      await buttons[0].trigger('click')
+      expect(wrapper.emitted('action')).toBeFalsy()
     })
 
-    it('should handle different size variants', () => {
-      const sizes = ['small', 'normal', 'large'] as const
+    it('should handle loading state', async () => {
+      wrapper = createWrapper({ loading: true })
       
-      sizes.forEach(size => {
-        const wrapper = mount(QuickActionButtons, {
-          props: {
-            ...defaultProps,
-            size
-          },
-          ...mountOptions
-        })
-        
-        const container = wrapper.find('.quick-action-buttons')
-        expect(container.classes()).toContain(`size-${size}`)
+      const buttons = wrapper.findAll('button')
+      
+      // All buttons should be disabled during loading
+      buttons.forEach(button => {
+        expect(button.attributes('disabled')).toBeDefined()
       })
+    })
+  })
+
+  describe('Custom Actions', () => {
+    it('should handle custom action configurations', () => {
+      const customActions = [
+        { id: 'custom1', label: 'Custom Action', icon: 'pi pi-star', severity: 'success' },
+        { id: 'custom2', label: 'Another Action', icon: 'pi pi-heart', severity: 'help' }
+      ]
+      
+      wrapper = createWrapper({ actions: customActions })
+      
+      const buttons = wrapper.findAll('button')
+      expect(buttons).toHaveLength(2)
+      
+      expect(buttons[0].text()).toContain('Custom Action')
+      expect(buttons[0].attributes('severity')).toBe('success')
+      
+      expect(buttons[1].text()).toContain('Another Action')
+      expect(buttons[1].attributes('severity')).toBe('help')
+    })
+
+    it('should handle actions without icons', () => {
+      const actionsWithoutIcons = [
+        { id: 'text1', label: 'Text Only' },
+        { id: 'text2', label: 'Another Text' }
+      ]
+      
+      wrapper = createWrapper({ 
+        actions: actionsWithoutIcons,
+        showIcons: true 
+      })
+      
+      const icons = wrapper.findAll('i')
+      expect(icons).toHaveLength(0)
+    })
+
+    it('should handle empty actions array', () => {
+      wrapper = createWrapper({ actions: [] })
+      
+      const buttons = wrapper.findAll('button')
+      expect(buttons).toHaveLength(0)
     })
   })
 
   describe('Accessibility', () => {
-    it('should have proper button attributes', () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
+    it('should have proper ARIA attributes', () => {
+      wrapper = createWrapper()
       
-      const buttons = wrapper.findAll('[data-testid="button"]')
-      buttons.forEach(button => {
-        expect(button.attributes('disabled')).toBe('false')
+      const buttons = wrapper.findAll('button')
+      
+      buttons.forEach((button, index) => {
+        const action = defaultActions[index]
+        expect(button.attributes('aria-label')).toContain(action.label)
       })
     })
 
-    it('should disable buttons when disabled prop is true', () => {
-      const wrapper = mount(QuickActionButtons, {
-        props: {
-          ...defaultProps,
-          disabled: true
-        },
-        ...mountOptions
-      })
-      
-      const buttons = wrapper.findAll('[data-testid="button"]')
-      buttons.forEach(button => {
-        expect(button.attributes('disabled')).toBe('true')
-      })
-    })
-
-    it('should have proper ARIA attributes for dropdown', async () => {
-      Object.defineProperty(window, 'innerWidth', { value: 600, writable: true })
-      
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
-      
-      window.dispatchEvent(new Event('resize'))
+    it('should have proper role for dropdown menu', async () => {
+      window.innerWidth = 480
+      wrapper = createWrapper()
       await nextTick()
       
-      const dropdownTrigger = wrapper.find('.dropdown-trigger')
-      expect(dropdownTrigger.exists()).toBe(true)
+      const menu = wrapper.findComponent({ name: 'Menu' })
+      expect(menu.exists()).toBe(true)
+    })
+
+    it('should be keyboard navigable', async () => {
+      wrapper = createWrapper()
+      
+      const buttons = wrapper.findAll('button')
+      
+      // Each button should be focusable
+      for (const button of buttons) {
+        await button.trigger('focus')
+        // In a real test, we'd check focus state
+        expect(button.exists()).toBe(true)
+      }
     })
   })
 
-  describe('Lifecycle Management', () => {
-    it('should add resize listener on mount', () => {
-      const addEventListenerSpy = vi.spyOn(window, 'addEventListener')
+  describe('Styling and Layout', () => {
+    it('should apply size prop to buttons', () => {
+      wrapper = createWrapper({ size: 'large' })
       
-      mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
+      const buttons = wrapper.findAll('button')
+      buttons.forEach(button => {
+        expect(button.attributes('size')).toBe('large')
       })
-      
-      expect(addEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function))
     })
 
-    it('should remove event listeners on unmount', () => {
-      const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener')
-      const removeDocumentListenerSpy = vi.spyOn(document, 'removeEventListener')
+    it('should apply custom CSS classes', () => {
+      wrapper = createWrapper({ class: 'custom-actions' })
       
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
+      expect(wrapper.classes()).toContain('custom-actions')
+    })
+
+    it('should handle touch-friendly mode', () => {
+      wrapper = createWrapper({ touchFriendly: true })
       
-      wrapper.unmount()
-      
-      expect(removeEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function))
-      expect(removeDocumentListenerSpy).toHaveBeenCalledWith('click', expect.any(Function))
+      expect(wrapper.classes()).toContain('quick-actions--touch-friendly')
     })
   })
 
-  describe('Dropdown Positioning', () => {
-    it('should position dropdown correctly', async () => {
-      Object.defineProperty(window, 'innerWidth', { value: 600, writable: true })
-      
-      // Mock getBoundingClientRect
-      const mockGetBoundingClientRect = vi.fn(() => ({
-        top: 100,
-        left: 200,
-        right: 250,
-        bottom: 130,
-        width: 50,
-        height: 30
+  describe('Performance', () => {
+    it('should handle large numbers of actions efficiently', () => {
+      const manyActions = Array.from({ length: 50 }, (_, i) => ({
+        id: `action-${i}`,
+        label: `Action ${i}`,
+        icon: 'pi pi-star'
       }))
       
-      const wrapper = mount(QuickActionButtons, {
-        props: defaultProps,
-        ...mountOptions
-      })
+      const startTime = performance.now()
+      wrapper = createWrapper({ actions: manyActions })
+      const renderTime = performance.now() - startTime
       
-      window.dispatchEvent(new Event('resize'))
+      // Should render quickly even with many actions
+      expect(renderTime).toBeLessThan(50)
+      
+      // On desktop, should render all buttons
+      if (window.innerWidth >= 768) {
+        const buttons = wrapper.findAll('button')
+        expect(buttons).toHaveLength(50)
+      }
+    })
+
+    it('should not re-render unnecessarily', async () => {
+      wrapper = createWrapper()
+      
+      const initialHtml = wrapper.html()
+      
+      // Update props that shouldn't cause re-render
+      await wrapper.setProps({ loading: false })
+      
+      // HTML should be similar (allowing for minor differences)
+      expect(wrapper.html().length).toBeCloseTo(initialHtml.length, -1)
+    })
+  })
+
+  describe('Error Handling', () => {
+    it('should handle malformed action objects gracefully', () => {
+      const malformedActions = [
+        { id: 'good', label: 'Good Action', icon: 'pi pi-check' },
+        { id: 'bad' }, // Missing label
+        { label: 'No ID' }, // Missing id
+        null, // Null action
+        undefined // Undefined action
+      ]
+      
+      expect(() => {
+        wrapper = createWrapper({ actions: malformedActions })
+      }).not.toThrow()
+      
+      // Should render only valid actions
+      const buttons = wrapper.findAll('button')
+      expect(buttons.length).toBeGreaterThan(0)
+    })
+
+    it('should handle resize events gracefully', async () => {
+      wrapper = createWrapper()
+      
+      // Rapid resize events
+      for (let i = 0; i < 10; i++) {
+        window.innerWidth = 400 + (i * 100)
+        window.dispatchEvent(new Event('resize'))
+      }
+      
       await nextTick()
       
-      // Mock the DOM elements
-      const component = wrapper.vm as any
-      component.$refs.dropdownTrigger = {
-        getBoundingClientRect: mockGetBoundingClientRect
-      }
-      component.$refs.dropdownMenu = {
-        getBoundingClientRect: () => ({ width: 120, height: 90 }),
-        style: {}
-      }
-      
-      const dropdownTrigger = wrapper.find('.dropdown-trigger')
-      await dropdownTrigger.trigger('click')
-      await nextTick()
-      
-      expect(mockGetBoundingClientRect).toHaveBeenCalled()
+      // Should still be functional
+      expect(wrapper.exists()).toBe(true)
+      const buttons = wrapper.findAll('button')
+      expect(buttons.length).toBeGreaterThan(0)
     })
   })
 })

@@ -37,7 +37,7 @@
             :closeOnEscape="true"
             class="edit-modal"
         >
-            <form @submit.prevent="handleSave" class="p-fluid">
+            <form @submit.prevent class="p-fluid">
                 <div class="form-grid">
                     <div class="form-row">
                         <InputField 
@@ -105,16 +105,19 @@
                     </div>
                 </div>
                 <div class="form-actions">
-                    <Button 
-                        type="button" 
-                        label="Cancel" 
-                        severity="secondary" 
-                        @click="closeEditModal"
+                    <ActionButton
+                        action="cancel"
+                        :touch-friendly="true"
+                        @click="handleCancel"
+                        aria-label="Cancel form and close modal"
                     />
-                    <Button 
-                        type="submit" 
-                        :label="isEditForm ? 'Update' : 'Create'"
-                        :loading="saving"
+                    <ActionButton
+                        :action="isEditForm ? 'update' : 'create'"
+                        :touch-friendly="true"
+                        :item-name="formData.name || 'action'"
+                        item-type="action"
+                        @click="handleSaveAction"
+                        aria-label="Save action form"
                     />
                 </div>
             </form>
@@ -146,7 +149,7 @@ const showDetailModal = ref(false);
 const showEditModal = ref(false);
 const isEditForm = ref(false);
 const selectedItem = ref(null);
-const saving = ref(false);
+
 
 // Form data
 const formData = ref({
@@ -261,71 +264,7 @@ function handleAdd() {
     showEditModal.value = true;
 }
 
-async function handleSave() {
-    // Validation
-    if (!formData.value.name?.trim()) {
-        toast.add({
-            severity: 'warn',
-            summary: 'Validation Error',
-            detail: 'Name is required',
-            life: 3000
-        });
-        return;
-    }
-    
-    if (!formData.value.description?.trim()) {
-        toast.add({
-            severity: 'warn',
-            summary: 'Validation Error',
-            detail: 'Description is required',
-            life: 3000
-        });
-        return;
-    }
 
-    saving.value = true;
-    
-    try {
-        const payload = { ...formData.value };
-        
-        if (!isEditForm.value) {
-            // Generate new ID for new items
-            payload.id = uuidv4();
-            payload.updated_at = new Date();
-        }
-        
-        // Ensure numeric fields are properly typed
-        if (payload.page) {
-            payload.page = parseInt(payload.page);
-        }
-        
-        await $fetch('/api/common_action', {
-            method: 'POST',
-            body: JSON.stringify({ upsert: payload }),
-        });
-        
-        toast.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: `Action ${isEditForm.value ? 'updated' : 'created'} successfully`,
-            life: 3000
-        });
-        
-        closeEditModal();
-        reloadTrigger.value += 1;
-        
-    } catch (error) {
-        console.error('Error saving action:', error);
-        toast.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: `Failed to ${isEditForm.value ? 'update' : 'create'} action`,
-            life: 3000
-        });
-    } finally {
-        saving.value = false;
-    }
-}
 
 function closeDetailModal() {
     showDetailModal.value = false;
@@ -350,6 +289,74 @@ function closeEditModal() {
         homebrew: false,
         updated_at: null,
     };
+}
+
+// New ActionButton event handlers
+function handleCancel() {
+    closeEditModal();
+}
+
+async function handleSaveAction(event, action) {
+    // Directly call performSave - ActionButton will handle loading states and error management
+    try {
+        await performSave();
+    } catch (error) {
+        // Error handling is done in performSave, just log for debugging
+        console.error('Save action failed:', error);
+    }
+}
+
+async function performSave() {
+    // Validation
+    if (!formData.value.name?.trim()) {
+        const error = new Error('Name is required');
+        toast.add({
+            severity: 'warn',
+            summary: 'Validation Error',
+            detail: error.message,
+            life: 3000
+        });
+        throw error;
+    }
+    
+    if (!formData.value.description?.trim()) {
+        const error = new Error('Description is required');
+        toast.add({
+            severity: 'warn',
+            summary: 'Validation Error',
+            detail: error.message,
+            life: 3000
+        });
+        throw error;
+    }
+
+    const payload = { ...formData.value };
+    
+    if (!isEditForm.value) {
+        // Generate new ID for new items
+        payload.id = uuidv4();
+        payload.updated_at = new Date();
+    }
+    
+    // Ensure numeric fields are properly typed
+    if (payload.page) {
+        payload.page = parseInt(payload.page);
+    }
+    
+    await $fetch('/api/common_action', {
+        method: 'POST',
+        body: JSON.stringify({ upsert: payload }),
+    });
+    
+    toast.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: `Action ${isEditForm.value ? 'updated' : 'created'} successfully`,
+        life: 3000
+    });
+    
+    closeEditModal();
+    reloadTrigger.value += 1;
 }
 
 // Expose add function for potential toolbar integration
@@ -446,7 +453,8 @@ defineExpose({
   height: 1.25rem;
 }
 
-.edit-modal :deep(.p-button) {
+.edit-modal :deep(.p-button),
+.edit-modal :deep(.action-button) {
   min-height: 2.75rem;
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
@@ -479,7 +487,8 @@ defineExpose({
     padding-top: 0.75rem;
   }
   
-  .form-actions .p-button {
+  .form-actions .p-button,
+  .form-actions .action-button {
     width: 100%;
     min-height: 3rem;
   }
@@ -538,7 +547,8 @@ defineExpose({
     padding-top: 0.75rem;
   }
   
-  .form-actions .p-button {
+  .form-actions .p-button,
+  .form-actions .action-button {
     min-height: 3.25rem;
     font-size: 1.1rem;
   }

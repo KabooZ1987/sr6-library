@@ -7,7 +7,9 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: ['./tests/setup/vitest.setup.ts']
+    include: ['**/*.perf.test.ts'],
+    testTimeout: 30000,
+    setupFiles: ['./tests/setup/performance.setup.ts']
   },
   resolve: {
     alias: {

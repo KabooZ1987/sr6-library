@@ -2,91 +2,120 @@
   <div class="quick-action-buttons" :class="containerClasses">
     <!-- Desktop: Full buttons with text -->
     <template v-if="screenSize === 'desktop'">
-      <Button
+      <BaseButton
         icon="pi pi-eye"
         label="View"
         severity="info"
         text
         size="small"
+        :disabled="disabled || loadingStates.view"
+        :loading="loadingStates.view"
         @click="handleView"
         v-tooltip.top="'View Details'"
         class="action-btn view-btn"
-        :disabled="disabled"
+        :aria-label="`View details for ${itemLabel}`"
+        :button-state-options="{ successDuration: 1000 }"
+        ref="viewButtonRef"
       />
-      <Button
+      <BaseButton
         icon="pi pi-pencil"
         label="Edit"
         severity="warning"
         text
         size="small"
+        :disabled="disabled || loadingStates.edit"
+        :loading="loadingStates.edit"
         @click="handleEdit"
         v-tooltip.top="'Edit'"
         class="action-btn edit-btn"
-        :disabled="disabled"
+        :aria-label="`Edit ${itemLabel}`"
+        :button-state-options="{ successDuration: 1000 }"
+        ref="editButtonRef"
       />
-      <Button
+      <BaseButton
         icon="pi pi-trash"
         label="Delete"
         severity="danger"
         text
         size="small"
+        :disabled="disabled || loadingStates.delete"
+        :loading="loadingStates.delete"
         @click="handleDelete"
         v-tooltip.top="'Delete'"
         class="action-btn delete-btn"
-        :disabled="disabled"
+        :aria-label="`Delete ${itemLabel}`"
+        :button-state-options="{ successDuration: 1000, errorDuration: 3000 }"
+        ref="deleteButtonRef"
       />
     </template>
 
     <!-- Tablet: Icons only with tooltips -->
     <template v-else-if="screenSize === 'tablet'">
-      <Button
+      <BaseButton
         icon="pi pi-eye"
         severity="info"
         text
         rounded
         size="small"
+        :disabled="disabled || loadingStates.view"
+        :loading="loadingStates.view"
         @click="handleView"
         v-tooltip.top="'View Details'"
         class="action-btn view-btn icon-only"
-        :disabled="disabled"
+        :aria-label="`View details for ${itemLabel}`"
+        :button-state-options="{ successDuration: 1000 }"
+        ref="viewButtonRef"
       />
-      <Button
+      <BaseButton
         icon="pi pi-pencil"
         severity="warning"
         text
         rounded
         size="small"
+        :disabled="disabled || loadingStates.edit"
+        :loading="loadingStates.edit"
         @click="handleEdit"
         v-tooltip.top="'Edit'"
         class="action-btn edit-btn icon-only"
-        :disabled="disabled"
+        :aria-label="`Edit ${itemLabel}`"
+        :button-state-options="{ successDuration: 1000 }"
+        ref="editButtonRef"
       />
-      <Button
+      <BaseButton
         icon="pi pi-trash"
         severity="danger"
         text
         rounded
         size="small"
+        :disabled="disabled || loadingStates.delete"
+        :loading="loadingStates.delete"
         @click="handleDelete"
         v-tooltip.top="'Delete'"
         class="action-btn delete-btn icon-only"
-        :disabled="disabled"
+        :aria-label="`Delete ${itemLabel}`"
+        :button-state-options="{ successDuration: 1000, errorDuration: 3000 }"
+        ref="deleteButtonRef"
       />
     </template>
 
     <!-- Mobile: Dropdown menu -->
     <template v-else>
-      <Button
+      <BaseButton
         icon="pi pi-ellipsis-v"
         severity="secondary"
         text
         rounded
         :size="screenSize === 'mobile-xs' ? 'normal' : 'small'"
+        :disabled="disabled || isAnyActionLoading"
+        :loading="isAnyActionLoading"
         @click="toggleDropdown"
         v-tooltip.top="'Actions'"
         class="action-btn dropdown-trigger"
         :class="{ 'touch-friendly': screenSize === 'mobile-xs' }"
-        :disabled="disabled"
+        :touch-friendly="screenSize === 'mobile-xs'"
+        :aria-label="`Actions for ${itemLabel}`"
+        :aria-expanded="showDropdown"
+        :aria-haspopup="true"
         ref="dropdownTrigger"
       />
       
@@ -97,17 +126,43 @@
         :class="{ 'touch-friendly': screenSize === 'mobile-xs' }"
         ref="dropdownMenu"
         @click.stop
+        role="menu"
+        :aria-label="`Actions menu for ${itemLabel}`"
       >
-        <div class="dropdown-item" @click="handleView">
-          <i class="pi pi-eye"></i>
+        <div 
+          class="dropdown-item" 
+          @click="handleView"
+          :class="{ 'loading': loadingStates.view, 'disabled': disabled }"
+          role="menuitem"
+          tabindex="0"
+          @keydown="handleDropdownItemKeydown($event, 'view')"
+          :aria-label="`View details for ${itemLabel}`"
+        >
+          <i class="pi pi-eye" :class="{ 'pi-spin pi-spinner': loadingStates.view }"></i>
           <span>View Details</span>
         </div>
-        <div class="dropdown-item" @click="handleEdit">
-          <i class="pi pi-pencil"></i>
+        <div 
+          class="dropdown-item" 
+          @click="handleEdit"
+          :class="{ 'loading': loadingStates.edit, 'disabled': disabled }"
+          role="menuitem"
+          tabindex="0"
+          @keydown="handleDropdownItemKeydown($event, 'edit')"
+          :aria-label="`Edit ${itemLabel}`"
+        >
+          <i class="pi pi-pencil" :class="{ 'pi-spin pi-spinner': loadingStates.edit }"></i>
           <span>Edit</span>
         </div>
-        <div class="dropdown-item delete-item" @click="handleDelete">
-          <i class="pi pi-trash"></i>
+        <div 
+          class="dropdown-item delete-item" 
+          @click="handleDelete"
+          :class="{ 'loading': loadingStates.delete, 'disabled': disabled }"
+          role="menuitem"
+          tabindex="0"
+          @keydown="handleDropdownItemKeydown($event, 'delete')"
+          :aria-label="`Delete ${itemLabel}`"
+        >
+          <i class="pi pi-trash" :class="{ 'pi-spin pi-spinner': loadingStates.delete }"></i>
           <span>Delete</span>
         </div>
       </div>
@@ -116,19 +171,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick, reactive, watch } from 'vue'
+import BaseButton from './BaseButton.vue'
+import { useLoadingState } from '~/composables/useLoadingState'
+import { useAccessibility } from '~/composables/useAccessibility'
 
 // Props Interface
 interface QuickActionButtonsProps {
   item: Record<string, any>
   disabled?: boolean
   size?: 'small' | 'normal' | 'large'
+  asyncActions?: boolean
 }
 
 // Props
 const props = withDefaults(defineProps<QuickActionButtonsProps>(), {
   disabled: false,
-  size: 'small'
+  size: 'small',
+  asyncActions: false
 })
 
 // Emits
@@ -136,6 +196,9 @@ const emit = defineEmits<{
   view: [item: Record<string, any>]
   edit: [item: Record<string, any>]
   delete: [item: Record<string, any>]
+  actionStart: [action: 'view' | 'edit' | 'delete', item: Record<string, any>]
+  actionComplete: [action: 'view' | 'edit' | 'delete', item: Record<string, any>]
+  actionError: [action: 'view' | 'edit' | 'delete', error: Error, item: Record<string, any>]
 }>()
 
 // Reactive Data
@@ -144,46 +207,234 @@ const showDropdown = ref(false)
 const dropdownTrigger = ref<HTMLElement>()
 const dropdownMenu = ref<HTMLElement>()
 
+// Button refs for accessing BaseButton methods
+const viewButtonRef = ref<InstanceType<typeof BaseButton>>()
+const editButtonRef = ref<InstanceType<typeof BaseButton>>()
+const deleteButtonRef = ref<InstanceType<typeof BaseButton>>()
+
+// Loading state management
+const { setLoading, isLoading } = useLoadingState()
+const loadingStates = reactive({
+  view: false,
+  edit: false,
+  delete: false
+})
+
+// Accessibility management
+const { 
+  announceStateChange, 
+  handleKeyboardNavigation,
+  trapFocus,
+  restoreFocus,
+  prefersReducedMotion,
+  prefersHighContrast
+} = useAccessibility({
+  announceStateChanges: true,
+  respectReducedMotion: true,
+  enableKeyboardNavigation: true,
+  enableFocusManagement: true,
+  enableHighContrast: true
+})
+
 // Computed Properties
 const containerClasses = computed(() => [
   `screen-${screenSize.value}`,
   `size-${props.size}`,
   {
     'dropdown-open': showDropdown.value,
-    'disabled': props.disabled
+    'disabled': props.disabled,
+    'has-loading': isAnyActionLoading.value
   }
 ])
 
+const itemLabel = computed(() => {
+  // Try to get a meaningful label from the item
+  return props.item?.name || props.item?.title || props.item?.label || props.item?.id || 'item'
+})
+
+const isAnyActionLoading = computed(() => {
+  return loadingStates.view || loadingStates.edit || loadingStates.delete
+})
+
+// Watch for loading state changes and announce them to screen readers
+watch(() => loadingStates.view, (newLoading, oldLoading) => {
+  if (newLoading !== oldLoading && newLoading) {
+    announceStateChange('Loading', `View ${itemLabel.value}`)
+  }
+})
+
+watch(() => loadingStates.edit, (newLoading, oldLoading) => {
+  if (newLoading !== oldLoading && newLoading) {
+    announceStateChange('Loading', `Edit ${itemLabel.value}`)
+  }
+})
+
+watch(() => loadingStates.delete, (newLoading, oldLoading) => {
+  if (newLoading !== oldLoading && newLoading) {
+    announceStateChange('Loading', `Delete ${itemLabel.value}`)
+  }
+})
+
+// Watch for dropdown state changes and announce them
+watch(() => showDropdown.value, (newOpen, oldOpen) => {
+  if (newOpen !== oldOpen) {
+    const state = newOpen ? 'opened' : 'closed'
+    announceStateChange(`Actions menu ${state}`, itemLabel.value)
+  }
+})
+
 // Methods
-function handleView() {
-  if (props.disabled) return
+async function handleView() {
+  if (props.disabled || loadingStates.view) return
+  
   closeDropdown()
-  emit('view', props.item)
+  
+  if (props.asyncActions) {
+    await executeAction('view', async () => {
+      emit('view', props.item)
+    })
+  } else {
+    emit('view', props.item)
+  }
 }
 
-function handleEdit() {
-  if (props.disabled) return
+async function handleEdit() {
+  if (props.disabled || loadingStates.edit) return
+  
   closeDropdown()
-  emit('edit', props.item)
+  
+  if (props.asyncActions) {
+    await executeAction('edit', async () => {
+      emit('edit', props.item)
+    })
+  } else {
+    emit('edit', props.item)
+  }
 }
 
-function handleDelete() {
-  if (props.disabled) return
+async function handleDelete() {
+  if (props.disabled || loadingStates.delete) return
+  
   closeDropdown()
-  emit('delete', props.item)
+  
+  if (props.asyncActions) {
+    await executeAction('delete', async () => {
+      emit('delete', props.item)
+    })
+  } else {
+    emit('delete', props.item)
+  }
+}
+
+// Execute action with proper loading state management
+async function executeAction(action: 'view' | 'edit' | 'delete', actionFn: () => Promise<void>) {
+  const actionKey = `quickaction-${action}-${props.item?.id || Date.now()}`
+  
+  try {
+    // Set loading state
+    loadingStates[action] = true
+    setLoading(actionKey, true)
+    emit('actionStart', action, props.item)
+    
+    // Execute the action
+    await actionFn()
+    
+    // Emit completion event
+    emit('actionComplete', action, props.item)
+    
+  } catch (error) {
+    // Handle error
+    const actionError = error instanceof Error ? error : new Error('Unknown error occurred')
+    emit('actionError', action, actionError, props.item)
+    
+    // Re-throw to let BaseButton handle error state
+    throw actionError
+    
+  } finally {
+    // Clear loading state
+    loadingStates[action] = false
+    setLoading(actionKey, false)
+  }
+}
+
+// Handle keyboard navigation in dropdown items
+function handleDropdownItemKeydown(event: KeyboardEvent, action: 'view' | 'edit' | 'delete') {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault()
+    
+    switch (action) {
+      case 'view':
+        handleView()
+        break
+      case 'edit':
+        handleEdit()
+        break
+      case 'delete':
+        handleDelete()
+        break
+    }
+  } else if (event.key === 'Escape') {
+    closeDropdown()
+    // Focus back to trigger button
+    nextTick(() => {
+      const triggerButton = dropdownTrigger.value?.querySelector('button')
+      triggerButton?.focus()
+    })
+  } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+    event.preventDefault()
+    navigateDropdownItems(event.key === 'ArrowDown' ? 1 : -1)
+  }
+}
+
+// Navigate between dropdown items with arrow keys
+function navigateDropdownItems(direction: 1 | -1) {
+  if (!dropdownMenu.value) return
+  
+  const items = Array.from(dropdownMenu.value.querySelectorAll('.dropdown-item:not(.disabled)')) as HTMLElement[]
+  const currentIndex = items.findIndex(item => item === document.activeElement)
+  
+  let nextIndex = currentIndex + direction
+  
+  // Wrap around
+  if (nextIndex < 0) {
+    nextIndex = items.length - 1
+  } else if (nextIndex >= items.length) {
+    nextIndex = 0
+  }
+  
+  items[nextIndex]?.focus()
 }
 
 function toggleDropdown() {
-  if (props.disabled) return
+  if (props.disabled || isAnyActionLoading.value) return
+  
   showDropdown.value = !showDropdown.value
   
   if (showDropdown.value) {
     nextTick(() => {
       positionDropdown()
       document.addEventListener('click', handleClickOutside)
+      document.addEventListener('keydown', handleGlobalKeydown)
+      
+      // Focus first dropdown item for keyboard navigation
+      const firstItem = dropdownMenu.value?.querySelector('.dropdown-item:not(.disabled)') as HTMLElement
+      firstItem?.focus()
     })
   } else {
     document.removeEventListener('click', handleClickOutside)
+    document.removeEventListener('keydown', handleGlobalKeydown)
+  }
+}
+
+// Handle global keyboard events when dropdown is open
+function handleGlobalKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape') {
+    closeDropdown()
+    // Focus back to trigger button
+    nextTick(() => {
+      const triggerButton = dropdownTrigger.value?.querySelector('button')
+      triggerButton?.focus()
+    })
   }
 }
 
@@ -341,33 +592,50 @@ onUnmounted(() => {
   transition: all 0.1s ease;
 }
 
-/* Action Button Styles */
+/* Action Button Styles - Enhanced for BaseButton */
 .action-btn {
   @apply transition-all duration-200 ease-in-out;
 }
 
-.action-btn:hover:not(:disabled) {
-  @apply transform scale-105;
+/* BaseButton integration - these styles work with the BaseButton component */
+.action-btn :deep(.base-button) {
+  @apply w-full h-full;
 }
 
-.action-btn:active:not(:disabled) {
-  @apply transform scale-95;
+.action-btn.view-btn :deep(.base-button:hover:not(.base-button--disabled):not(.base-button--loading)) {
+  @apply bg-blue-50 text-blue-600 border-blue-200;
 }
 
-.action-btn.view-btn:hover:not(:disabled) {
-  @apply bg-blue-50 text-blue-600;
+.action-btn.edit-btn :deep(.base-button:hover:not(.base-button--disabled):not(.base-button--loading)) {
+  @apply bg-amber-50 text-amber-600 border-amber-200;
 }
 
-.action-btn.edit-btn:hover:not(:disabled) {
-  @apply bg-amber-50 text-amber-600;
+.action-btn.delete-btn :deep(.base-button:hover:not(.base-button--disabled):not(.base-button--loading)) {
+  @apply bg-red-50 text-red-600 border-red-200;
 }
 
-.action-btn.delete-btn:hover:not(:disabled) {
-  @apply bg-red-50 text-red-600;
+/* Loading state enhancements */
+.action-btn :deep(.base-button--loading) {
+  @apply cursor-wait;
 }
 
-/* Disabled State */
-.disabled .action-btn {
+.action-btn :deep(.base-button--loading .p-button-loading-icon) {
+  @apply animate-spin;
+}
+
+/* Success state feedback */
+.action-btn :deep(.base-button--success) {
+  @apply bg-green-50 text-green-600 border-green-200;
+}
+
+/* Error state feedback */
+.action-btn :deep(.base-button--error) {
+  @apply bg-red-50 text-red-600 border-red-200;
+}
+
+/* Disabled State - Enhanced for BaseButton */
+.disabled .action-btn :deep(.base-button),
+.has-loading .action-btn :deep(.base-button:not(.base-button--loading)) {
   @apply opacity-50 cursor-not-allowed;
 }
 
@@ -418,6 +686,23 @@ onUnmounted(() => {
   @apply bg-red-100;
 }
 
+/* Loading states for dropdown items */
+.dropdown-item.loading {
+  @apply opacity-75 cursor-wait;
+}
+
+.dropdown-item.loading i.pi-spin {
+  @apply animate-spin;
+}
+
+.dropdown-item.disabled {
+  @apply opacity-50 cursor-not-allowed pointer-events-none;
+}
+
+.dropdown-item.disabled:hover {
+  @apply bg-transparent;
+}
+
 /* Size Variants */
 .size-small .action-btn {
   @apply text-xs;
@@ -451,6 +736,61 @@ onUnmounted(() => {
 
 .dropdown-item:focus-visible {
   @apply outline-2 outline-offset-2 outline-blue-500 bg-gray-50;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .action-btn {
+    border: 2px solid;
+  }
+  
+  .action-btn:focus-visible {
+    outline-width: 3px;
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .dropdown-menu {
+    border: 2px solid;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  }
+  
+  .dropdown-item {
+    border: 1px solid transparent;
+  }
+  
+  .dropdown-item:focus-visible {
+    border-color: currentColor;
+    outline-width: 3px;
+  }
+  
+  .dropdown-item.delete-item {
+    border-top: 2px solid;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .action-btn {
+    transition: none;
+  }
+  
+  .dropdown-trigger:active,
+  .dropdown-item:active {
+    transform: none;
+    transition: none;
+  }
+  
+  .dropdown-menu {
+    animation: none;
+  }
+  
+  .dropdown-appear {
+    animation: none;
+  }
+  
+  .animate-in {
+    animation: none;
+  }
 }
 
 /* Animation Classes */
