@@ -1,7 +1,7 @@
 <template>
     <div class="inputfield">
-        <label class="label" :for="props.Name" >{{ props.Name }}<span v-show="props.Name && required">*</span></label>
-        <Input :id="props.Name" :type="type" :placeholder="props.placeholder" v-model="modelValue" :disabled="props.disabled" :required="required"
+        <label class="label" :for="props.label" >{{ props.label }}<span v-show="props.label && required">*</span></label>
+        <Input :id="props.label" :type="type" :placeholder="props.placeholder" v-model="modelValue" :disabled="props.disabled" :required="required"
                :class="{ disabled: props.disabled, 'mr-auto': true, 'w-full': true }"
                :ui="{
             color: { white: { outline: 'bg-neutral-100 dark:bg-neutral-800'}},

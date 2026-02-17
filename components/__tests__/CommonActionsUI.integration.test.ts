@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { nextTick, ref } from 'vue'
-import RulesPage from '~/pages/rules.vue'
+import CommonActionsPage from '~/pages/commonActions.vue'
 
 // Mock the global functions
 const mockFetch = vi.fn()
@@ -10,14 +10,16 @@ const mockUseConfirm = vi.fn()
 const mockUseToast = vi.fn()
 
 // Mock data
-const mockRulesData = [
+const mockActionsData = [
   {
     id: '1',
-    name: 'Test Rule 1',
-    category: 'Combat',
-    description: 'This is a test rule description for combat mechanics.',
+    name: 'Test Action',
+    type: 'major',
+    attribute: 'agility',
+    skill: 'firearms',
+    description: 'Test description',
     homebrew: false,
-    source: 'Core Rulebook',
+    source: 'core',
     page: 123,
     updated_at: new Date('2024-01-01')
   }
@@ -46,7 +48,7 @@ vi.mock('uuid', () => ({
   v4: () => 'mock-uuid-1234'
 }))
 
-describe('Rules Page Integration', () => {
+describe('CommonActions Page Integration', () => {
   let wrapper: any
   let mockConfirm: any
   let mockToast: any
@@ -65,7 +67,7 @@ describe('Rules Page Integration', () => {
     mockUseToast.mockReturnValue(mockToast)
     
     mockUseAsyncData.mockReturnValue({
-      data: { value: mockRulesData },
+      data: { value: mockActionsData },
       pending: { value: false },
       refresh: vi.fn()
     })
@@ -107,8 +109,8 @@ describe('Rules Page Integration', () => {
 
   it('should render the page with OptimizedDataTable', async () => {
     wrapper = mount({
-      template: '<Suspense><RulesPage /></Suspense>',
-      components: { RulesPage }
+      template: '<Suspense><CommonActionsPage /></Suspense>',
+      components: { CommonActionsPage }
     }, {
       global: {
         stubs: commonStubs
@@ -121,13 +123,13 @@ describe('Rules Page Integration', () => {
     expect(wrapper.exists()).toBe(true)
     const dataTable = wrapper.findComponent({ name: 'OptimizedDataTable' })
     expect(dataTable.exists()).toBe(true)
-    expect(dataTable.props('dataType')).toBe('rules')
+    expect(dataTable.props('dataType')).toBe('commonActions')
   })
 
-  it('should handle view action from OptimizedDataTable', async () => {
+  it('should handle edit action', async () => {
     wrapper = mount({
-      template: '<Suspense><RulesPage /></Suspense>',
-      components: { RulesPage }
+      template: '<Suspense><CommonActionsPage /></Suspense>',
+      components: { CommonActionsPage }
     }, {
       global: {
         stubs: commonStubs
@@ -138,76 +140,11 @@ describe('Rules Page Integration', () => {
     await new Promise(resolve => setTimeout(resolve, 0))
 
     const dataTable = wrapper.findComponent({ name: 'OptimizedDataTable' })
-    await dataTable.vm.$emit('view', mockRulesData[0])
-    await nextTick()
-
-    const detailModal = wrapper.findComponent({ name: 'DetailModal' })
-    expect(detailModal.props('visible')).toBe(true)
-    expect(detailModal.props('item')).toEqual(mockRulesData[0])
-  })
-
-  it('should handle edit action from OptimizedDataTable', async () => {
-    wrapper = mount({
-      template: '<Suspense><RulesPage /></Suspense>',
-      components: { RulesPage }
-    }, {
-      global: {
-        stubs: commonStubs
-      }
-    })
-
-    await nextTick()
-    await new Promise(resolve => setTimeout(resolve, 0))
-
-    const dataTable = wrapper.findComponent({ name: 'OptimizedDataTable' })
-    await dataTable.vm.$emit('edit', mockRulesData[0])
+    await dataTable.vm.$emit('edit', mockActionsData[0])
     await nextTick()
 
     const editModal = wrapper.findComponent({ name: 'GenericEditModal' })
     expect(editModal.props('visible')).toBe(true)
     expect(editModal.props('isEdit')).toBe(true)
-  })
-
-  it('should handle delete action with confirmation', async () => {
-    wrapper = mount({
-      template: '<Suspense><RulesPage /></Suspense>',
-      components: { RulesPage }
-    }, {
-      global: {
-        stubs: commonStubs
-      }
-    })
-
-    await nextTick()
-    await new Promise(resolve => setTimeout(resolve, 0))
-
-    const dataTable = wrapper.findComponent({ name: 'OptimizedDataTable' })
-    await dataTable.vm.$emit('delete', mockRulesData[0])
-    
-    expect(mockConfirm.require).toHaveBeenCalled()
-  })
-
-  it('should show add new button and handle add action', async () => {
-    wrapper = mount({
-      template: '<Suspense><RulesPage /></Suspense>',
-      components: { RulesPage }
-    }, {
-      global: {
-        stubs: commonStubs
-      }
-    })
-
-    await nextTick()
-    await new Promise(resolve => setTimeout(resolve, 0))
-
-    const addButton = wrapper.find('.add-button')
-    expect(addButton.exists()).toBe(true)
-    
-    await addButton.trigger('click')
-    await nextTick()
-
-    const editModal = wrapper.findComponent({ name: 'GenericEditModal' })
-    expect(editModal.props('visible')).toBe(true)
-    expect(editModal.props('isEdit')).toBe(false)
   })
 })

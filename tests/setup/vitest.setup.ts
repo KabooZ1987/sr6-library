@@ -43,15 +43,65 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
 }))
 
 // Mock process.client and NODE_ENV
-Object.defineProperty(global, 'process', {
-  value: {
-    client: true,
-    server: false,
-    env: {
-      NODE_ENV: 'test'
+if (typeof process !== 'undefined') {
+  (process as any).client = true;
+  (process as any).server = false;
+} else {
+  Object.defineProperty(global, 'process', {
+    value: {
+      client: true,
+      server: false,
+      env: {
+        NODE_ENV: 'test'
+      }
     }
+  })
+}
+
+// Mock common Nuxt composables
+const mockUseAsyncData = vi.fn().mockImplementation(() => {
+  return Promise.resolve({
+    data: { value: [] },
+    pending: { value: false },
+    refresh: vi.fn()
+  });
+});
+const mockFetch = vi.fn().mockResolvedValue([]);
+const mockUseHead = vi.fn();
+const mockUseRuntimeConfig = vi.fn(() => ({ public: {} }));
+
+// Define on multiple possible global objects
+[global, globalThis, window].forEach((obj: any) => {
+  try {
+    Object.defineProperty(obj, 'useAsyncData', {
+      value: mockUseAsyncData,
+      writable: true,
+      configurable: true
+    });
+    Object.defineProperty(obj, '$fetch', {
+      value: mockFetch,
+      writable: true,
+      configurable: true
+    });
+    Object.defineProperty(obj, 'useHead', {
+      value: mockUseHead,
+      writable: true,
+      configurable: true
+    });
+    Object.defineProperty(obj, 'useRuntimeConfig', {
+      value: mockUseRuntimeConfig,
+      writable: true,
+      configurable: true
+    });
+  } catch (e) {
+    // Ignore if already defined and not configurable
   }
-})
+});
+
+vi.stubGlobal('useAsyncData', mockUseAsyncData);
+vi.stubGlobal('$fetch', mockFetch);
+vi.stubGlobal('useHead', mockUseHead);
+vi.stubGlobal('useRuntimeConfig', mockUseRuntimeConfig);
 
 // Mock Element.focus and blur methods
 Element.prototype.focus = vi.fn()

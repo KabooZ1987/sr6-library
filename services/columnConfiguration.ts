@@ -168,9 +168,9 @@ export class ColumnConfigurationService {
           title: 'Basic Information',
           fields: [
             { key: 'name', label: 'Name', type: 'text' },
-            { key: 'type', label: 'Action Type', type: 'text' },
-            { key: 'attribute', label: 'Attribute', type: 'text' },
-            { key: 'skill', label: 'Skill', type: 'text' }
+            { key: 'type', label: 'Action Type', type: 'select' },
+            { key: 'attribute', label: 'Attribute', type: 'select' },
+            { key: 'skill', label: 'Skill', type: 'select' }
           ]
         },
         {
@@ -223,18 +223,6 @@ export class ColumnConfigurationService {
           searchable: true,
           priority: 3,
           minWidth: '120px'
-        },
-        {
-          field: 'description_preview',
-          header: 'Description',
-          sortable: false,
-          searchable: true,
-          priority: 4,
-          minWidth: '200px',
-          formatter: (value: any, row: any) => {
-            const desc = row.description || '';
-            return desc.length > 100 ? desc.substring(0, 100) + '...' : desc;
-          }
         }
       ],
       searchableFields: ['name', 'description', 'restriction', 'source'],
@@ -291,18 +279,6 @@ export class ColumnConfigurationService {
           formatter: (value: any) => value ? `${value}` : 'N/A'
         },
         {
-          field: 'effect_summary',
-          header: 'Effect',
-          sortable: false,
-          searchable: true,
-          priority: 3,
-          minWidth: '200px',
-          formatter: (value: any, row: any) => {
-            const desc = row.description || '';
-            return desc.length > 80 ? desc.substring(0, 80) + '...' : desc;
-          }
-        },
-        {
           field: 'source',
           header: 'Source',
           sortable: true,
@@ -330,7 +306,7 @@ export class ColumnConfigurationService {
         {
           title: 'Source Information',
           fields: [
-            { key: 'source', label: 'Source', type: 'text' },
+            { key: 'source', label: 'Source', type: 'select' },
             { key: 'page', label: 'Page', type: 'number' },
             { key: 'updated_at', label: 'Last Updated', type: 'date' }
           ]
@@ -390,7 +366,7 @@ export class ColumnConfigurationService {
           title: 'Basic Information',
           fields: [
             { key: 'name', label: 'Name', type: 'text' },
-            { key: 'category', label: 'Category', type: 'text' }
+            { key: 'category', label: 'Rule Category', type: 'select' }
           ]
         },
         {
@@ -403,7 +379,7 @@ export class ColumnConfigurationService {
           title: 'Meta Information',
           fields: [
             { key: 'homebrew', label: 'Homebrew', type: 'boolean' },
-            { key: 'source', label: 'Source', type: 'text' },
+            { key: 'source', label: 'Source', type: 'select' },
             { key: 'page', label: 'Page', type: 'number' },
             { key: 'updated_at', label: 'Last Updated', type: 'date' }
           ]
@@ -436,18 +412,6 @@ export class ColumnConfigurationService {
           width: '120px'
         },
         {
-          field: 'description_preview',
-          header: 'Description',
-          sortable: false,
-          searchable: true,
-          priority: 3,
-          minWidth: '200px',
-          formatter: (value: any, row: any) => {
-            const desc = row.description || '';
-            return desc.length > 100 ? desc.substring(0, 100) + '...' : desc;
-          }
-        },
-        {
           field: 'updated_at',
           header: 'Last Updated',
           sortable: true,
@@ -468,7 +432,7 @@ export class ColumnConfigurationService {
           title: 'Basic Information',
           fields: [
             { key: 'name', label: 'Name', type: 'text' },
-            { key: 'category', label: 'Category', type: 'text' }
+            { key: 'category', label: 'Category', type: 'select' }
           ]
         },
         {

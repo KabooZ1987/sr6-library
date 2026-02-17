@@ -1,9 +1,9 @@
 <template>
   <div>
-    <Textarea v-on="modelValue" rows="4" />
-    <div class="mt-2 p-2 border rounded bg-gray-50">
-      <div class="text-sm font-semibold">Preview</div>
-      <div v-html="renderMarkdown(modelValue)" />
+    <Textarea v-model="modelValue" rows="4" class="w-full" />
+    <div class="mt-2 p-2 border rounded bg-gray-50 dark:bg-neutral-800 dark:border-gray-600">
+      <div class="text-sm font-semibold mb-1">Preview</div>
+      <div class="prose dark:prose-invert max-w-none" v-html="renderMarkdown(modelValue)" />
     </div>
   </div>
 </template>
@@ -12,8 +12,7 @@
 import { computed } from 'vue';
 import { marked } from 'marked';
 
-const props = defineProps(['modelValue']);
-const emit = defineEmits(['update:modelValue']);
+const modelValue = defineModel();
 
 function renderMarkdown(text) {
   return marked.parse(text || '');
