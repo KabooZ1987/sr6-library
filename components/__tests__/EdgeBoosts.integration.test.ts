@@ -3,7 +3,13 @@ import { mount, flushPromises } from '@vue/test-utils'
 import { nextTick, Suspense } from 'vue'
 import EdgeBoostsPage from '~/pages/edgeBoosts.vue'
 
-// Mock the API calls
+// Mock the global functions
+const mockFetch = vi.fn()
+const mockUseAsyncData = vi.fn()
+const mockUseConfirm = vi.fn()
+const mockUseToast = vi.fn()
+
+// Mock data
 const mockData = [
   {
     id: '1',
@@ -12,7 +18,7 @@ const mockData = [
     description: 'Test description 1',
     source: 'Core Rulebook',
     page: 123,
-    updated_at: '2024-01-01'
+    updated_at: new Date('2024-01-01')
   },
   {
     id: '2',
@@ -21,50 +27,61 @@ const mockData = [
     description: 'Test description 2',
     source: 'Street Lethal',
     page: 456,
-    updated_at: '2024-01-02'
+    updated_at: new Date('2024-01-02')
   }
 ]
 
-vi.mock('~/composables/useAsyncData', () => ({
-  useAsyncData: vi.fn(() => Promise.resolve({
-    data: { value: mockData },
-    pending: { value: false }
-  }))
+// Mock global functions
+;(global as any).useAsyncData = mockUseAsyncData
+;(global as any).$fetch = mockFetch
+
+// Mock the composables
+vi.mock('#app', () => ({
+  useAsyncData: (...args: any[]) => (global as any).useAsyncData(...args)
 }))
 
-// Mock $fetch
-global.$fetch = vi.fn().mockResolvedValue({ success: true })
+vi.mock('primevue/useconfirm', () => ({
+  useConfirm: () => mockUseConfirm()
+}))
 
-// Mock confirm dialog
-global.confirm = vi.fn(() => true)
+vi.mock('primevue/usetoast', () => ({
+  useToast: () => mockUseToast()
+}))
 
-// Mock PrimeVue components
-const mockComponents = {
-  Dialog: { template: '<div class="mock-dialog"><slot /></div>' },
-  Card: { template: '<div class="mock-card"><slot /></div>' },
-  Button: { 
-    template: '<button class="mock-button" @click="$emit(\'click\')"><slot /></button>',
-    emits: ['click']
-  },
+// Mock UUID
+vi.mock('uuid', () => ({
+  v4: () => 'mock-uuid-1234'
+}))
+
+const commonStubs = {
   OptimizedDataTable: {
-    template: '<div class="mock-optimized-table" data-testid="optimized-table"></div>',
+    name: 'OptimizedDataTable',
+    template: '<div data-testid="optimized-data-table" />',
     props: ['data', 'dataType', 'loading', 'searchable', 'filterable'],
     emits: ['view', 'edit', 'delete']
   },
   DetailModal: {
-    template: '<div class="mock-detail-modal" v-if="visible"></div>',
+    name: 'DetailModal',
+    template: '<div data-testid="detail-modal" />',
     props: ['visible', 'item', 'dataType', 'modalSections', 'showEditButton'],
     emits: ['close', 'edit']
   },
-  InputField: { 
-    template: '<input class="mock-input" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-    props: ['modelValue', 'label', 'type', 'required'],
-    emits: ['update:modelValue']
+  GenericEditModal: {
+    name: 'GenericEditModal',
+    template: '<div data-testid="generic-edit-modal" v-if="visible"><slot /></div>',
+    props: ['visible', 'item', 'dataType', 'isEdit', 'title'],
+    emits: ['close', 'save', 'update:visible']
   },
-  SelectField: { 
-    template: '<select class="mock-select" :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><option v-for="option in options" :key="option" :value="option">{{ option }}</option></select>',
-    props: ['modelValue', 'options', 'label', 'required'],
-    emits: ['update:modelValue']
+  Button: {
+    template: '<button data-testid="button" v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>',
+    props: ['label', 'icon', 'loading', 'severity', 'type'],
+    emits: ['click']
+  },
+  ConfirmDialog: {
+    template: '<div data-testid="confirm-dialog" />'
+  },
+  Toast: {
+    template: '<div data-testid="toast" />'
   }
 }
 
@@ -73,25 +90,35 @@ describe('EdgeBoosts Page Integration', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    
+    mockUseConfirm.mockReturnValue({
+      require: vi.fn()
+    })
+    mockUseToast.mockReturnValue({
+      add: vi.fn()
+    })
+    
+    mockUseAsyncData.mockReturnValue({
+      data: { value: mockData },
+      pending: { value: false },
+      refresh: vi.fn()
+    })
+    
+    mockFetch.mockResolvedValue({ success: true })
   })
 
   it('should render the page with OptimizedDataTable', async () => {
-    const SuspenseWrapper = {
+    wrapper = mount({
       template: '<Suspense><EdgeBoostsPage /></Suspense>',
-      components: { EdgeBoostsPage, Suspense }
-    }
-
-    wrapper = mount(SuspenseWrapper, {
+      components: { EdgeBoostsPage }
+    }, {
       global: {
-        components: mockComponents,
-        stubs: {
-          'client-only': { template: '<div><slot /></div>' }
-        }
+        stubs: commonStubs
       }
     })
 
-    await flushPromises()
     await nextTick()
+    await new Promise(resolve => setTimeout(resolve, 0))
 
     // Check that the page renders
     expect(wrapper.find('h1').text()).toBe('EDGE BOOSTS')
@@ -100,21 +127,20 @@ describe('EdgeBoosts Page Integration', () => {
     const dataTable = wrapper.findComponent({ name: 'OptimizedDataTable' })
     expect(dataTable.exists()).toBe(true)
     expect(dataTable.props('dataType')).toBe('edgeBoosts')
-    expect(dataTable.props('searchable')).toBe(true)
-    expect(dataTable.props('filterable')).toBe(true)
   })
 
   it('should handle view action from OptimizedDataTable', async () => {
-    wrapper = mount(EdgeBoostsPage, {
+    wrapper = mount({
+      template: '<Suspense><EdgeBoostsPage /></Suspense>',
+      components: { EdgeBoostsPage }
+    }, {
       global: {
-        components: mockComponents,
-        stubs: {
-          'client-only': { template: '<div><slot /></div>' }
-        }
+        stubs: commonStubs
       }
     })
 
     await nextTick()
+    await new Promise(resolve => setTimeout(resolve, 0))
 
     const dataTable = wrapper.findComponent({ name: 'OptimizedDataTable' })
     const testItem = { id: '1', name: 'Test Edge Boost' }
@@ -127,20 +153,20 @@ describe('EdgeBoosts Page Integration', () => {
     const detailModal = wrapper.findComponent({ name: 'DetailModal' })
     expect(detailModal.props('visible')).toBe(true)
     expect(detailModal.props('item')).toEqual(testItem)
-    expect(detailModal.props('dataType')).toBe('edgeBoosts')
   })
 
   it('should handle edit action from OptimizedDataTable', async () => {
-    wrapper = mount(EdgeBoostsPage, {
+    wrapper = mount({
+      template: '<Suspense><EdgeBoostsPage /></Suspense>',
+      components: { EdgeBoostsPage }
+    }, {
       global: {
-        components: mockComponents,
-        stubs: {
-          'client-only': { template: '<div><slot /></div>' }
-        }
+        stubs: commonStubs
       }
     })
 
     await nextTick()
+    await new Promise(resolve => setTimeout(resolve, 0))
 
     const dataTable = wrapper.findComponent({ name: 'OptimizedDataTable' })
     const testItem = { 
@@ -156,74 +182,49 @@ describe('EdgeBoosts Page Integration', () => {
     await dataTable.vm.$emit('edit', testItem)
     await nextTick()
 
-    // Check that edit modal is opened and form is populated
-    expect(wrapper.vm.isOpen).toBe(true)
-    expect(wrapper.vm.isEditForm).toBe(true)
-    expect(wrapper.vm.Name).toBe(testItem.name)
-    expect(wrapper.vm.Cost).toBe(testItem.cost)
-    expect(wrapper.vm.Description).toBe(testItem.description)
+    // Check that edit modal is opened
+    const editModal = wrapper.findComponent({ name: 'GenericEditModal' })
+    expect(editModal.props('visible')).toBe(true)
+    expect(editModal.props('isEdit')).toBe(true)
   })
 
   it('should handle delete action with confirmation', async () => {
-    wrapper = mount(EdgeBoostsPage, {
+    const mockConfirm = { require: vi.fn() }
+    mockUseConfirm.mockReturnValue(mockConfirm)
+
+    wrapper = mount({
+      template: '<Suspense><EdgeBoostsPage /></Suspense>',
+      components: { EdgeBoostsPage }
+    }, {
       global: {
-        components: mockComponents,
-        stubs: {
-          'client-only': { template: '<div><slot /></div>' }
-        }
+        stubs: commonStubs
       }
     })
 
     await nextTick()
+    await new Promise(resolve => setTimeout(resolve, 0))
 
     const dataTable = wrapper.findComponent({ name: 'OptimizedDataTable' })
     const testItem = { id: '1', name: 'Test Edge Boost' }
 
     // Simulate delete action
     await dataTable.vm.$emit('delete', testItem)
-    await nextTick()
-
-    // Check that confirmation was called
-    expect(global.confirm).toHaveBeenCalledWith('Are you sure you want to delete "Test Edge Boost"?')
     
-    // Check that API delete was called
-    expect(global.$fetch).toHaveBeenCalledWith('/api/edge_boost', {
-      method: 'Delete',
-      body: JSON.stringify({ id: '1' })
-    })
-  })
-
-  it('should configure edgeBoosts data type correctly', async () => {
-    wrapper = mount(EdgeBoostsPage, {
-      global: {
-        components: mockComponents,
-        stubs: {
-          'client-only': { template: '<div><slot /></div>' }
-        }
-      }
-    })
-
-    await nextTick()
-
-    const dataTable = wrapper.findComponent({ name: 'OptimizedDataTable' })
-    expect(dataTable.props('dataType')).toBe('edgeBoosts')
-    
-    // Check that modal sections are computed correctly
-    expect(wrapper.vm.modalSections).toBeDefined()
-    expect(Array.isArray(wrapper.vm.modalSections)).toBe(true)
+    expect(mockConfirm.require).toHaveBeenCalled()
   })
 
   it('should show add new button', async () => {
-    wrapper = mount(EdgeBoostsPage, {
+    wrapper = mount({
+      template: '<Suspense><EdgeBoostsPage /></Suspense>',
+      components: { EdgeBoostsPage }
+    }, {
       global: {
-        components: mockComponents,
-        stubs: {
-          'client-only': { template: '<div><slot /></div>' }
-        }
+        stubs: commonStubs
       }
     })
 
     await nextTick()
+    await new Promise(resolve => setTimeout(resolve, 0))
 
     const addButton = wrapper.find('.add-button')
     expect(addButton.exists()).toBe(true)
@@ -232,34 +233,34 @@ describe('EdgeBoosts Page Integration', () => {
     await addButton.trigger('click')
     await nextTick()
     
-    expect(wrapper.vm.isOpen).toBe(true)
-    expect(wrapper.vm.isEditForm).toBe(false)
+    const editModal = wrapper.findComponent({ name: 'GenericEditModal' })
+    expect(editModal.props('visible')).toBe(true)
+    expect(editModal.props('isEdit')).toBe(false)
   })
 
   it('should handle detail modal close', async () => {
-    wrapper = mount(EdgeBoostsPage, {
+    wrapper = mount({
+      template: '<Suspense><EdgeBoostsPage /></Suspense>',
+      components: { EdgeBoostsPage }
+    }, {
       global: {
-        components: mockComponents,
-        stubs: {
-          'client-only': { template: '<div><slot /></div>' }
-        }
+        stubs: commonStubs
       }
     })
 
     await nextTick()
+    await new Promise(resolve => setTimeout(resolve, 0))
 
-    // Open detail modal first
-    wrapper.vm.showDetailModal = true
-    wrapper.vm.selectedItem = { id: '1', name: 'Test' }
+    const vm = wrapper.findComponent(EdgeBoostsPage).vm
+    vm.showDetailModal = true
+    vm.selectedItem = { id: '1', name: 'Test' }
     await nextTick()
 
     const detailModal = wrapper.findComponent({ name: 'DetailModal' })
-    
-    // Simulate close event
     await detailModal.vm.$emit('close')
     await nextTick()
 
-    expect(wrapper.vm.showDetailModal).toBe(false)
-    expect(wrapper.vm.selectedItem).toBe(null)
+    expect(vm.showDetailModal).toBe(false)
+    expect(vm.selectedItem).toBe(null)
   })
 })

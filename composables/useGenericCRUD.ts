@@ -1,11 +1,11 @@
 import { ref } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
-import { useAsyncData, $fetch } from '#app'
-import { useToast } from 'primevue/usetoast'
+import { useAsyncData } from '#app'
+import { useToastService } from '~/services/toastService'
 import { useConfirm } from 'primevue/useconfirm'
 
 export function useGenericCRUD(entityName: string, apiUrl: string) {
-  const toast = useToast()
+  const toastService = useToastService()
   const confirm = useConfirm()
 
   const reloadTrigger = ref(0)
@@ -57,21 +57,11 @@ export function useGenericCRUD(entityName: string, apiUrl: string) {
             method: 'DELETE',
             body: JSON.stringify({ id: item.id }),
           })
-          toast.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: `${entityName} deleted successfully`,
-            life: 3000
-          })
+          toastService.success('Success', `${entityName} deleted successfully`)
           reloadTrigger.value += 1
         } catch (error) {
           console.error(`Error deleting ${entityName}:`, error)
-          toast.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: `Failed to delete ${entityName}`,
-            life: 3000
-          })
+          toastService.error('Error', `Failed to delete ${entityName}`)
         }
       }
     })
@@ -80,7 +70,7 @@ export function useGenericCRUD(entityName: string, apiUrl: string) {
   async function saveItem(payload: any) {
     // Basic validation
     if (!payload.name?.trim()) {
-      toast.add({ severity: 'warn', summary: 'Validation Error', detail: 'Name is required' })
+      toastService.warn('Validation Error', 'Name is required')
       return
     }
 
@@ -96,22 +86,12 @@ export function useGenericCRUD(entityName: string, apiUrl: string) {
         body: JSON.stringify({ upsert: payload }),
       })
 
-      toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: `${entityName} saved successfully`,
-        life: 3000
-      })
+      toastService.success('Success', `${entityName} saved successfully`)
       closeModal()
       reloadTrigger.value += 1
     } catch (error) {
       console.error(`Error saving ${entityName}:`, error)
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: `Failed to save ${entityName}`,
-        life: 3000
-      })
+      toastService.error('Error', `Failed to save ${entityName}`)
     } finally {
       saving.value = false
     }

@@ -1,26 +1,28 @@
 <template>
-  <component
-    :is="linkComponent"
-    :to="internalTo"
-    :href="externalHref"
-    :target="linkTarget"
-    :rel="linkRel"
-    :class="linkClasses"
-    :aria-label="ariaLabel"
-    :tabindex="tabindex"
+  <a
+    v-if="url"
+    v-bind="componentProps"
+    :href="hrefValue"
     @click="handleClick"
     @keydown="handleKeydown"
   >
     <slot />
-  </component>
+  </a>
+  <span
+    v-else
+    v-bind="componentProps"
+  >
+    <slot />
+  </span>
 </template>
 
 <script setup lang="ts">
-import { computed, resolveComponent } from 'vue'
+import { computed } from 'vue'
+import { useRouter, useRequestURL } from '#imports'
 import { useAccessibility } from '~/composables/useAccessibility'
 
 interface Props {
-  to?: string
+  to?: string | object
   href?: string
   target?: '_blank' | '_self' | '_parent' | '_top'
   rel?: string
@@ -30,6 +32,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  to: undefined,
+  href: undefined,
   target: undefined,
   rel: undefined,
   class: undefined,
@@ -42,12 +46,12 @@ const emit = defineEmits<{
   error: [error: Error]
 }>()
 
+const router = useRouter()
+
 // Accessibility management
 const { 
   handleKeyboardNavigation,
-  generateAriaLabel,
-  prefersHighContrast,
-  announceToScreenReader
+  prefersHighContrast
 } = useAccessibility({
   announceStateChanges: true,
   enableKeyboardNavigation: true,
@@ -57,44 +61,48 @@ const {
 // Determine the URL to use (props.to takes precedence over props.href)
 const url = computed(() => props.to || props.href || '')
 
-// Check if URL is internal (starts with / or is relative)
+// Check if URL is internal
 const isInternal = computed(() => {
   if (!url.value) return false
   
+  // If it's an object, it's a Vue Router location, so it's internal
+  if (typeof url.value === 'object') return true
+  
+  const urlString = String(url.value)
+  
   try {
     // Handle relative paths and absolute internal paths
-    if (url.value.startsWith('/') || url.value.startsWith('./') || url.value.startsWith('../')) {
+    if (urlString.startsWith('/') || urlString.startsWith('./') || urlString.startsWith('../')) {
       return true
     }
     
     // Handle hash links (same page navigation)
-    if (url.value.startsWith('#')) {
+    if (urlString.startsWith('#')) {
       return false // Use anchor tag for hash links
     }
     
-    // Check if it's an external URL
-    const urlObj = new URL(url.value, window.location.origin)
-    return urlObj.origin === window.location.origin
+    // Get current origin safely
+    let currentOrigin = ''
+    try {
+      if (typeof window !== 'undefined' && window.location) {
+        currentOrigin = window.location.origin
+      } else {
+        currentOrigin = useRequestURL().origin
+      }
+    } catch {
+      // Fallback if useRequestURL fails
+    }
+    
+    if (currentOrigin) {
+      const urlObj = new URL(urlString, currentOrigin)
+      return urlObj.origin === currentOrigin
+    }
+    
+    // Fallback: Check if it looks like an external URL
+    return !urlString.includes('://') && !urlString.startsWith('mailto:') && !urlString.startsWith('tel:')
   } catch {
-    // If URL parsing fails, treat as internal if it doesn't look like external URL
-    return !url.value.includes('://') && !url.value.startsWith('mailto:') && !url.value.startsWith('tel:')
+    return !urlString.includes('://') && !urlString.startsWith('mailto:') && !urlString.startsWith('tel:')
   }
-})
-
-// Determine which component to use
-const linkComponent = computed(() => {
-  if (!url.value) return 'span'
-  return isInternal.value ? resolveComponent('NuxtLink') : 'a'
-})
-
-// Props for internal links (NuxtLink)
-const internalTo = computed(() => {
-  return isInternal.value ? url.value : undefined
-})
-
-// Props for external links (anchor tag)
-const externalHref = computed(() => {
-  return !isInternal.value ? url.value : undefined
 })
 
 // Determine target attribute
@@ -102,7 +110,7 @@ const linkTarget = computed(() => {
   if (props.target) return props.target
   
   // Auto-set target="_blank" for external links
-  if (!isInternal.value && url.value && !url.value.startsWith('#')) {
+  if (!isInternal.value && url.value && typeof url.value === 'string' && !url.value.startsWith('#')) {
     return '_blank'
   }
   
@@ -123,7 +131,7 @@ const linkRel = computed(() => {
 
 // Handle CSS classes
 const linkClasses = computed(() => {
-  const classes = []
+  const classes: string[] = []
   
   if (props.class) {
     if (typeof props.class === 'string') {
@@ -131,43 +139,57 @@ const linkClasses = computed(() => {
     } else if (Array.isArray(props.class)) {
       classes.push(...props.class)
     } else {
-      // Handle object format { 'class-name': boolean }
       Object.entries(props.class).forEach(([className, condition]) => {
         if (condition) classes.push(className)
       })
     }
   }
   
-  // Add accessibility-related classes
-  if (props.disabled) {
-    classes.push('app-link--disabled')
-  }
-  
-  if (prefersHighContrast()) {
-    classes.push('app-link--high-contrast')
-  }
-  
-  if (!isInternal.value) {
-    classes.push('app-link--external')
-  }
+  if (props.disabled) classes.push('app-link--disabled')
+  if (prefersHighContrast()) classes.push('app-link--high-contrast')
+  if (!isInternal.value && url.value) classes.push('app-link--external')
   
   return classes.join(' ')
 })
 
 // Accessibility attributes
-const ariaLabel = computed(() => {
+const ariaLabelValue = computed(() => {
   if (props.ariaLabel) return props.ariaLabel
-  
-  // Auto-generate aria-label for external links
-  if (!isInternal.value && linkTarget.value === '_blank') {
-    return 'Opens in new tab'
-  }
-  
+  if (!isInternal.value && linkTarget.value === '_blank') return 'Opens in new tab'
   return undefined
 })
 
-const tabindex = computed(() => {
-  return props.disabled ? -1 : 0
+const tabindex = computed(() => props.disabled ? -1 : 0)
+
+// Href value logic
+const hrefValue = computed(() => {
+  if (!url.value) return undefined
+  if (typeof url.value === 'string') return url.value
+  
+  try {
+    return router.resolve(url.value).href
+  } catch {
+    return '#'
+  }
+})
+
+// Component props logic
+const componentProps = computed(() => {
+  const p: Record<string, any> = {
+    class: linkClasses.value,
+    'aria-label': ariaLabelValue.value,
+    tabindex: tabindex.value
+  }
+
+  if (!url.value) {
+    p.role = 'link'
+    p['aria-disabled'] = 'true'
+  } else {
+    p.target = linkTarget.value
+    p.rel = linkRel.value
+  }
+
+  return p
 })
 
 // Click handler
@@ -177,20 +199,43 @@ const handleClick = (event: MouseEvent) => {
     event.stopPropagation()
     return
   }
-  
+
+  // URL validation helper (inlined for simplicity)
+  const isValid = (urlString: string): boolean => {
+    if (!urlString) return false
+    if (urlString.startsWith('/') || urlString.startsWith('./') || urlString.startsWith('../')) return true
+    if (urlString.startsWith('#')) return true
+    if (urlString.startsWith('mailto:') || urlString.startsWith('tel:')) return true
+    try {
+      new URL(urlString)
+      return true
+    } catch {
+      return false
+    }
+  }
+
   try {
-    // Validate URL before navigation
-    if (url.value && !isValidUrl(url.value)) {
+    if (url.value && typeof url.value === 'string' && !isValid(url.value)) {
       const error = new Error(`Invalid URL: ${url.value}`)
       emit('error', error)
       event.preventDefault()
       return
     }
     
+    // Emit click event first so listeners can prevent default if needed
     emit('click', event)
+
+    if (event.defaultPrevented) return
+
+    // Manual navigation for internal links
+    const isNormalClick = event.button === 0 && !event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey
+    
+    if (isInternal.value && isNormalClick && linkTarget.value !== '_blank' && url.value) {
+      event.preventDefault()
+      router.push(url.value as any)
+    }
   } catch (error) {
     emit('error', error as Error)
-    event.preventDefault()
   }
 }
 
@@ -198,51 +243,16 @@ const handleClick = (event: MouseEvent) => {
 const handleKeydown = (event: KeyboardEvent) => {
   if (props.disabled) return
   
-  // Use accessibility helper for keyboard navigation
   handleKeyboardNavigation(event, {
     Enter: (e) => {
-      e.preventDefault()
-      const clickEvent = new MouseEvent('click', {
-        bubbles: true,
-        cancelable: true
-      })
-      handleClick(clickEvent)
+      // Browser handles Enter on <a>
     },
     Space: (e) => {
       e.preventDefault()
-      const clickEvent = new MouseEvent('click', {
-        bubbles: true,
-        cancelable: true
-      })
-      handleClick(clickEvent)
+      const target = e.currentTarget as HTMLElement
+      target.click()
     }
   })
-}
-
-// URL validation helper
-const isValidUrl = (urlString: string): boolean => {
-  try {
-    // Handle relative paths
-    if (urlString.startsWith('/') || urlString.startsWith('./') || urlString.startsWith('../')) {
-      return true
-    }
-    
-    // Handle hash links
-    if (urlString.startsWith('#')) {
-      return true
-    }
-    
-    // Handle special protocols
-    if (urlString.startsWith('mailto:') || urlString.startsWith('tel:')) {
-      return true
-    }
-    
-    // Validate full URLs
-    new URL(urlString)
-    return true
-  } catch {
-    return false
-  }
 }
 </script>
 

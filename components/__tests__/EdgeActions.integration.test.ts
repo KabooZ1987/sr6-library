@@ -29,8 +29,7 @@ const mockEdgeActionsData = [
 
 // Mock the composables
 vi.mock('#app', () => ({
-  useAsyncData: (...args: any[]) => (global as any).useAsyncData(...args),
-  $fetch: (...args: any[]) => (global as any).$fetch(...args)
+  useAsyncData: (...args: any[]) => (global as any).useAsyncData(...args)
 }))
 
 vi.mock('#imports', () => ({

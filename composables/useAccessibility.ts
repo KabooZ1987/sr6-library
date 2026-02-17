@@ -192,7 +192,12 @@ export function useAccessibility(options: AccessibilityOptions = {}): Accessibil
   const handleKeyboardNavigation = (event: KeyboardEvent, handlers: KeyboardHandlers) => {
     if (!enableKeyboardNavigation) return
     
-    const handler = handlers[event.key as keyof KeyboardHandlers]
+    // Normalize keys
+    let key = event.key
+    if (key === ' ') key = 'Space'
+    if (key === 'Spacebar') key = 'Space'
+    
+    const handler = handlers[key as keyof KeyboardHandlers]
     if (handler) {
       handler(event)
     }

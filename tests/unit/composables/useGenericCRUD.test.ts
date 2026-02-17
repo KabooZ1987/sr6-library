@@ -3,8 +3,7 @@ import { useGenericCRUD } from '~/composables/useGenericCRUD'
 import { nextTick, ref } from 'vue'
 
 vi.mock('#app', () => ({
-  useAsyncData: vi.fn().mockImplementation((...args: any[]) => (global as any).useAsyncData(...args)),
-  $fetch: vi.fn().mockImplementation((...args: any[]) => (global as any).$fetch(...args))
+  useAsyncData: vi.fn().mockImplementation((...args: any[]) => (global as any).useAsyncData(...args))
 }))
 
 vi.mock('primevue/usetoast', () => ({
@@ -13,6 +12,10 @@ vi.mock('primevue/usetoast', () => ({
 
 vi.mock('primevue/useconfirm', () => ({
   useConfirm: () => (global as any).mockConfirm
+}))
+
+vi.mock('~/services/toastService', () => ({
+  useToastService: () => (global as any).mockToastService
 }))
 
 vi.mock('uuid', () => ({
@@ -28,7 +31,12 @@ describe('useGenericCRUD', () => {
       refresh: vi.fn()
     })
     ;(global as any).$fetch = vi.fn()
-    ;(global as any).mockToast = { add: vi.fn() }
+    ;(global as any).mockToastService = { 
+      success: vi.fn(),
+      error: vi.fn(),
+      warn: vi.fn(),
+      info: vi.fn()
+    }
     ;(global as any).mockConfirm = { require: vi.fn() }
   })
 

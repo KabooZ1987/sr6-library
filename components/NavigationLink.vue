@@ -8,6 +8,7 @@
     :aria-label="navigationAriaLabel"
     :aria-current="isActive ? 'page' : undefined"
     @click="handleNavClick"
+    @keydown="$emit('keydown', $event)"
     @error="handleError"
   >
     <slot />
@@ -15,8 +16,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, provide, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed, provide, watch, useSlots } from 'vue'
+import { useRoute, useRouter } from '#imports'
 import { useAccessibility } from '~/composables/useAccessibility'
 
 interface Props {
@@ -55,6 +56,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   click: [event: MouseEvent]
+  keydown: [event: KeyboardEvent]
   error: [error: Error]
   activate: [route: string]
   expand: [expanded: boolean]
@@ -85,27 +87,29 @@ const isActive = computed(() => {
   if (!navigationUrl.value || props.disabled) return false
   
   try {
-    const currentPath = route.path
-    const linkPath = navigationUrl.value
+    // Normalize paths by removing trailing slashes for comparison
+    const currentPath = route.path.replace(/\/$/, '') || '/'
+    const linkPath = String(navigationUrl.value).replace(/\/$/, '') || '/'
     
-    if (props.exact) {
-      // Exact match required
+    if (props.exact || linkPath === '/') {
       return currentPath === linkPath
-    } else {
-      // Partial match (useful for nested routes)
-      return currentPath.startsWith(linkPath) && linkPath !== '/'
     }
+    
+    // For non-exact, check if it's a sub-path
+    return currentPath.startsWith(linkPath + '/') || currentPath === linkPath
   } catch {
     return false
   }
 })
 
-// Check if this is an exact match (for different styling)
+// Check if this is an exact match
 const isExactActive = computed(() => {
   if (!navigationUrl.value || props.disabled) return false
   
   try {
-    return route.path === navigationUrl.value
+    const currentPath = route.path.replace(/\/$/, '') || '/'
+    const linkPath = String(navigationUrl.value).replace(/\/$/, '') || '/'
+    return currentPath === linkPath
   } catch {
     return false
   }
@@ -154,28 +158,37 @@ const navigationClasses = computed(() => {
   return classes
 })
 
+const slots = useSlots()
+
 // Enhanced aria-label for navigation context
 const navigationAriaLabel = computed(() => {
   if (props.ariaLabel) return props.ariaLabel
   
-  let label = ''
-  
-  // Add breadcrumb context
-  if (props.breadcrumbLabel) {
-    label += `${props.breadcrumbLabel}, `
+  // Helper to get text from slots
+  const getSlotText = () => {
+    const slotContent = slots.default?.()
+    if (!slotContent) return ''
+    
+    return slotContent
+      .map(vnode => {
+        if (typeof vnode.children === 'string') return vnode.children
+        return ''
+      })
+      .join('')
+      .trim()
   }
   
-  // Add active state context
-  if (isActive.value) {
-    label += 'current page, '
-  }
+  const linkText = getSlotText() || String(navigationUrl.value)
   
-  // Add nested navigation context
+  let label = isActive.value 
+    ? `${props.breadcrumbLabel || linkText}, current page`
+    : `Navigate to ${props.breadcrumbLabel || linkText}`
+    
   if (props.hasChildren) {
-    label += props.isExpanded ? 'expanded menu, ' : 'collapsed menu, '
+    label += props.isExpanded ? ', expanded menu' : ', collapsed menu'
   }
   
-  return label || undefined
+  return label
 })
 
 // Handle navigation clicks
@@ -203,12 +216,12 @@ const handleError = (error: Error) => {
   emit('error', error)
 }
 
-// Provide navigation context for nested components
-const navigationContext = {
+// Provide reactive navigation context for nested components
+const navigationContext = computed(() => ({
   isActive: isActive.value,
   isExactActive: isExactActive.value,
   level: (props.breadcrumbLevel || 0) + 1
-}
+}))
 
 // Make context available to child components
 provide('navigationContext', navigationContext)

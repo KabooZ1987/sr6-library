@@ -13,15 +13,24 @@ export class ToastService {
   private toast: ReturnType<typeof useToast> | null = null
 
   constructor() {
-    // Initialize toast in a composable context
-    if (process.client) {
-      this.toast = useToast()
-    }
+    // Initialization is deferred to getToast() or manual setToast()
+  }
+
+  setToast(instance: any) {
+    this.toast = instance
   }
 
   private getToast() {
     if (!this.toast && process.client) {
-      this.toast = useToast()
+      try {
+        this.toast = useToast()
+        if (!this.toast) {
+          console.warn('ToastService: useToast() returned null. Ensure Toast component is in your app.')
+        }
+      } catch (e) {
+        // useToast() must be called in a setup context
+        console.error('ToastService error: useToast must be called in a setup context. Ensure you call useToastService() inside <script setup>.')
+      }
     }
     return this.toast
   }
@@ -106,5 +115,18 @@ export const toastService = new ToastService()
 
 // Composable for easy use in components
 export function useToastService() {
+  if (process.client) {
+    try {
+      const toast = useToast()
+      if (toast) {
+        toastService.setToast(toast)
+      } else {
+        console.warn('useToastService: useToast() returned null. Toast may not show.')
+      }
+    } catch (e) {
+      // Gracefully handle if called outside of setup context
+      console.error('useToastService must be called in a setup context.')
+    }
+  }
   return toastService
 }
